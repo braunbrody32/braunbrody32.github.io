@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Conquer Stuff</title>
+    <style>
+        body { background: #000000; }
+        label { color: #ffffff}
+        canvas { border: 1px solid #ffffff; display: block; margin: 20px auto; background: #ffffff; }
+        p { color: #ffffff}
+    </style>
+    <link rel="icon" type="image/x-icon" href="../appimages/merca.png">
+</head>
+<body>
+<div style="text-align: center; margin: 10px;">
+<input type="file" id="upload" accept="image/*">
+<p>Upload image: White = Impassable, Black = Land</p>
+</div>
+
+<canvas id="map" width="1200" height="600"></canvas>
+
+<br><br><a href="../main.html">Go to home page.</a>
+
+<script>
+const gameMap = document.getElementById("map");
+const ctx = gameMap.getContext("2d");
+const size = 20;
+const rows = gameMap.height / size;
+const cols = gameMap.width / size;
+const upload = document.getElementById('upload');
+let seed = prompt("Game seed? (0-54)");
+
+let gamePaused = true
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max); 
+}
+
+let grid = Array.from({ length: rows }, (v, r) => 
+    Array.from({ length: cols }, (v, c) => new Land(c, r))
+);
+
+function Land(gridX, gridY) {
+    this.x = gridX;
+    this.y = gridY;
+    this.owner = 0; // 0: Neutral, 1: Red, 2: Blue, 3: Green, 4: yellow, 5: purple, 6: orange
+}
+
+let redStrength = 0.6;
+let blueStrength = 0.6;
+let greenStrength = 0.6;
+let yellowStrength = 0.6;
+let purpleStrength = 0.6;
+let orangeStrength = 0.6;
+
+capitalOnAnnex = "stay";
+
+let sx = seed;
+let sy = seed;
+if (seed > 29) {
+    sx = Math.floor(sx/2);
+}
+
+const redCapital = grid[sx][sy];
+const blueCapital = grid[Math.floor(sx/2)][Math.floor(sy/3)];
+const greenCapital = grid[Math.floor(sx*greenStrength/greenStrength)+1][Math.floor(sy/2)];
+const yellowCapital = grid[sx][sy/sx];
+const purpleCapital = grid[getRandomInt(30)][getRandomInt(59)];
+const orangeCapital = grid[getRandomInt(30)][getRandomInt(59)];
+
+const capitals = [0 ,redCapital, blueCapital, greenCapital, yellowCapital, purpleCapital, orangeCapital];
+redCapital.owner = 1;
+blueCapital.owner = 2;
+greenCapital.owner = 3;
+yellowCapital.owner = 4;
+purpleCapital.owner = 5;
+orangeCapital.owner = 6;
+
+function lake(lakex,lakey) {    
+    grid[lakex][lakey] = "impassable";
+    grid[lakex][lakey-1] = "impassable";
+    grid[lakex][lakey+1] = "impassable";
+    grid[lakex-1][lakey] = "impassable";
+    grid[lakex+1][lakey] = "impassable";
+    grid[lakex][lakey-2] = "impassable";
+    grid[lakex][lakey+2] = "impassable";
+    grid[lakex-2][lakey] = "impassable";
+    grid[lakex+2][lakey] = "impassable";
+    grid[lakex-1][lakey-1] = "impassable";
+    grid[lakex+1][lakey+1] = "impassable";
+    grid[lakex-1][lakey+1] = "impassable";
+    grid[lakex+1][lakey-1] = "impassable";
+}
+
+function diamond(dx,dy, owner) {    
+    grid[dx][dx] = owner;
+    grid[dx][dx-1] = owner;
+    grid[dx][dx+1] = owner;
+    grid[dx-1][dx] = owner;
+    grid[dx+1][dx] = owner;
+    grid[dx][dx-2] = owner;
+    grid[dx][dx+2] = owner;
+    grid[dx-2][dx] = owner;
+    grid[dx+2][dx] = owner;
+    grid[dx-1][dx-1] = owner;
+    grid[dx+1][dx+1] = owner;
+    grid[dx-1][dx+1] = owner;
+    grid[dx+1][dx-1] = owner;
+}
+
+let lastCell = { r: -1, c: -1 };
+let isMouseDown = false;
+
+gameMap.addEventListener('mousedown', (e) => {
+    isMouseDown = true;
+    updateMousePos(e);
+});
+
+window.addEventListener('mouseup', () => {
+    isMouseDown = false;
+    lastCell = { r: -1, c: -1 };
+});
+
+gameMap.addEventListener('mousemove', (e) => {
+    if (isMouseDown) updateMousePos(e);
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.code === 'Space') {
+    if (gamePaused === false) {gamePaused = true}
+    else {gamePaused = false}
+  }
+  let selected = 0;
+  if (event.code === '49') {
+    selected = 1;
+  }
+  if (event.code === '50') {
+    selected = 2;
+  }
+  if (event.code === '51') {
+    selected = 3;
+  }
+  if (event.code === '52') {
+    selected = 4;
+  }
+  if (event.code === '53') {
+    selected = 5;
+  }
+  if (event.code === '54') {
+    selected = 6;
+  }
+});
+
+
+function updateMousePos(e) {
+    const rect = gameMap.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const col = Math.floor(x / size);
+    const row = Math.floor(y / size);
+
+    if (row >= 0 && row < rows && col >= 0 && col < cols) {
+        if (lastCell.r !== row || lastCell.c !== col) {
+            const cell = grid[row][col];
+            cell.owner = selected;
+            lastCell = { r: row, c: col };
+        }
+    }
+}
+
+Land.prototype.update = function() {
+    if (this.owner === 0 || this.owner === "impassable") return;
+
+    const neighbors = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+    let [dx, dy] = neighbors[Math.floor(Math.random() * neighbors.length)];
+    
+    let nx = this.x + dx;
+    let ny = this.y + dy;
+    
+    if (capitalOnAnnex === "annex") {
+    if (redCapital.owner != 1) {
+        if (this.owner === 1) {
+            this.owner = redCapital.owner;
+        }
+    }
+    if (blueCapital.owner != 2) {
+        if (this.owner === 2) {
+            this.owner = blueCapital.owner;
+        }
+    }
+    if (greenCapital.owner != 3) {
+        if (this.owner === 3) {
+            this.owner = greenCapital.owner;
+        }
+    }
+    if (yellowCapital.owner != 4) {
+        if (this.owner === 4) {
+            this.owner = yellowCapital.owner;
+        }
+    }
+    if (purpleCapital.owner != 5) {
+        if (this.owner === 5) {
+            this.owner = purpleCapital.owner;
+        }
+    }
+    if (orangeCapital.owner != 6) {
+        if (this.owner === 6) {
+            this.owner = orangeCapital.owner;
+        }
+    }
+    }
+    if (capitalOnAnnex === "fall") {
+    if (redCapital.owner != 1) {
+        if (this.owner === 1) {
+            this.owner = 0;
+        }
+    }
+    if (blueCapital.owner != 2) {
+        if (this.owner === 2) {
+            this.owner = 0;
+        }
+    }
+    if (greenCapital.owner != 3) {
+        if (this.owner === 3) {
+            this.owner = 0;
+        }
+    }
+    if (yellowCapital.owner != 4) {
+        if (this.owner === 4) {
+            this.owner = 0;
+        }
+    }
+    if (purpleCapital.owner != 5) {
+        if (this.owner === 5) {
+            this.owner = 0;
+        }
+    }
+    if (orangeCapital.owner != 6) {
+        if (this.owner === 6) {
+            this.owner = 0;
+        }
+    }
+}
+
+if (gamePaused === false) {
+    if (ny >= 0 && ny < rows && nx >= 0 && nx < cols) {
+        let neighbor = grid[ny][nx];
+        if (neighbor instanceof Land && neighbor.owner !== "impassable" && neighbor.owner !== this.owner) {
+            if (this.owner === 1) {
+            if (Math.random() > redStrength) {
+                neighbor.owner = this.owner;
+            }
+            }
+            if (this.owner === 2) {
+            if (Math.random() > blueStrength) {
+                neighbor.owner = this.owner;
+            }
+            }
+            if (this.owner === 3) {
+            if (Math.random() > greenStrength) {
+                neighbor.owner = this.owner;
+            }
+            }
+            if (this.owner === 4) {
+            if (Math.random() > yellowStrength) {
+                neighbor.owner = this.owner;
+            }
+            }
+            if (this.owner === 5) {
+            if (Math.random() > purpleStrength) {
+                neighbor.owner = this.owner;
+            }
+            }
+            if (this.owner === 6) {
+            if (Math.random() > orangeStrength) {
+                neighbor.owner = this.owner;
+            }
+            }
+        }
+    }
+}
+}
+
+function relocateCapitals() {
+    capitals.forEach((cap, index) => {
+        if (index === 0) return;
+        let rx, ry;
+        do {
+            rx = getRandomInt(rows);
+            ry = getRandomInt(cols);
+        } while (grid[rx][ry].owner === "impassable");
+        
+        capitals[index] = grid[rx][ry];
+        capitals[index].owner = index;
+    });
+    for (let gx = 0; gx < 30; gx++) {
+        grid[gx][gy] = 0;
+        if (gx === 30) {
+            gy++;
+            gx = 0;
+        }
+    }
+}
+
+
+upload.addEventListener('change', function(e) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+            // Create a temporary canvas to read image data
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = cols;
+            tempCanvas.height = rows;
+
+            // Draw and resize image to match grid dimensions
+            tempCtx.drawImage(img, 0, 0, cols, rows);
+            const imgData = tempCtx.getImageData(0, 0, cols, rows).data;
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const i = (r * cols + c) * 4;
+                    const brightness = (imgData[i] + imgData[i+1] + imgData[i+2]) / 3;
+
+                    if (brightness > 180) {
+                        grid[r][c].owner = "impassable";
+                    } else {
+                        if (grid[r][c].owner === "impassable") grid[r][c].owner = 0;
+                    }
+                }
+            }
+            relocateCapitals(); 
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(e.target.files[0]);
+});
+
+function draw() {
+    ctx.clearRect(0, 0, gameMap.width, gameMap.height);
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            const cell = grid[r][c];
+            ctx.fillStyle = 
+                            cell.owner === 1 ? "red" : 
+                            cell.owner === 2 ? "blue" :
+                            cell.owner === 3 ? "green" :
+                            cell.owner === 4 ? "yellow" :
+                            cell.owner === 5 ? "purple" :
+                            cell.owner === 6 ? "orange" : "#333";
+            ctx.fillRect(c * size, r * size, size - 1, size - 1);
+        }
+    }
+
+    ctx.fillStyle = "white";
+    capitals.forEach(cap => {
+        ctx.beginPath();
+        const centerX = (cap.x * size) + (size / 2);
+        const centerY = (cap.y * size) + (size / 2);
+        const radius = size / 4;
+
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
+
+function gameLoop() {
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            if (grid[r][c] instanceof Land) {
+                grid[r][c].update();
+            }
+        }
+    }
+    draw();
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+
+</script>
+</body>
+</html>
