@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Civ 67 (Selection)</title>
+    <style>
+        @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+        }
+
+        body { 
+            display: flex; flex-direction: column; align-items: center; 
+            height: 100vh; margin: 0; background: #1a1a1a; color: #f0f0f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background-image: radial-gradient(circle at center, #1a1a1a, #353535, #7a4eb8);
+            animation-name: fadeIn;
+            animation-duration: 1s;
+            animation-fill-mode: forwards;
+        }
+        button { 
+            padding: 2px 6px; font-weight: bold; cursor: pointer; background: #5a2e98; color: white; 
+            border: 1px solid #7a4eb8; border-radius: 2px; transition: 0.2s; width: 30%; margin-bottom: 5px;
+        }
+        button:hover { background: #7a4eb8; }
+        button:disabled { background: #444; color: #888; border-color: #555; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <h2>Select Nation</h2>
+    <p id="country">n/a</p>
+    <label for="secret">Enter Code:</label>
+    <input type="text" id="secret" label="codes"><br>
+    <button type="button" id="america">America</button>
+    <button type="button" id="china">China</button>
+    <button type="button" id="germany">Germany</button>
+    <button type="button" id="japan">Japan</button>
+    <button type="button" id="rome">Rome</button>
+    <button type="button" id="france">France</button>
+    <button type="button" id="britain">Britain</button>
+    <button type="button" id="persia">Persia</button>
+    <button type="button" id="spain">Spain</button>
+    <button type="button" id="sweden">Sweden</button>
+    <button type="button" id="arabia">Arabia</button>
+    <button type="button" id="india">India</button>
+    <button type="button" id="brazil">Brazil</button>
+    <button type="button" id="greece">Greece</button>
+    <button type="button" id="russia">Russia</button>
+    <button type="button" id="start">Start Game</button>
+    <script>
+        localStorage.setItem("colormode", "Dark");
+        localStorage.setItem("p1team", "America");
+        const ct = document.getElementById('country')
+        function checkInput() {
+        const inputElement = document.getElementById("secret");
+        let inputValue = inputElement.value;
+        
+        if (inputValue === "ohio") {
+            ct.textContent = "Ohio";
+            localStorage.setItem("p1team", "Ohio");
+        }
+        if (inputValue === "lucapuca") {
+            ct.textContent = "LucaLand";
+            localStorage.setItem("p1team", "LucaLand");
+        }
+        if (inputValue === "lightmode") {
+            localStorage.setItem("colormode", "Light");
+        }
+        }
+        document.getElementById("america").addEventListener("click", function() {
+            ct.textContent = "America";
+            localStorage.setItem("p1team", "America");
+        });
+        document.getElementById("china").addEventListener("click", function() {
+            ct.textContent = "China";
+            localStorage.setItem("p1team", "China");
+        });
+        document.getElementById("germany").addEventListener("click", function() {
+            ct.textContent = "Germany";
+            localStorage.setItem("p1team", "Germany");
+        });
+        document.getElementById("japan").addEventListener("click", function() {
+            ct.textContent = "Japan";
+            localStorage.setItem("p1team", "Japan");
+        });
+        document.getElementById("france").addEventListener("click", function() {
+            ct.textContent = "France";
+            localStorage.setItem("p1team", "France");
+        });
+        document.getElementById("rome").addEventListener("click", function() {
+            ct.textContent = "Rome";
+            localStorage.setItem("p1team", "Rome");
+        });
+        document.getElementById("britain").addEventListener("click", function() {
+            ct.textContent = "Britain";
+            localStorage.setItem("p1team", "Britain       ");
+        });
+        document.getElementById("persia").addEventListener("click", function() {
+            ct.textContent = "Persia";
+            localStorage.setItem("p1team", "Persia");
+        });
+        document.getElementById("spain").addEventListener("click", function() {
+            ct.textContent = "Spain";
+            localStorage.setItem("p1team", "Spain");
+        });
+        document.getElementById("sweden").addEventListener("click", function() {
+            ct.textContent = "Sweden";
+            localStorage.setItem("p1team", "Sweden");
+        });
+        document.getElementById("arabia").addEventListener("click", function() {
+            ct.textContent = "Arabia";
+            localStorage.setItem("p1team", "Arabia");
+        });
+        document.getElementById("brazil").addEventListener("click", function() {
+            ct.textContent = "Brazil";
+            localStorage.setItem("p1team", "Brazil");
+        });
+        document.getElementById("india").addEventListener("click", function() {
+            ct.textContent = "India";
+            localStorage.setItem("p1team", "India");
+        });
+        document.getElementById("greece").addEventListener("click", function() {
+            ct.textContent = "Greece";
+            localStorage.setItem("p1team", "Greece");
+        });
+        document.getElementById("russia").addEventListener("click", function() {
+            ct.textContent = "Rusia";
+            localStorage.setItem("p1team", "Russia");
+        });
+        document.getElementById("start").addEventListener("click", function() {
+            window.location.href = "game.html";
+            checkInput();
+        });
+    </script>
+</body>
+</html>
