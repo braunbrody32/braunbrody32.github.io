@@ -58,7 +58,6 @@
 
         #end-turn-btn { background: #D6B913; border-color: #c0832e; font-size: 16px; padding: 12px; }
         #end-turn-btn:hover { background: #74640c; }
-
         select { width: 100%; padding: 5px; background: var(--c-color); color: var(--t-color); border: 1px solid var(--b-color); border-radius: 4px; }
         
         .controls-hint { font-size: 11px; color: #aaa; text-align: center; margin-bottom: -5px; }
@@ -78,11 +77,7 @@
     <div id="game-container">
         <canvas id="canvas" width="900" height="650"></canvas>
         <div id="sidebar">
-            <button onclick="nextTurn()">END TURN</button>
-            <button onclick="saveState()">Save</button>
-            <input type="file" id="json-upload" accept="downloads/json" />
-            <button onclick="loadandupdate()">Load and Update</button>
-
+            <button id="end-turn-btn" onclick="nextTurn()">END TURN</button>
             <div class="controls-hint">Scroll to Zoom • Right-Click + Drag to Pan</div>
             
             <div class="panel" id="research-panel">
@@ -138,90 +133,6 @@ if (colormode === "Light") {
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max); 
-}
-
-function downloadJSON(jsonObject, filename) {
-  // 1. Convert the JavaScript object to a JSON string
-  const jsonString = JSON.stringify(jsonObject, null, 2);
-
-  // 2. Create a Blob object with the JSON data and specify the MIME type
-  const blob = new Blob([jsonString], { type: 'application/json' });
-
-  // 3. Generate a temporary object URL for the blob
-  const url = URL.createObjectURL(blob);
-
-  // 4. Create an anchor element and set attributes
-  const anchorEl = document.createElement('a');
-  anchorEl.href = url;
-  anchorEl.download = filename;
-  anchorEl.style.display = 'none';
-
-  // 5. Append the anchor to the body (necessary for Firefox) and simulate a click
-  document.body.appendChild(anchorEl);
-  anchorEl.click();
-
-  // 6. Clean up: remove the anchor and revoke the object URL
-  document.body.removeChild(anchorEl);
-  URL.revokeObjectURL(url);
-}
-
-let jsVariables = {};
-
-document.getElementById('json-upload').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            // 1. Parse the uploaded JSON content into a JavaScript object
-            const jsonContent = JSON.parse(e.target.result);
-
-            // 2. Assign or merge the data with your existing JS variables
-            jsVariables = jsonContent; 
-        } catch (error) {
-            alert("Invalid JSON file");
-        }
-    };
-    // Read the file as plain text
-    reader.readAsText(file);
-});
-
-function updateData() {
-    if (jsVariables && jsVariables.hasOwnProperty('civ')) {
-        player.civ = jsVariables.civ;
-    }
-    if (jsVariables && jsVariables.hasOwnProperty('gold')) {
-        player.gold = jsVariables.gold;
-    }
-    if (jsVariables && jsVariables.hasOwnProperty('sciencePerTurn')) {
-        player.sciencePerTurn = jsVariables.sciencePerTurn;
-    }
-    if (jsVariables && jsVariables.hasOwnProperty('culturePerTurn')) {
-        player.culturePerTurn = jsVariables.culturePerTurn;
-    }
-    if (jsVariables && jsVariables.hasOwnProperty('techProgress')) {
-        player.techProgress = jsVariables.techProgress;
-    }
-    if (jsVariables && jsVariables.hasOwnProperty('currentTech')) {
-        player.currentTech = jsVariables.currentTech;
-    }
-    if (jsVariables && jsVariables.hasOwnProperty('unlockedTechs')) {
-        player.unlockedTechs = jsVariables.unlockedTechs;
-    }
-    if (jsVariables && jsVariables.hasOwnProperty('civicProgress')) {
-        player.civicProgress = jsVariables.civicProgress;
-    }
-    if (jsVariables && jsVariables.hasOwnProperty('currentCivic')) {
-        player.currentCivic = jsVariables.currentCivic;
-    }
-    if (jsVariables && jsVariables.hasOwnProperty('unlockedCivics')) {
-        player.unlockedCivics = jsVariables.unlockedCivics;
-    }
-}
-
-function loadandupdate() {
-    updateData();
 }
 
 if (true) {
@@ -349,7 +260,7 @@ const HEX_WIDTH = Math.sqrt(3) * HEX_RADIUS;
 const HEX_HEIGHT = 2 * HEX_RADIUS;
 
 const TERRAINS = {
-    WATER: { name: "Water", color: "#1e5b8a", weight: 0.2, gold: 1, science: 2, culture: 2, prod: 1, passable: false }, 
+    WATER: { name: "Water", color: "#1e5b8a", weight: 0.3, gold: 1, science: 2, culture: 2, prod: 1, passable: false }, 
     PLAINS: { name: "Plains", color: "#63a35c", weight: 0.5, gold: 1, science: 1, culture: 1, prod: 1, passable: true },
     FOREST: { name: "Forest", color: "#2d5a27", weight: 0.7, gold: 2, science: 1, culture: 1, prod: 2, passable: true },
     DESERT: { name: "Desert", color: "#d4b872", weight: 0.9, gold: 1, science: 2, culture: 2, prod: 1, passable: true },
@@ -451,10 +362,6 @@ function getCivName(ownerId) {
     return ownerId.replace("AI_", "");
 }
 
-function saveState() {
-    downloadJSON(player, 'player_data.civ67');
-}
-
 // --- INITIALIZATION ---
 function init() {
     initGrid(40, 30); 
@@ -504,30 +411,7 @@ function initGrid(cols, rows) {
 function nextTurn() {
     let totalSci = 0, totalCult = 0, totalGold = 0;
     
-    let rn = getRandomInt(10);
-    if (rn === 0) {
-        alert("Global Econimic Crash. :(");
-        player.gold -= 100;
-    }
-    if (rn === 1) {
-        alert("+2000000 social credit");
-        player.culturePerTurn += 50;
-    }
-    if (rn === 2) {
-        alert("smort");
-        player.sciencePerTurn += 50;
-    }
-    if (rn === 3) {
-        alert("Global Econimic Boost. :)");
-        player.gold += 100;
-    }
-    if (rn === 4) {
-        alert("Plague!");
-        player.gold -= 100;
-        player.sciencePerTurn -= 100;
-        player.culturePerTurn -= 100;
-    }
-
+    // Simulate AI relationships shifting
     processAIDiplomacy();
 
     cities.forEach(city => {
@@ -605,6 +489,24 @@ function nextTurn() {
     player.gold += totalGold; 
     player.sciencePerTurn = totalSci; 
     player.culturePerTurn = totalCult;
+
+    let rn = getRandomInt(10);
+    if (rn === 0) {
+        alert("Global Econimic Crash. :(")
+        player.gold -= 100;
+    }
+    if (rn === 1) {
+        alert("+2000000 social credit")
+        player.culturePerTurn += 50;
+    }
+    if (rn === 2) {
+        alert("smort")
+        player.sciencePerTurn += 50;
+    }
+    if (rn === 0) {
+        alert("Global Econimic Boost. :)")
+        player.gold += 100;
+    }
     
     processResearch();
     
