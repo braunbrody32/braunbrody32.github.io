@@ -428,10 +428,16 @@ function gameLoop() {
         }
     }
 
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 1+Math.floor(redTiles/1000); i++) {
         units.push(new Infantry(redSpawnX,redSpawnY,1));
+    }
+    for (let i = 0; i < 1+Math.floor(blueTiles/1000); i++) {
         units.push(new Infantry(blueSpawnX,blueSpawnY,2));
+    }
+    for (let i = 0; i < 1+Math.floor(greenTiles/1000); i++) {
         units.push(new Infantry(greenSpawnX,greenSpawnY,3));
+    }
+    for (let i = 0; i < 1+Math.floor(purpleTiles/1000); i++) {
         units.push(new Infantry(purpleSpawnX,purpleSpawnY,4));
     }
     for (let i = 0; i < 0; i++) {
