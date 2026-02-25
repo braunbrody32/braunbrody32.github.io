@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <title>Civ 67 (Main)</title>
     <style>
+        @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+        }
+
+        .animate {
+            animation-name: fadeOut;
+            animation-duration: 3s;
+            animation-fill-mode: forwards;
+        }
+
         body { 
             display: flex; flex-direction: column; align-items: center; 
             height: 100vh; margin: 0; background: #1a1a1a; color: #f0f0f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -23,15 +34,19 @@
         button:disabled { background: #444; color: #888; border-color: #555; cursor: not-allowed; }
     </style>
 </head>
-<body>
+<body id="body">
     <br><br><br><br><br><br><br><br>
     <h1 id="title">Civilization VI VII</h1>
     <br><br><br><br><br><br><br><br><br><br><br>
     <button type="button" id="start">Start Game</button>
     <button type="button" id="leave">Leave</button>
     <script>
+        let b = document.getElementById("body");
         document.getElementById("start").addEventListener("click", function() {
-            window.location.href = "nationenter.html";
+            b.classList.add('animate');
+            b.addEventListener('animationend', () => {
+                window.location.href = "nationenter.html";
+            }, { once: true });
         });
         document.getElementById("leave").addEventListener("click", function() {
             window.location.href = "../index.html";
