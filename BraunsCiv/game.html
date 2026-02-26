@@ -490,7 +490,7 @@ function nextTurn() {
     player.sciencePerTurn = totalSci; 
     player.culturePerTurn = totalCult;
 
-    let rn = getRandomInt(10);
+    let rn = getRandomInt(20);
     if (rn === 0) {
         alert("Global Econimic Crash. :(")
         player.gold -= 100;
@@ -503,7 +503,7 @@ function nextTurn() {
         alert("smort")
         player.sciencePerTurn += 50;
     }
-    if (rn === 0) {
+    if (rn === 3) {
         alert("Global Econimic Boost. :)")
         player.gold += 100;
     }
