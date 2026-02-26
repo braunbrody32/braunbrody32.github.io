@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BraunCode Editor v4</title>
+    <style>
+        :root {
+            --bg: #1e1e1e;
+            --header-bg: #2d2d2d;
+            --accent: #4931b4;
+            --keyword: #e1319e;
+            --bracket: #4931b4;
+            --string: #cebd78;
+            --comment: #6a9955;
+            --number: #6c99dd; 
+        }
+
+        body { margin: 0; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: var(--bg); color: white; }
+        header { padding: 10px; background: var(--header-bg); display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #444; }
+        main { display: flex; flex: 1; overflow: hidden; }
+
+        #editor-container { flex: 1; position: relative; overflow: hidden; background: var(--bg); }
+        
+        #editor, #highlight-layer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            line-height: 1.5;
+            tab-size: 4;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: none;
+            margin: 0;
+        }
+
+        #editor {
+            z-index: 2;
+            background: transparent;
+            color: transparent;
+            caret-color: white;
+            resize: none;
+            outline: none;
+        }
+
+        #highlight-layer {
+            z-index: 1;
+            color: #d4d4d4;
+            pointer-events: none;
+            overflow-y: auto;
+        }
+
+        /* Syntax Colors */
+        .hl-keyword { color: var(--keyword); font-weight: bold; }
+        .hl-bracket { color: var(--bracket); }
+        .hl-string  { color: var(--string); }
+        .hl-comment { color: var(--comment); font-style: italic; }
+        .hl-number  { color: var(--number); }
+        .hl-logic   { color: #ff9d00; font-weight: bold; }
+
+        #preview { flex: 1; background: #fff; border-left: 2px solid #444; position: relative; }
+        canvas { background: white; width: 100%; height: 100%; }
+
+        button, label { background: var(--accent); color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 3px; font-size: 14px; }
+        button:hover { background: #005f99; }
+        input[type="file"] { display: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <strong>BraunCode v4</strong>
+    <button onclick="runCode()">▶ Run</button>
+    <button onclick="saveFile()">💾 Save</button>
+    <label for="load-file">📂 Load</label>
+    <a href="../main.html">Go to home page.</a>
+    <input type="file" id="load-file" onchange="loadFile(event)">
+</header>
+
+<main>
+    <div id="editor-container">
+        <div id="highlight-layer"></div>
+        <textarea id="editor" spellcheck="false" oninput="updateHighlight()" onscroll="syncScroll()">
+/* Define a custom object */
+object Player() {
+    this.x = 200;
+    this.y = 200;
+    this.size = 40;
+}
+
+/* Create an instance of the object */
+var p = new Player();
+var moving = "true";
+
+func draw() {
+    clear(); 
+
+    if (keyDown("w")) { 
+        p.y = p.y - 5; 
+    }
+    if (keyDown("s")) { 
+        p.y = p.y + 5; 
+    }
+    if (keyDown("a")) { 
+        p.x = p.x - 5; 
+    }
+    if (keyDown("d")) { 
+        p.x = p.x + 5; 
+    }
+
+    rect(p.x, p.y, p.size, p.size, "purple");
+}</textarea>
+    </div>
+    
+    <div id="preview">
+        <canvas id="outputCanvas"></canvas>
+    </div>
+</main>
+
+<script>
+    const editor = document.getElementById('editor');
+    const highlightLayer = document.getElementById('highlight-layer');
+    const canvas = document.getElementById('outputCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // --- SYNTAX HIGHLIGHTING ENGINE ---
+    function updateHighlight() {
+        let code = editor.value;
+        code = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        code = code.replace(/\/\*[\s\S]*?\*\//g, '<span class="hl-comment">$&</span>');
+        code = code.replace(/"[^"]*"/g, '<span class="hl-string">$&</span>');
+        code = code.replace(/\b(var|func|if|else|repeat|return|object|new)\b/g, '<span class="hl-keyword">$1</span>');
+        code = code.replace(/[\{\}\(\)\[\]]/g, '<span class="hl-bracket">$&</span>');
+        // Highlight logical operators
+        code = code.replace(/[&|!]/g, '<span class="hl-logic">$&</span>');
+        code = code.replace(/\b\d+\b/g, '<span class="hl-number">$&</span>');
+
+        highlightLayer.innerHTML = code + "\n";
+    }
+
+    function syncScroll() {
+        highlightLayer.scrollTop = editor.scrollTop;
+        highlightLayer.scrollLeft = editor.scrollLeft;
+    }
+
+    editor.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+            this.selectionStart = this.selectionEnd = start + 4;
+            updateHighlight();
+        }
+    });
+
+    // --- COMPILER & RUNTIME ---
+    const keys = {};
+    window.addEventListener('keydown', (e) => keys[e.key] = true);
+    window.addEventListener('keyup', (e) => keys[e.key] = false);
+
+    function compile(code) {
+        let js = code;
+
+        js = js.replace(/object\s+(\w+)\(\)\s*\{/g, 'function $1() {');
+
+        js = js.replace(/&/g, '&&');
+        js = js.replace(/\|/g, '||');
+
+        js = js.replace(/var\s+(\w+)\s*=\s*([^;]+);/g, 'let $1 = $2;');
+        js = js.replace(/func\s+(\w+)\(([^)]*)\)\s*\{/g, 'function $1($2) {');
+        let loopCount = 0;
+        js = js.replace(/repeat\(([^)]+)\)\s*\{/g, (m, t) => `for(let _i${loopCount++}=0; _i${loopCount-1}<${t}; _i${loopCount-1}++){`);
+        js = js.replace(/circle\(([^,]+),([^,]+),([^,]+),([^)]+)\);/g, 'ctx.beginPath(); ctx.arc($1,$2,$3,0,Math.PI*2); ctx.fillStyle=$4; ctx.fill();');
+        js = js.replace(/rect\(([^,]+),([^,]+),([^,]+),([^,]+),([^)]+)\);/g, 'ctx.fillStyle=$5; ctx.fillRect($1,$2,$3,$4);');
+        
+        return js;
+    }
+
+    let animationId = null;
+    function runCode() {
+        if (animationId) cancelAnimationFrame(animationId);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        try {
+            const clear = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const keyDown = (k) => !!keys[k];
+            const compiled = compile(editor.value);
+            const runEnv = new Function('ctx', 'clear', 'keyDown', compiled + '\nreturn typeof draw !== "undefined" ? draw : null;');
+            const userDraw = runEnv(ctx, clear, keyDown);
+            if (userDraw) {
+                const loop = () => { userDraw(); animationId = requestAnimationFrame(loop); };
+                loop();
+            }
+        } catch (err) { console.error(err); }
+    }
+
+    function saveFile() {
+        const blob = new Blob([editor.value], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.download = 'logic.bc';
+        a.href = URL.createObjectURL(blob);
+        a.click();
+    }
+
+    function loadFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => { editor.value = e.target.result; updateHighlight(); };
+        reader.readAsText(file);
+    }
+
+    window.addEventListener('resize', () => { canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; });
+    canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
+    updateHighlight();
+    runCode();
+</script>
+</body>
+</html>

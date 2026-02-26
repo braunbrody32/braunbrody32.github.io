@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Braun Visual Studio</title>
+    <style>
+        :root {
+            --bg: #1a1a1a; --side: #252526; --accent: #3498db;
+            --node: #333; --text: #eee; --dot: #e67e22; --bool: #2ecc71; --magenta: #ff00ff;
+        }
+        body, html { margin: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+        
+        .app-container { display: flex; height: 100vh; width: 100vw; }
+
+        #sidebar { width: 240px; min-width: 240px; background: var(--side); padding: 15px; border-right: 1px solid #444; overflow-y: auto; z-index: 10; }
+        
+        #workspace { 
+            flex: 1; position: relative; background: #222; overflow: hidden; 
+            background-image: radial-gradient(#333 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        #selection-box { position: absolute; border: 1px dashed #3498db; background: rgba(52, 152, 219, 0.2); z-index: 100; pointer-events: none; display: none; }
+
+        #resizer { width: 8px; cursor: col-resize; background: #111; border-left: 1px solid #444; border-right: 1px solid #444; z-index: 20; transition: background 0.2s; }
+        #resizer:hover { background: var(--accent); }
+
+        #output-area { 
+            width: 350px; min-width: 100px; background: #000; padding: 10px; 
+            display: flex; flex-direction: column; align-items: center; border-left: 1px solid #444; z-index: 10; 
+        }
+        
+        #outputCanvas { background: white; width: 100%; aspect-ratio: 1/1; border-radius: 4px; }
+
+        #view-layer { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+        #node-container { position: absolute; z-index: 2; }
+        #svg-layer { position: absolute; top: 0; left: 0; overflow: visible; pointer-events: none; z-index: 1; }
+
+        .section-hd { font-size: 10px; color: #888; text-transform: uppercase; margin: 15px 0 5px; letter-spacing: 1px; }
+        .menu-btn { 
+            width: 100%; padding: 8px; margin-bottom: 5px; background: var(--node); 
+            border: 1px solid #555; color: white; cursor: pointer; border-radius: 4px; text-align: left; font-size: 12px;
+        }
+        .menu-btn:hover { background: #444; border-color: var(--accent); }
+        .save-btn { background: #27ae60; margin-top: 10px; }
+        
+        #debug-log { font-size: 10px; color: #888; text-align: left; margin-top: 10px; padding: 5px; background: #111; height: 100px; width: 100%; overflow-y: auto; font-family: monospace; white-space: pre-wrap; box-sizing: border-box;}
+
+        .node { position: absolute; background: var(--node); border-radius: 6px; min-width: 160px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 10; border: 1px solid #444; pointer-events: all; }
+        .node.selected { border: 2px solid #f1c40f !important; box-shadow: 0 0 15px rgba(241, 196, 15, 0.4) !important; }
+
+        .node-hdr { padding: 6px 10px; border-radius: 5px 5px 0 0; cursor: move; font-size: 11px; font-weight: bold; background: var(--accent); color: white; display: flex; justify-content: space-between; align-items: center; }
+        .del-btn { cursor: pointer; color: #fff; background: rgba(0,0,0,0.2); padding: 0 5px; border-radius: 3px; font-size: 12px; }
+        .del-btn:hover { background: #e74c3c; }
+        
+        .node-body { padding: 10px; font-size: 12px; }
+        .port-row { display: flex; justify-content: space-between; align-items: center; margin: 6px 0; position: relative; }
+        
+        input, select { background: #000; border: 1px solid #555; color: white; width: 75px; border-radius: 3px; font-size: 11px; padding: 2px; }
+        .dot { width: 10px; height: 10px; background: var(--dot); border-radius: 50%; position: absolute; cursor: crosshair; border: 2px solid #222; }
+        .dot.in { left: -16px; }
+        .dot.out { right: -16px; }
+        .dot.bool { background: var(--bool); }
+        .dot.color-dot { background: var(--magenta); }
+
+        .graph-cvs { background: #111; width: 100%; height: 60px; border-radius: 3px; border: 1px solid #444; margin-top: 5px; display: block; }
+
+        path.line { fill: none; stroke: var(--dot); stroke-width: 3; stroke-linecap: round; }
+        path.line.bool-wire { stroke: var(--bool); }
+        path.line.color-wire { stroke: var(--magenta); }
+        .d-val { color: #f1c40f; font-weight: bold; font-family: monospace; }
+        .var-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div id="sidebar">
+        <h3>Logic Studio</h3>
+        <div class="section-hd">Project</div>
+        <button class="menu-btn save-btn" onclick="saveProject()">💾 Download Save</button>
+        <button class="menu-btn" onclick="document.getElementById('fileInput').click()">📂 Load File</button>
+        <a href="../main.html">Go to home page.</a>
+        <input type="file" id="fileInput" style="display:none" onchange="loadProject(event)">
+
+        <div class="section-hd">Automation & Math</div>
+        <button class="menu-btn" onclick="spawnNode('clock')">Clock / Timer</button>
+        <button class="menu-btn" onclick="spawnNode('mathConstants')">Math Constants</button>
+        <button class="menu-btn" onclick="spawnNode('mathAdvanced')">Advanced Math (!, exp)</button>
+        <button class="menu-btn" onclick="spawnNode('graph')">Grapher</button>
+        
+        <div class="section-hd">Logic & Input</div>
+        <button class="menu-btn" onclick="spawnNode('numConst')">Constant Number</button>
+        <button class="menu-btn" onclick="spawnNode('boolConst')">Constant Boolean</button>
+        <button class="menu-btn" onclick="spawnNode('math')">Basic Math</button>
+        <button class="menu-btn" onclick="spawnNode('mouseMove')">Mouse Position</button>
+        <button class="menu-btn" onclick="spawnNode('keyInput')">Key Pressed</button>
+        <button class="menu-btn" onclick="spawnNode('compare')">Compare</button>
+        <button class="menu-btn" onclick="spawnNode('if')">If Gate</button>
+
+        <div class="section-hd">Variables</div>
+        <div id="var-editor"><button class="menu-btn" style="background:var(--accent)" onclick="addVariable()">+ New Variable</button><div id="var-list"></div></div>
+        <button class="menu-btn" onclick="spawnNode('getVar')">Get Var</button>
+        <button class="menu-btn" onclick="spawnNode('setVar')">Set Var</button>
+        <button class="menu-btn" onclick="spawnNode('changeVar')">Add Var</button>
+
+        <div class="section-hd">Drawing</div>
+        <button class="menu-btn" onclick="spawnNode('numberOut')">Display Value</button>
+        <button class="menu-btn" onclick="spawnNode('drawRect')">Rectangle</button>
+        <button class="menu-btn" onclick="spawnNode('drawCircle')">Circle</button>
+        <button class="menu-btn" onclick="spawnNode('colorMix')">Color Mixer</button>
+    </div>
+
+    <div id="workspace">
+        <div id="selection-box"></div>
+        <div id="view-layer">
+            <svg id="svg-layer"></svg>
+            <div id="node-container"></div>
+        </div>
+    </div>
+
+    <div id="resizer"></div>
+
+    <div id="output-area">
+        <canvas id="outputCanvas" width="600" height="600"></canvas>
+        <div id="debug-log">System Ready</div>
+    </div>
+</div>
+
+<script>
+    const workspace = document.getElementById('workspace'), viewLayer = document.getElementById('view-layer');
+    const container = document.getElementById('node-container'), svg = document.getElementById('svg-layer');
+    const canvas = document.getElementById('outputCanvas'), ctx = canvas.getContext('2d');
+    const debugLog = document.getElementById('debug-log'), resizer = document.getElementById('resizer'), outputArea = document.getElementById('output-area');
+    const selectionBox = document.getElementById('selection-box');
+    
+    let zoom = 1, panX = 0, panY = 0;
+    let nodes = [], wires = [], variableStorage = { score: 0 }, graphHistory = {};
+    let wireStartDot = null, tempPath = null;
+    let isPanning = false, isResizing = false;
+    const inputState = { mouseX: 0, mouseY: 0, keys: {} };
+
+    // Selection & Drag State
+    let selectedNodes = new Set(), initialSelection = new Set();
+    let isBoxSelecting = false, isDraggingNodes = false;
+    let selStart = { x: 0, y: 0 };
+
+    resizer.addEventListener('mousedown', () => isResizing = true);
+
+    workspace.addEventListener('wheel', e => {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? 0.9 : 1.1;
+        const newZoom = Math.min(Math.max(0.1, zoom * delta), 5);
+        const rect = workspace.getBoundingClientRect();
+        panX = (e.clientX - rect.left) - ((e.clientX - rect.left) - panX) * (newZoom / zoom);
+        panY = (e.clientY - rect.top) - ((e.clientY - rect.top) - panY) * (newZoom / zoom);
+        zoom = newZoom; updateTransform();
+    });
+
+    workspace.addEventListener('mousedown', e => { 
+        if (e.button === 2 || (e.button === 0 && inputState.keys[' '])) { 
+            isPanning = true; workspace.style.cursor = 'grabbing'; 
+        } else if (e.button === 0 && !e.target.closest('.node') && !e.target.closest('.dot')) {
+            isBoxSelecting = true;
+            if (!e.shiftKey) clearSelection();
+            initialSelection = new Set(selectedNodes);
+            const rect = workspace.getBoundingClientRect();
+            selStart = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+            selectionBox.style.left = selStart.x + 'px';
+            selectionBox.style.top = selStart.y + 'px';
+            selectionBox.style.width = '0px';
+            selectionBox.style.height = '0px';
+            selectionBox.style.display = 'block';
+        }
+    });
+    
+    window.addEventListener('mousemove', e => {
+        if (isResizing) { outputArea.style.width = Math.max(100, window.innerWidth - e.clientX) + 'px'; return; }
+        const rect = canvas.getBoundingClientRect();
+        inputState.mouseX = (e.clientX - rect.left) * (600 / rect.width);
+        inputState.mouseY = (e.clientY - rect.top) * (600 / rect.height);
+        
+        if (isPanning) { panX += e.movementX; panY += e.movementY; updateTransform(); }
+        
+        if (isDraggingNodes) {
+            selectedNodes.forEach(nid => {
+                const n = nodes.find(x => x.id === nid);
+                if (n) {
+                    const curX = parseFloat(n.el.style.left) || 0;
+                    const curY = parseFloat(n.el.style.top) || 0;
+                    n.el.style.left = (curX + e.movementX / zoom) + 'px';
+                    n.el.style.top = (curY + e.movementY / zoom) + 'px';
+                }
+            });
+            updateWires();
+        } else if (isBoxSelecting) {
+            const wRect = workspace.getBoundingClientRect();
+            const curX = e.clientX - wRect.left;
+            const curY = e.clientY - wRect.top;
+            const minX = Math.min(selStart.x, curX);
+            const maxX = Math.max(selStart.x, curX);
+            const minY = Math.min(selStart.y, curY);
+            const maxY = Math.max(selStart.y, curY);
+            
+            selectionBox.style.left = minX + 'px';
+            selectionBox.style.top = minY + 'px';
+            selectionBox.style.width = (maxX - minX) + 'px';
+            selectionBox.style.height = (maxY - minY) + 'px';
+
+            const boxRect = selectionBox.getBoundingClientRect();
+            nodes.forEach(n => {
+                const nRect = n.el.getBoundingClientRect();
+                const inBox = (nRect.left < boxRect.right && nRect.right > boxRect.left && nRect.top < boxRect.bottom && nRect.bottom > boxRect.top);
+                
+                if (inBox) {
+                    selectedNodes.add(n.id);
+                    n.el.classList.add('selected');
+                } else {
+                    if (!initialSelection.has(n.id)) {
+                        selectedNodes.delete(n.id);
+                        n.el.classList.remove('selected');
+                    }
+                }
+            });
+        }
+
+        if (wireStartDot && tempPath) {
+            const p1 = getCenter(wireStartDot), rectW = workspace.getBoundingClientRect();
+            tempPath.setAttribute("d", `M ${p1.x} ${p1.y} L ${(e.clientX - rectW.left - panX) / zoom} ${(e.clientY - rectW.top - panY) / zoom}`);
+        }
+    });
+
+    window.addEventListener('mouseup', () => { 
+        isPanning = isResizing = isDraggingNodes = false; 
+        if (isBoxSelecting) { isBoxSelecting = false; selectionBox.style.display = 'none'; }
+        wireStartDot = null; 
+        if (tempPath) { tempPath.remove(); tempPath = null; }
+        workspace.style.cursor = 'default'; 
+    });
+
+    workspace.addEventListener('contextmenu', e => e.preventDefault());
+
+    function clearSelection() {
+        selectedNodes.forEach(nid => { const n = nodes.find(x => x.id === nid); if (n) n.el.classList.remove('selected'); });
+        selectedNodes.clear();
+    }
+
+    function updateTransform() { viewLayer.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`; workspace.style.backgroundPosition = `${panX}px ${panY}px`; workspace.style.backgroundSize = `${20 * zoom}px ${20 * zoom}px`; }
+
+    function factorial(n) { if (n < 0) return 0; let res = 1; for (let i = 2; i <= Math.min(n, 170); i++) res *= i; return res; }
+
+    function spawnNode(type, x = null, y = null, savedId = null) {
+        const id = savedId || 'n' + Date.now() + Math.random().toString(36).substr(2, 5);
+        const el = document.createElement('div');
+        el.className = 'node'; el.id = id;
+        
+        if(x === null || y === null) {
+            const rect = workspace.getBoundingClientRect();
+            el.style.left = ((rect.width/2 - panX) / zoom - 80) + 'px';
+            el.style.top = ((rect.height/2 - panY) / zoom - 40) + 'px';
+        } else {
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+        }
+
+        let html = `<div class="node-hdr"><span>${type}</span><span class="del-btn" onclick="deleteNode('${id}')">×</span></div><div class="node-body">`;
+        switch(type) {
+            case 'clock': html += `Time Data:<div class="port-row">Secs <div class="dot out" data-port="s"></div></div><div class="port-row">Sin Wave <div class="dot out" data-port="sin"></div></div>`; break;
+            case 'numConst': html += `Value: <input type="number" class="val" value="10"><div class="port-row">Out <div class="dot out" data-port="out"></div></div>`; break;
+            case 'mathConstants': html += `Pick: <select class="op"><option value="pi">π (PI)</option><option value="e">e (Euler)</option><option value="phi">φ (Golden)</option><option value="sq2">√2</option></select><div class="port-row">Val <div class="dot out" data-port="out"></div></div>`; break;
+            case 'mathAdvanced': html += `Op:<select class="op" style="width:85px"><option value="pow">A ^ B</option><option value="abs">Abs(A)</option><option value="fact">Factorial(A!)</option><option value="sin">Sin(A)</option><option value="cos">Cos(A)</option><option value="log">Log(A)</option><option value="sqrt">Sqrt(A)</option></select><div class="port-row"><div class="dot in" data-port="a"></div> A</div><div class="port-row"><div class="dot in" data-port="b"></div> B</div><div class="port-row">Out <div class="dot out" data-port="out"></div></div>`; break;
+            case 'graph': html += `<div class="port-row"><div class="dot in" data-port="in"></div> Stream</div><canvas class="graph-cvs" width="140" height="60"></canvas>`; break;
+            case 'boolConst': html += `<select class="val"><option value="1">True</option><option value="0">False</option></select><div class="port-row">Out <div class="dot out bool" data-port="out"></div></div>`; break;
+            case 'numberOut': html += `<div class="port-row"><div class="dot in" data-port="in"></div> Display: <span class="d-val">0</span></div>`; break;
+            case 'getVar': html += `Var: <select class="var-name"></select><div class="port-row">Val <div class="dot out" data-port="out"></div></div>`; break;
+            case 'setVar': html += `Var: <select class="var-name"></select><div class="port-row"><div class="dot in" data-port="val"></div> Input</div>`; break;
+            case 'changeVar': html += `Var: <select class="var-name"></select><div class="port-row"><div class="dot in" data-port="val"></div> Add</div>`; break;
+            case 'math': html += `<div class="port-row"><div class="dot in" data-port="a"></div> A <select class="op"><option>+</option><option>-</option><option>*</option><option>/</option><option>%</option></select></div><div class="port-row"><div class="dot in" data-port="b"></div> B</div><div class="port-row">Out <div class="dot out" data-port="out"></div></div>`; break;
+            case 'drawRect': html += `<div class="port-row"><div class="dot in" data-port="x"></div> X</div><div class="port-row"><div class="dot in" data-port="y"></div> Y</div><div class="port-row"><div class="dot in color-dot" data-port="color"></div> Color</div>`; break;
+            case 'mouseMove': html += `<div class="port-row">X <div class="dot out" data-port="x"></div></div><div class="port-row">Y <div class="dot out" data-port="y"></div></div>`; break;
+            case 'drawCircle': html += `<div class="port-row"><div class="dot in" data-port="x"></div> X</div><div class="port-row"><div class="dot in" data-port="y"></div> Y</div><div class="port-row"><div class="dot in color-dot" data-port="color"></div> Color</div>`; break;
+            case 'colorMix': html += `<div class="port-row"><div class="dot in" data-port="r"></div> R</div><div class="port-row"><div class="dot in" data-port="g"></div> G</div><div class="port-row"><div class="dot in" data-port="b"></div> B</div><div class="port-row">Color <div class="dot out color-dot" data-port="out"></div></div>`; break;
+            case 'keyInput': html += `Key: <input type="text" value="w" class="key" style="width:30px"><div class="port-row">Pressed <div class="dot out bool" data-port="out"></div></div>`; break;
+            case 'if': html += `<div class="port-row"><div class="dot in bool" data-port="cond"></div> If</div><div class="port-row"><div class="dot in" data-port="val"></div> Then <div class="dot out" data-port="out"></div></div>`; break;
+            case 'compare': html += `<div class="port-row"><div class="dot in" data-port="a"></div> A <select class="op"><option>></option><option><</option><option>==</option></select></div><div class="port-row"><div class="dot in" data-port="b"></div> B</div><div class="port-row">Bool <div class="dot out bool" data-port="out"></div></div>`; break;
+        }
+        html += `</div>`;
+        el.innerHTML = html; container.appendChild(el); nodes.push({ id, type, el });
+        initNodeEvents(el); updateVarUI();
+        
+        if(type === 'graph') graphHistory[id] = new Array(50).fill(0);
+        return el;
+    }
+
+    function initNodeEvents(el) {
+        const id = el.id;
+        el.querySelector('.node-hdr').onmousedown = (e) => {
+            if(e.target.classList.contains('del-btn')) return;
+            e.stopPropagation();
+            if (e.shiftKey) {
+                if (selectedNodes.has(id)) {
+                    selectedNodes.delete(id); el.classList.remove('selected');
+                } else {
+                    selectedNodes.add(id); el.classList.add('selected');
+                }
+            } else {
+                if (!selectedNodes.has(id)) {
+                    clearSelection();
+                    selectedNodes.add(id); el.classList.add('selected');
+                }
+            }
+            isDraggingNodes = true;
+        };
+        el.querySelectorAll('.dot').forEach(dot => {
+            dot.onmousedown = (e) => {
+                e.stopPropagation(); wireStartDot = dot;
+                tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                tempPath.setAttribute("class", "line " + (dot.classList.contains('bool') ? "bool-wire " : "") + (dot.classList.contains('color-dot') ? "color-wire" : ""));
+                svg.appendChild(tempPath);
+            };
+            dot.onmouseup = (e) => {
+                e.stopPropagation();
+                if (wireStartDot && wireStartDot !== dot && wireStartDot.classList.contains('out') && dot.classList.contains('in')) {
+                    wires = wires.filter(w => w.to === dot ? (w.path.remove(), false) : true); 
+                    wires.push({ from: wireStartDot, to: dot, path: tempPath }); tempPath = null; updateWires();
+                }
+            };
+        });
+    }
+
+    function getCenter(el) {
+        const rect = el.getBoundingClientRect();
+        const viewRect = viewLayer.getBoundingClientRect();
+        return { x: (rect.left - viewRect.left) / zoom + (rect.width / 2) / zoom, y: (rect.top - viewRect.top) / zoom + (rect.height / 2) / zoom };
+    }
+
+    function updateWires() {
+        wires.forEach(w => {
+            const p1 = getCenter(w.from), p2 = getCenter(w.to);
+            const dx = Math.abs(p1.x - p2.x) * 0.5;
+            w.path.setAttribute("d", `M ${p1.x} ${p1.y} C ${p1.x + dx} ${p1.y}, ${p2.x - dx} ${p2.y}, ${p2.x} ${p2.y}`);
+        });
+    }
+
+    function getInVal(nodeId, port, fallback = 0) {
+        const wire = wires.find(w => w.to.closest('.node').id === nodeId && w.to.dataset.port === port);
+        return wire ? evaluateNode(wire.from.closest('.node').id, wire.from.dataset.port) : fallback;
+    }
+
+    function evaluateNode(id, port) {
+        const n = nodes.find(x => x.id === id); if (!n) return 0;
+        switch(n.type) {
+            case 'clock': return port === 's' ? (Date.now() / 1000) % 60 : Math.sin(Date.now() / 500);
+            case 'mathConstants':
+                const c = n.el.querySelector('.op').value;
+                return c === 'pi' ? Math.PI : c === 'e' ? Math.E : c === 'phi' ? 1.61803398 : Math.SQRT2;
+            case 'mathAdvanced':
+                const advA = getInVal(id, 'a'), advB = getInVal(id, 'b'), advOp = n.el.querySelector('.op').value;
+                switch(advOp) { case 'pow': return Math.pow(advA, advB); case 'abs': return Math.abs(advA); case 'fact': return factorial(advA); case 'sin': return Math.sin(advA); case 'cos': return Math.cos(advA); case 'log': return Math.log(advA); default: return Math.sqrt(advA); }
+            case 'numConst': return parseFloat(n.el.querySelector('.val').value) || 0;
+            case 'boolConst': return n.el.querySelector('.val').value === "1";
+            case 'getVar': return variableStorage[n.el.querySelector('.var-name').value] || 0;
+            case 'mouseMove': return port === 'x' ? inputState.mouseX : inputState.mouseY;
+            case 'keyInput': return !!inputState.keys[n.el.querySelector('.key').value];
+            case 'math':
+                const ma = getInVal(id, 'a'), mb = getInVal(id, 'b'), op = n.el.querySelector('.op').value;
+                if(op === '+') return ma + mb; if(op === '-') return ma - mb; if(op === '*') return ma * mb; if(op === '/') return ma / mb; return ma % mb;
+            case 'colorMix': return `rgb(${getInVal(id, 'r', 255)},${getInVal(id, 'g', 0)},${getInVal(id, 'b', 0)})`;
+            case 'compare':
+                const ca = getInVal(id, 'a'), cb = getInVal(id, 'b'), cop = n.el.querySelector('.op').value;
+                if(cop === '>') return ca > cb; if(cop === '<') return ca < cb; return ca == cb;
+            case 'if': return getInVal(id, 'cond', false) ? getInVal(id, 'val') : 0;
+            default: return 0;
+        }
+    }
+
+    function deleteNode(nodeId) {
+        const nodeIdx = nodes.findIndex(n => n.id === nodeId);
+        if (nodeIdx === -1) return;
+        wires = wires.filter(w => {
+            const isConnected = w.from.closest('.node').id === nodeId || w.to.closest('.node').id === nodeId;
+            if (isConnected) w.path.remove();
+            return !isConnected;
+        });
+        nodes[nodeIdx].el.remove();
+        nodes.splice(nodeIdx, 1);
+        selectedNodes.delete(nodeId);
+    }
+
+    function duplicateSelected() {
+        if (selectedNodes.size === 0) return;
+        const oldToNew = {};
+        const newlySelected = new Set();
+        
+        selectedNodes.forEach(nid => {
+            const n = nodes.find(x => x.id === nid);
+            if (!n) return;
+            const curX = parseFloat(n.el.style.left);
+            const curY = parseFloat(n.el.style.top);
+            
+            spawnNode(n.type, curX + 30, curY + 30);
+            const newN = nodes[nodes.length - 1]; 
+            oldToNew[nid] = newN.id;
+            newlySelected.add(newN.id);
+            
+            if (n.type === 'graph') graphHistory[newN.id] = [...graphHistory[nid]];
+
+            const oldInputs = n.el.querySelectorAll('input, select');
+            const newInputs = newN.el.querySelectorAll('input, select');
+            oldInputs.forEach((inp, idx) => { if(newInputs[idx]) newInputs[idx].value = inp.value; });
+        });
+        
+        // Reconnect internal wires
+        wires.forEach(w => {
+            const fromId = w.from.closest('.node').id, toId = w.to.closest('.node').id;
+            if (oldToNew[fromId] && oldToNew[toId]) {
+                const newFromNode = document.getElementById(oldToNew[fromId]);
+                const newToNode = document.getElementById(oldToNew[toId]);
+                const newFromDot = newFromNode.querySelector(`.dot.out[data-port="${w.from.dataset.port}"]`);
+                const newToDot = newToNode.querySelector(`.dot.in[data-port="${w.to.dataset.port}"]`);
+                
+                if (newFromDot && newToDot) {
+                    const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    p.setAttribute("class", "line " + (newFromDot.classList.contains('bool') ? "bool-wire " : "") + (newFromDot.classList.contains('color-dot') ? "color-wire" : ""));
+                    svg.appendChild(p);
+                    wires.push({ from: newFromDot, to: newToDot, path: p });
+                }
+            }
+        });
+        
+        clearSelection();
+        newlySelected.forEach(nid => { selectedNodes.add(nid); document.getElementById(nid).classList.add('selected'); });
+        updateWires();
+    }
+    
+    function saveProject() {
+        const data = {
+            vars: variableStorage,
+            nodes: nodes.map(n => ({ id: n.id, type: n.type, x: parseFloat(n.el.style.left), y: parseFloat(n.el.style.top), vals: Array.from(n.el.querySelectorAll('input, select')).map(i => i.value) })),
+            wires: wires.map(w => ({ fromNode: w.from.closest('.node').id, fromPort: w.from.dataset.port, toNode: w.to.closest('.node').id, toPort: w.to.dataset.port }))
+        };
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], {type: 'application/json'}));
+        a.download = 'project.bvc'; a.click();
+    }
+
+    function loadProject(e) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const data = JSON.parse(ev.target.result);
+            nodes.forEach(n => n.el.remove()); wires.forEach(w => w.path.remove());
+            nodes = []; wires = []; variableStorage = data.vars;
+            data.nodes.forEach(dn => {
+                const el = spawnNode(dn.type, dn.x, dn.y, dn.id);
+                const inputs = el.querySelectorAll('input, select');
+                dn.vals.forEach((v, i) => { if(inputs[i]) inputs[i].value = v; });
+            });
+            data.wires.forEach(dw => {
+                const f = document.querySelector(`#${dw.fromNode} .dot.out[data-port="${dw.fromPort}"]`);
+                const t = document.querySelector(`#${dw.toNode} .dot.in[data-port="${dw.toPort}"]`);
+                if(f && t) {
+                    const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    p.setAttribute("class", "line " + (f.classList.contains('bool') ? "bool-wire" : ""));
+                    svg.appendChild(p); wires.push({ from: f, to: t, path: p });
+                }
+            });
+            updateVarUI(); updateWires();
+        };
+        reader.readAsText(e.target.files[0]);
+    }
+
+    function addVariable() { let n = prompt("Var Name:"); if(n) { variableStorage[n] = 0; updateVarUI(); } }
+    function updateVarUI() {
+        const list = document.getElementById('var-list'); list.innerHTML = '';
+        for (let k in variableStorage) {
+            const r = document.createElement('div'); r.className='var-row';
+            r.innerHTML = `<span style="font-size:10px">${k}</span><input type="number" value="${variableStorage[k]}" onchange="variableStorage['${k}']=parseFloat(this.value)">`;
+            list.appendChild(r);
+        }
+        document.querySelectorAll('select.var-name').forEach(s => {
+            const v = s.value; s.innerHTML = Object.keys(variableStorage).map(k=>`<option value="${k}">${k}</option>`).join('');
+            if(variableStorage[v] !== undefined) s.value = v;
+        });
+    }
+
+    window.addEventListener('keydown', e => { 
+        inputState.keys[e.key] = true; 
+        
+        // Prevent deleting/duplicating if user is typing in a text or number box
+        if (e.target.matches('input, select')) return;
+
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+            selectedNodes.forEach(nid => deleteNode(nid));
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+            e.preventDefault();
+            duplicateSelected();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+            e.preventDefault();
+            nodes.forEach(n => { selectedNodes.add(n.id); n.el.classList.add('selected'); });
+        }
+    });
+    window.addEventListener('keyup', e => inputState.keys[e.key] = false);
+
+    function loop() {
+        nodes.forEach(n => {
+            if (n.type === 'setVar') variableStorage[n.el.querySelector('.var-name').value] = getInVal(n.id, 'val');
+            if (n.type === 'changeVar') variableStorage[n.el.querySelector('.var-name').value] += getInVal(n.id, 'val');
+        });
+        
+        ctx.clearRect(0, 0, 600, 600);
+        
+        nodes.forEach(n => {
+            if (n.type === 'drawRect' || n.type === 'drawCircle') {
+                ctx.fillStyle = getInVal(n.id, 'color', '#3498db');
+                const x = getInVal(n.id, 'x', 50), y = getInVal(n.id, 'y', 50);
+                if(n.type === 'drawRect') ctx.fillRect(x, y, 50, 50);
+                else { ctx.beginPath(); ctx.arc(x, y, 25, 0, Math.PI*2); ctx.fill(); }
+            }
+            if (n.type === 'numberOut') {
+                const val = getInVal(n.id, 'in');
+                n.el.querySelector('.d-val').innerText = (typeof val === 'number') ? val.toFixed(2) : val;
+            }
+            if (n.type === 'graph') {
+                const val = getInVal(n.id, 'in'), history = graphHistory[n.id];
+                const gcvs = n.el.querySelector('canvas'), gctx = gcvs.getContext('2d');
+                history.push(val); history.shift(); 
+                gctx.clearRect(0, 0, 140, 60); 
+                gctx.strokeStyle = '#e67e22'; gctx.beginPath();
+                const max = Math.max(...history, 1), min = Math.min(...history, -1), range = (max - min) || 1;
+                history.forEach((v, i) => { 
+                    const x = (i/50)*140, y = 60 - ((v - min)/range)*60; 
+                    i===0 ? gctx.moveTo(x,y) : gctx.lineTo(x,y); 
+                }); 
+                gctx.stroke();
+            }
+        });
+        
+        debugLog.innerText = `Zoom: ${zoom.toFixed(2)} | Pan: ${panX.toFixed(0)},${panY.toFixed(0)}\nSelected Nodes: ${selectedNodes.size}\nVars: ${JSON.stringify(variableStorage)}`;
+        requestAnimationFrame(loop);
+    }
+
+    updateTransform(); loop();
+</script>
+</body>
+</html>

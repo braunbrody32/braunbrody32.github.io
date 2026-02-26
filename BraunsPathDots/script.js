@@ -2,7 +2,7 @@ const gameMap = document.getElementById("map");
 const ctx = gameMap.getContext("2d");
 const scoreElement = document.getElementById("score");
 
-const song = prompt("Song?");
+const song = prompt("Song? (6: National Anthem)");
 
 let score = 0;
 let missed = 0;
