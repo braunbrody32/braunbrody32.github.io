@@ -25,6 +25,7 @@
             animation-name: fadeIn;
             animation-duration: 20s;
             animation-fill-mode: forwards;
+            padding-top: 60px;
         }
         #game-container { display: flex; flex-direction: row; margin-top: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
         canvas { background-color: var(--secondary-color); cursor: crosshair; border-radius: 5px 0 0 5px; }
@@ -61,9 +62,50 @@
         select { width: 100%; padding: 5px; background: var(--c-color); color: var(--t-color); border: 1px solid var(--b-color); border-radius: 4px; }
         
         .controls-hint { font-size: 11px; color: #aaa; text-align: center; margin-bottom: -5px; }
+        
+        .modal {
+        display: none;
+        position: fixed;
+        z-index: 10;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%; 
+        background-color: rgba(0,0,0,0.7);
+        justify-content: center;
+        align-items: center;
+        }
+
+        .modal-content {
+        background-color: #000000;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        border-radius: 10px;
+        text-align: center;
+        }
+
+        .close-btn {
+        color: #ffffff;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
+    <div id="customAlertModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAlert()">&times;</span>
+        <h2 id="alertTitle"></h2>
+        <p id="alertMessage"></p>
+        <button onclick="closeAlert()">OK</button>
+    </div>
+    </div>
+
     <div id="ui-top">
         <div id="turn-display" style="font-size: 20px; font-weight: bold;">TURN 1</div>
         <div id="stats">
@@ -113,6 +155,18 @@
         </div>
     </div>
 <script>
+function showAlert(title, message) {
+    const modal = document.getElementById('customAlertModal');
+    document.getElementById('alertTitle').textContent = title;
+    document.getElementById('alertMessage').textContent = message;
+    modal.style.display = 'flex';
+}
+
+function closeAlert() {
+    const modal = document.getElementById('customAlertModal');
+    modal.style.display = 'none';
+}
+
 let playerCiv = localStorage.getItem("p1team");
 
 let colormode = localStorage.getItem("colormode");
@@ -259,23 +313,23 @@ const HEX_RADIUS = 30;
 const HEX_WIDTH = Math.sqrt(3) * HEX_RADIUS;
 const HEX_HEIGHT = 2 * HEX_RADIUS;
 
-const TERRAINS = {
-    WATER: { name: "Water", color: "#1e5b8a", weight: 0.3, gold: 1, science: 2, culture: 2, prod: 1, passable: false }, 
-    PLAINS: { name: "Plains", color: "#63a35c", weight: 0.5, gold: 1, science: 1, culture: 1, prod: 1, passable: true },
-    FOREST: { name: "Forest", color: "#2d5a27", weight: 0.7, gold: 2, science: 1, culture: 1, prod: 2, passable: true },
+let TERRAINS = {
+    WATER: { name: "Water", color: "#1e5b8a", weight: 0.5, gold: 1, science: 2, culture: 2, prod: 1, passable: false }, 
+    PLAINS: { name: "Plains", color: "#63a35c", weight: 0.7, gold: 1, science: 1, culture: 1, prod: 1, passable: true },
+    FOREST: { name: "Forest", color: "#2d5a27", weight: 0.8, gold: 2, science: 1, culture: 1, prod: 2, passable: true },
     DESERT: { name: "Desert", color: "#d4b872", weight: 0.9, gold: 1, science: 2, culture: 2, prod: 1, passable: true },
     MOUNTAIN: { name: "Mountain", color: "#555555", weight: 1.0, gold: 1, science: 2, culture: 0, prod: 1, passable: false } 
 };
 
 let regen = 10;
 const UNIT_TYPES = {
-    "Settler": { hp: 100, mp: 3, str: 0, cost: 60, icon: "🧑‍🌾" },
+    "Settler": { hp: 100, mp: 3, str: 1, cost: 60, icon: "🧑‍🌾" },
     "Scout": { hp: 100, mp: 3, str: 10, cost: 20, icon: "😶‍🌫️" },
     "Warrior": { hp: 100, mp: 2, str: 20, cost: 30, icon: "😡" },
     "Archer": { hp: 100, mp: 2, str: 25, cost: 40, reqTech: "Archery", icon: "🏹" },
     "Swordsman": { hp: 100, mp: 2, str: 30, cost: 60, reqTech: "Bronze Working", icon: "⚔️" },
     "Horsemen": { hp: 100, mp: 4, str: 40, cost: 70, reqTech: "Horses", icon: "🐎" },
-    "Knight": { hp: 100, mp: 5, str: 60, cost: 100, reqTech: "Knighting", icon: "🏇" }
+    "Knight": { hp: 100, mp: 3, str: 65, cost: 90, reqTech: "Knighting", icon: "🏇" }
 };
 
 const TECHS = {
@@ -284,6 +338,7 @@ const TECHS = {
     "Archery": { cost: 70, req: "Pottery", unlocks: "Archer" },
     "Bronze Working": { cost: 120, req: "Mining", unlocks: "Swordsman" },
     "Iron Working": { cost: 120, req: "Bronze Working" },
+    "Sailing": { cost: 200, req: "Iron Working" },
     "Field Hospital": { cost: 190, req: "Iron Working", bonus: { regen: 10} },
     "Horses": { cost: 140, req: "Archery", unlocks: "Horsemen", bonus: { mp: 1 }, desc: "All units +1 Movement" },
     "Knighting": { cost: 200, req: "Horses", req: "Iron Working", unlocks: "Knight", bonus: { culture: 2 }, desc: "+2 Culture per turn" }
@@ -301,7 +356,7 @@ const CIVICS = {
 const CIV_DATA = {
     "America": { trait: "Manifest Destiny", description: "+2 Gold from all tiles", apply: (stats) => { stats.gold += 2; }, color: "rgba(48, 96, 207, 0.3)", border: "#3060CF", names: ["Washington", "New York", "Chicago", "Boston", "Philadelphia", "San Francisco", "Los Angeles", "Atlanta", "Houston", "Seattle", "St. Louis", "Detroit", "New Orleans", "Baltimore", "Denver", "Dallas", "Portland", "Cincinnati", "Miami", "Phoenix", "Nashville", "Las Vegas", "Salt Lake City", "Honolulu", "Anchorage", "Buffalo", "San Diego", "Memphis", "Orlando", "Austin"] },
     "Ohio": { trait: "Only in Ohio", description: "+2 Production from all tiles", apply: (stats) => { stats.production += 2; }, color: "rgba(222, 157, 100, 0.3)", border: "#DE9D64", names: ["Columbus", "Cleveland", "Cincinnati", "Toledo", "Arken", "Daton", "Parma", "Canton", "Lorain", "Hamilton", "Youngstown", "Springfield", "Kettering", "Elrya", "Cuyahoga Falls", "Middletown", "Lakewood", "Nework", "Eulucid", "Dublin", "Mansfield", "Mentor", "Beaver Creek", "Strongsville", "Fairfield", "Huber Heights", "Delaware", "Grove City"] },
-    "LucaLand": { trait: "Puca", description: "+2 Production from all tiles", apply: (stats) => { stats.production += 2; }, color: "rgba(222, 157, 100, 0.3)", border: "#DE9D64", names: ["Luca", "Margot", "Da Stad van de Boederji", "Gloria", "St. Louis", "Room 212"] },
+    "LucaLand": { trait: "Puca", description: "+2 Production from all tiles", apply: (stats) => { stats.production += 2; }, color: "rgba(222, 157, 100, 0.3)", border: "#DE9D64", names: ["Luca", "Margot", "Da Stad van de Boederji", "Gloria", "St. Louis", "Room 200"] },
     "China": { trait: "Dynastic Cycle", description: "+1 Science from all tiles", apply: (stats) => { stats.science += 1; }, color: "rgba(255, 68, 68, 0.3)", border: "#ff4444", names: ["Xi'an", "Beijing", "Shanghai", "Guangzhou", "Nanjing", "Chengdu", "Hangzhou", "Wuhan", "Shenyang", "Chongqing", "Tianjin", "Kunming", "Changsha", "Xining", "Hefei", "Luoyang", "Kaifeng", "Suzhou", "Jinan", "Fuzhou", "Harbin", "Taiyuan", "Nanning", "Lanzhou", "Urumqi", "Guiyang", "Hohhot", "Haikou", "Zhengzhou", "Sanya"] },
     "Rome": { trait: "All Roads Lead to Rome", description: "+1 Gold from all tiles", apply: (stats) => { stats.gold += 1; }, color: "rgba(128, 0, 32, 0.3)", border: "#800020", names: ["Rome", "Antium", "Cumae", "Ravenna", "Neapolis", "Mediolanum", "Lugdunum", "Lutetia", "Arretium", "Tarentum", "Brundisium", "Ancona", "Genua", "Ostia", "Puteoli", "Aquileia", "Verona", "Salernum", "Syracuse", "Arpinum", "Velitrae", "Capua", "Beneventum", "Tibur", "Pompeii", "Herculaneum", "Veii", "Ostia", "Corfinium", "Viterbo"] },
     "Japan": { trait: "Meiji Restoration", description: "+1 Science from all tiles", apply: (stats) => { stats.science += 1; }, color: "rgba(212, 204, 167, 0.3)", border: "#D4CCA7", names: ["Kyoto", "Tokyo", "Osaka", "Nagoya", "Yokohama", "Fukuoka", "Sapporo", "Hiroshima", "Sendai", "Nara", "Kobe", "Okayama", "Kanazawa", "Kagoshima", "Matsuyama", "Kumamoto", "Niigata", "Sakai", "Hamamatsu", "Shizuoka", "Sagamihara", "Chiba", "Otsu", "Koshigaya", "Nagano", "Morioka", "Aomori", "Akita", "Toyama", "Kochi"] },
@@ -321,7 +376,7 @@ const CIV_DATA = {
 let aiCiv = "Brazil";
 
 // --- DIPLOMACY STATE ---
-const FACTIONS = ["Player 1", "AI_China", "AI_Rome", "AI_Japan", "AI_France"];
+const FACTIONS = ["Player 1", "AI_1", "AI_2", "AI_3", "AI_4"];
 let diplomacy = {};
 FACTIONS.forEach(f1 => {
     diplomacy[f1] = {};
@@ -349,41 +404,100 @@ let turnCount = 1;
 let camera = { x: 0, y: 0, zoom: 1 };
 let isDragging = false;
 
+let rcv;
+function getRandomCiv() {
+    let rc = getRandomInt(15);
+    if (rc === 0) {rcv = "America"}
+    else if (rc === 1) {rcv = "China"}
+    else if (rc === 2) {rcv = "Germany"}
+    else if (rc === 3) {rcv = "France"}
+    else if (rc === 4) {rcv = "Rome"}
+    else if (rc === 5) {rcv = "Japan"}
+    else if (rc === 6) {rcv = "Brazil"}
+    else if (rc === 7) {rcv = "Spain"}
+    else if (rc === 8) {rcv = "Sweden"}
+    else if (rc === 9) {rcv = "India"}
+    else if (rc === 10) {rcv = "Persia"}
+    else if (rc === 11) {rcv = "Arabia"}
+    else if (rc === 12) {rcv = "Britain"}
+    else if (rc === 13) {rcv = "Greece"}
+    else if (rc === 14) {rcv = "Russia"}
+}
+
+getRandomCiv();
+let ai1c = rcv;
+getRandomCiv();
+let ai2c = rcv;
+getRandomCiv();
+let ai3c = rcv;
+getRandomCiv();
+let ai4c = rcv;
+
 function getCivKey(ownerId) {
+    if (ai1c === ai2c || ai1c === ai3c || ai1c === ai4c || ai1c === playerCiv) {
+        getRandomCiv();
+        let ai1c = rcv;
+    }
+    if (ai2c === ai1c || ai2c === ai3c || ai2c === ai4c || ai2c === playerCiv) {
+        getRandomCiv();
+        let ai2c = rcv;
+    }
+    if (ai3c === ai2c || ai3c === ai1c || ai3c === ai4c || ai3c === playerCiv) {
+        getRandomCiv();
+        let ai3c = rcv;
+    }
+    if (ai4c === ai2c || ai4c === ai3c || ai4c === ai1c || ai4c === playerCiv) {
+        getRandomCiv();
+        let ai4c = rcv;
+    }
     if (ownerId === "Player 1") return player.civ;
-    if (ownerId === "AI_China") return "China";
-    if (ownerId === "AI_Rome") return "Rome";
-    if (ownerId === "AI_Japan") return "Japan";
-    if (ownerId === "AI_France") return "France";
+    if (ownerId === "AI_1") return ai1c;
+    if (ownerId === "AI_2") return ai2c;
+    if (ownerId === "AI_3") return ai3c;
+    if (ownerId === "AI_4") return ai4c;
     return "Germany";
 }
 
 function getCivName(ownerId) {
-    return ownerId.replace("AI_", "");
+    if (ownerId === "AI_1") {ownerId=ai1c;}
+    if (ownerId === "AI_2") {ownerId=ai2c;}
+    if (ownerId === "AI_3") {ownerId=ai3c;}
+    if (ownerId === "AI_4") {ownerId=ai4c;}
+    return ownerId
 }
 
 // --- INITIALIZATION ---
 function init() {
     initGrid(40, 30); 
     
-    spawnUnit(3, 3, "Player 1", "Settler");
-    spawnUnit(3, 4, "Player 1", "Warrior");
+    let i = 5;
+    let z = 5;
+    spawnUnit(i, z, "Player 1", "Settler");
+    spawnUnit(i, z+1, "Player 1", "Warrior");
     
-    const startTile = grid[3][3];
+    const startTile = grid[i][z];
     camera.x = -startTile.x + canvas.width / 2;
     camera.y = -startTile.y + canvas.height / 2;
 
-    spawnUnit(5, 30, "AI_China", "Settler");
-    spawnUnit(5, 29, "AI_China", "Warrior");
+    i = 7;
+    z = 7;
+    spawnUnit(i, z, "AI_1", "Settler");
+    spawnUnit(i, z+1, "AI_1", "Warrior");
 
-    spawnUnit(25, 5, "AI_Rome", "Settler");
-    spawnUnit(25, 6, "AI_Rome", "Warrior");
+    i = 9;
+    z = 9;
+    spawnUnit(i, z, "AI_2", "Settler");
+    spawnUnit(i, z+1, "AI_2", "Warrior");
 
-    spawnUnit(25, 30, "AI_Japan", "Settler");
-    spawnUnit(25, 29, "AI_Japan", "Warrior");
+    i = 11;
+    z = 11;
+    spawnUnit(i, z, "AI_3", "Settler");
+    spawnUnit(i, z+1, "AI_3", "Warrior");
 
-    spawnUnit(12, 15, "AI_France", "Settler");
-    spawnUnit(12, 16, "AI_France", "Warrior");
+    i = 13;
+    z = 13;
+    spawnUnit(i, z, "AI_4", "Settler");
+    spawnUnit(i, z+1, "AI_4", "Warrior");
 
     populateDropdowns();
     updateUI();
@@ -401,18 +515,23 @@ function initGrid(cols, rows) {
             if (rand < TERRAINS.WATER.weight) typeKey = "WATER";
             else if (rand < TERRAINS.PLAINS.weight) typeKey = "PLAINS";
             else if (rand < TERRAINS.FOREST.weight) typeKey = "FOREST";
-            else if (rand < TERRAINS.DESERT.weight) typeKey = "DESERT";
+            else if (rand < TERRAINS.DESERT.weight) typeKey = "DESERT";;
             grid[r][c] = { r, c, x, y, terrain: TERRAINS[typeKey], city: null, owner: null };
         }
     }
 }
 
+let ad = 10;
+
 // --- CORE LOGIC ---
 function nextTurn() {
+    ad++;
     let totalSci = 0, totalCult = 0, totalGold = 0;
     
     // Simulate AI relationships shifting
     processAIDiplomacy();
+
+    if (player.unlockedTechs.includes("Sailing")) TERRAINS.WATER.passable = true;
 
     cities.forEach(city => {
         let cityProd = 0;
@@ -442,6 +561,12 @@ function nextTurn() {
                     totalGold += tileStats.gold; 
                     totalSci += tileStats.science; 
                     totalCult += tileStats.culture;
+                }
+                if (city.owner !== "Player 1") {
+                    cityProd += 3;
+                }
+                if (city.name === city.name[0]) {
+                    cityProd += 3;
                 }
                 cityProd += (tileStats.prod + tileStats.production);
             }
@@ -489,22 +614,22 @@ function nextTurn() {
     player.gold += totalGold; 
     player.sciencePerTurn = totalSci; 
     player.culturePerTurn = totalCult;
-
+    
     let rn = getRandomInt(20);
     if (rn === 0) {
-        alert("Global Econimic Crash. :(")
+        showAlert("Global Economic Crash. :(", "Every one has lost all their money gambaling.")
         player.gold -= 100;
     }
     if (rn === 1) {
-        alert("+2000000 social credit")
+        showAlert("+2000000 Social Credit", "Ur sooooooo tuff.")
         player.culturePerTurn += 50;
     }
     if (rn === 2) {
-        alert("smort")
+        showAlert("Smort", "Big brain activities.")
         player.sciencePerTurn += 50;
     }
     if (rn === 3) {
-        alert("Global Econimic Boost. :)")
+        showAlert("Global Economic Boost. :(", "Every one got a lot of money gambaling.")
         player.gold += 100;
     }
     
@@ -530,7 +655,7 @@ function nextTurn() {
 }
 
 function processAIDiplomacy() {
-    const aiPlayers = ["AI_China", "AI_Rome", "AI_Japan", "AI_France"];
+    const aiPlayers = ["AI_1", "AI_2", "AI_3", "AI_4"];
     aiPlayers.forEach(ai1 => {
         FACTIONS.forEach(ai2 => {
             if (ai1 !== ai2 && ai2 !== "Player 1") { // AIs declare war on AIs randomly
@@ -557,6 +682,7 @@ function processResearch() {
             
             player.techProgress = 0; 
             player.currentTech = null;
+            showAlert('Discovery: '+unlocked+' has been researched!',"You unlocked a new tech, choose a new one.");
         }
     }
     
@@ -575,7 +701,7 @@ function processResearch() {
 }
 
 function runAILogic() {
-    const aiPlayers = ["AI_China", "AI_Rome", "AI_Japan", "AI_France"];
+    const aiPlayers = ["AI_1", "AI_2", "AI_3", "AI_4"];
 
     aiPlayers.forEach(aiOwner => {
         const aiUnits = units.filter(u => u.owner === aiOwner);
@@ -797,15 +923,17 @@ canvas.addEventListener('dblclick', (e) => {
     }
 });
 
-// --- UI UPDATES ---
 function toggleDiplomacy(ai) {
-    const currentStatus = diplomacy["Player 1"][ai];
-    const newStatus = currentStatus === "War" ? "Peace" : "War";
-    diplomacy["Player 1"][ai] = newStatus;
-    diplomacy[ai]["Player 1"] = newStatus;
+    if (ad >= 10) {
+        const currentStatus = diplomacy["Player 1"][ai];
+        const newStatus = currentStatus === "War" ? "Peace" : "War";
+        diplomacy["Player 1"][ai] = newStatus;
+        diplomacy[ai]["Player 1"] = newStatus;
     
-    logEvent(`You declared ${newStatus} with ${getCivName(ai)}.`);
-    updateUI();
+        logEvent(`You declared ${newStatus} with ${getCivName(ai)}.`);
+        updateUI();
+        fd = 0;
+    }
 }
 
 function populateDropdowns() {
@@ -854,7 +982,7 @@ function updateUI() {
     const logHtml = newsLog.map(msg => `<div style="color:#aaa; font-size:11px;">${msg}</div>`).join("");
     diploDiv.innerHTML += `<div style="margin-bottom: 10px; padding: 5px; background: #222; border-radius: 3px;"><strong>World News:</strong><br>${logHtml}</div>`;
 
-    const aiPlayers = ["AI_China", "AI_Rome", "AI_Japan", "AI_France"];
+    const aiPlayers = ["AI_1", "AI_2", "AI_3", "AI_4"];
     aiPlayers.forEach(ai => {
         const aiName = getCivName(ai);
         const status = diplomacy["Player 1"][ai];
