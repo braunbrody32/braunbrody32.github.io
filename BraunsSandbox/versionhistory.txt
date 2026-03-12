@@ -6,3 +6,4 @@ Version 1.4.0: oil, wood, ash
 Version 1.4.1: acid, oil lag fix
 Version 1.5.1: anti powder,liquid,gas and cloner fix
 Version 1.5.2: bomb
+Version 1.6.0: 20 new elements (snow, ice, lava, obsidian, glass, gunpowder, fuse, tnt, rubber, sponge, smoke, toxic gas, virus, salt, saltwater, concrete, cooler, methane, mud, plasma); acid now properly dissolves materials; oil now correctly floats on water
