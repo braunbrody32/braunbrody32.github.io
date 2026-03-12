@@ -1,40 +1,84 @@
 body { background-color: #000000; color: white; text-align: center; }
 canvas { border: 1px solid #ffffff; display: block; margin: 20px auto; background: #111; }
-#erase { background-color: red; color: white; padding: 10px; cursor: pointer; }
-#dirt { background-color: brown; color: white; padding: 10px; cursor: pointer; }
-#sand { background-color: rgb(221, 186, 141); color: white; padding: 10px; cursor: pointer; }
-#stone { background-color: rgb(99, 99, 99); color: white; padding: 10px; cursor: pointer; }
+
+/* === Tools === */
+#erase      { background-color: red; color: white; padding: 10px; cursor: pointer; }
+#save       { background-color: #cc00ff; color: white; padding: 10px; cursor: pointer; }
+#load       { background-color: #cc00ff; color: white; padding: 10px; cursor: pointer; display: inline-block; }
+
+/* === Powders === */
+#dirt       { background-color: brown; color: white; padding: 10px; cursor: pointer; }
+#sand       { background-color: rgb(221, 186, 141); color: white; padding: 10px; cursor: pointer; }
+#ash        { background-color: rgb(136, 136, 136); color: white; padding: 10px; cursor: pointer; }
+#snow       { background-color: #E8F0FF; color: #333; padding: 10px; cursor: pointer; }
+#salt       { background-color: #F0F0F0; color: #333; padding: 10px; cursor: pointer; }
+#gunpowder  { background-color: #2f2f2f; color: white; padding: 10px; cursor: pointer; }
+#mud        { background-color: #4a2c00; color: white; padding: 10px; cursor: pointer; }
 #antipowder { background-color: rgb(255, 0, 225); color: rgb(0, 0, 0); padding: 10px; cursor: pointer; }
+#charcoal   { background-color: #1a1a1a; color: #aaa; padding: 10px; cursor: pointer; border: 1px solid #444; }
+#sulfur     { background-color: #c8b400; color: #111; padding: 10px; cursor: pointer; }
+#coal       { background-color: #111111; color: #888; padding: 10px; cursor: pointer; border: 1px solid #333; }
+#chalk      { background-color: #f0f0f0; color: #333; padding: 10px; cursor: pointer; }
+#gravel     { background-color: #787878; color: white; padding: 10px; cursor: pointer; }
+#rust       { background-color: #8B4010; color: white; padding: 10px; cursor: pointer; }
+
+/* === Solids === */
+#stone      { background-color: rgb(99, 99, 99); color: white; padding: 10px; cursor: pointer; }
+#wood       { background-color: rgb(124, 74, 7); color: white; padding: 10px; cursor: pointer; }
+#ice        { background-color: #A0D8EF; color: #333; padding: 10px; cursor: pointer; }
+#obsidian   { background-color: #2a1040; color: white; padding: 10px; cursor: pointer; }
+#glass      { background-color: #c8eef5; color: #333; padding: 10px; cursor: pointer; }
+#rubber     { background-color: #1a1a1a; color: white; padding: 10px; cursor: pointer; border: 1px solid #555; }
+#sponge     { background-color: #d4aa00; color: #333; padding: 10px; cursor: pointer; }
+#fuse       { background-color: #8B4513; color: white; padding: 10px; cursor: pointer; }
+#concrete   { background-color: #aaaaaa; color: #333; padding: 10px; cursor: pointer; }
+#steel      { background-color: #b0b8c0; color: #111; padding: 10px; cursor: pointer; }
+#diamond    { background-color: #c8f0ff; color: #222; padding: 10px; cursor: pointer; }
+#wax        { background-color: #fffacd; color: #333; padding: 10px; cursor: pointer; }
+#ceramic    { background-color: #e8d8c0; color: #333; padding: 10px; cursor: pointer; }
+#brick      { background-color: #8B3500; color: white; padding: 10px; cursor: pointer; }
+#crystal    { background-color: #aaffff; color: #222; padding: 10px; cursor: pointer; }
+
+/* === Liquids === */
+#water      { background-color: #1E90FF; color: white; padding: 10px; cursor: pointer; }
+#oil        { background-color: rgb(50, 35, 0); color: white; padding: 10px; cursor: pointer; }
+#acid       { background-color: rgb(0, 255, 0); color: rgb(0, 0, 0); padding: 10px; cursor: pointer; }
+#lava       { background-color: #FF4500; color: white; padding: 10px; cursor: pointer; }
+#saltwater  { background-color: #4488cc; color: white; padding: 10px; cursor: pointer; }
 #antiliquid { background-color: rgb(255, 0, 225); color: rgb(0, 0, 0); padding: 10px; cursor: pointer; }
-#antigas { background-color: rgb(255, 0, 225); color: rgb(0, 0, 0); padding: 10px; cursor: pointer; }
-#wood { background-color: rgb(124, 74, 7); color: white; padding: 10px; cursor: pointer; }
-#ash { background-color: rgb(136, 136, 136); color: white; padding: 10px; cursor: pointer; }
-#water { background-color: #1E90FF; color: white; padding: 10px; cursor: pointer; }
-#bomb { background-color: rgb(2, 111, 11); color: white; padding: 10px; cursor: pointer; }
-#oil { background-color: rgb(50, 35, 0); color: white; padding: 10px; cursor: pointer; }
-#acid { background-color: rgb(0, 255, 0); color: rgb(0, 0, 0); padding: 10px; cursor: pointer; }
-#steam { background-color: grey; color: white; padding: 10px; cursor: pointer; }
-#fire { background-color: orangered; color: white; padding: 10px; cursor: pointer; }
-#heater { background-color: rgb(116, 99, 92); color: white; padding: 10px; cursor: pointer; }
-#cloner { background-color: rgb(169, 171, 101); color: white; padding: 10px; cursor: pointer; }
-#destroyer { background-color: rgb(30, 30, 30); color: white; padding: 10px; cursor: pointer; border: 1px solid #555; }
-#snow { background-color: #E8F0FF; color: #333; padding: 10px; cursor: pointer; }
-#ice { background-color: #A0D8EF; color: #333; padding: 10px; cursor: pointer; }
-#lava { background-color: #FF4500; color: white; padding: 10px; cursor: pointer; }
-#obsidian { background-color: #2a1040; color: white; padding: 10px; cursor: pointer; }
-#glass { background-color: #c8eef5; color: #333; padding: 10px; cursor: pointer; }
-#gunpowder { background-color: #2f2f2f; color: white; padding: 10px; cursor: pointer; }
-#fuse { background-color: #8B4513; color: white; padding: 10px; cursor: pointer; }
-#tnt { background-color: #cc0000; color: white; padding: 10px; cursor: pointer; }
-#rubber { background-color: #1a1a1a; color: white; padding: 10px; cursor: pointer; border: 1px solid #555; }
-#sponge { background-color: #d4aa00; color: #333; padding: 10px; cursor: pointer; }
-#smoke { background-color: #555555; color: white; padding: 10px; cursor: pointer; }
-#toxicgas { background-color: #88dd00; color: #000; padding: 10px; cursor: pointer; }
-#virus { background-color: #ff00aa; color: white; padding: 10px; cursor: pointer; }
-#salt { background-color: #F0F0F0; color: #333; padding: 10px; cursor: pointer; }
-#saltwater { background-color: #4488cc; color: white; padding: 10px; cursor: pointer; }
-#concrete { background-color: #aaaaaa; color: #333; padding: 10px; cursor: pointer; }
-#cooler { background-color: #00ccff; color: #000; padding: 10px; cursor: pointer; }
-#methane { background-color: #aaffaa; color: #000; padding: 10px; cursor: pointer; }
-#mud { background-color: #4a2c00; color: white; padding: 10px; cursor: pointer; }
-#plasma { background-color: #ee44ff; color: white; padding: 10px; cursor: pointer; }
+#alcohol    { background-color: #d4f0ff; color: #333; padding: 10px; cursor: pointer; }
+#mercury    { background-color: #c8c8cc; color: #111; padding: 10px; cursor: pointer; }
+#honey      { background-color: #d4a000; color: #111; padding: 10px; cursor: pointer; }
+#tar        { background-color: #0a0a0a; color: #888; padding: 10px; cursor: pointer; border: 1px solid #333; }
+#slime      { background-color: #00aa44; color: white; padding: 10px; cursor: pointer; }
+#blood      { background-color: #cc0000; color: white; padding: 10px; cursor: pointer; }
+
+/* === Gasses === */
+#steam      { background-color: grey; color: white; padding: 10px; cursor: pointer; }
+#smoke      { background-color: #555555; color: white; padding: 10px; cursor: pointer; }
+#toxicgas   { background-color: #88dd00; color: #000; padding: 10px; cursor: pointer; }
+#methane    { background-color: #aaffaa; color: #000; padding: 10px; cursor: pointer; }
+#antigas    { background-color: rgb(255, 0, 225); color: rgb(0, 0, 0); padding: 10px; cursor: pointer; }
+#hydrogen   { background-color: #eeffee; color: #333; padding: 10px; cursor: pointer; }
+#oxygen     { background-color: #eeeeff; color: #333; padding: 10px; cursor: pointer; }
+#nitrogen   { background-color: #c0c8ff; color: #222; padding: 10px; cursor: pointer; }
+#propane    { background-color: #ffffcc; color: #333; padding: 10px; cursor: pointer; }
+#fog        { background-color: #e8e8e8; color: #444; padding: 10px; cursor: pointer; }
+
+/* === Extras === */
+#heater     { background-color: rgb(116, 99, 92); color: white; padding: 10px; cursor: pointer; }
+#cooler     { background-color: #00ccff; color: #000; padding: 10px; cursor: pointer; }
+#fire       { background-color: orangered; color: white; padding: 10px; cursor: pointer; }
+#ember      { background-color: #ff6600; color: white; padding: 10px; cursor: pointer; }
+#bomb       { background-color: rgb(2, 111, 11); color: white; padding: 10px; cursor: pointer; }
+#tnt        { background-color: #cc0000; color: white; padding: 10px; cursor: pointer; }
+#nitrogel   { background-color: #80ff40; color: #111; padding: 10px; cursor: pointer; }
+#virus      { background-color: #ff00aa; color: white; padding: 10px; cursor: pointer; }
+#plasma     { background-color: #ee44ff; color: white; padding: 10px; cursor: pointer; }
+#lightning  { background-color: #ffff44; color: #111; padding: 10px; cursor: pointer; }
+#cloner     { background-color: rgb(169, 171, 101); color: white; padding: 10px; cursor: pointer; }
+#destroyer  { background-color: rgb(30, 30, 30); color: white; padding: 10px; cursor: pointer; border: 1px solid #555; }
+#gel        { background-color: #88ff88; color: #111; padding: 10px; cursor: pointer; }
+#superacid  { background-color: #dd00ff; color: white; padding: 10px; cursor: pointer; }
+#antimatter { background-color: #220022; color: #cc88ff; padding: 10px; cursor: pointer; border: 1px solid #660066; }
+#void       { background-color: #050005; color: #880088; padding: 10px; cursor: pointer; border: 1px solid #440044; }
