@@ -4,6 +4,74 @@ Version 1.2.0: stone, sand
 Version 1.3.0: cloner, heater
 Version 1.4.0: oil, wood, ash
 Version 1.4.1: acid, oil lag fix
-Version 1.5.1: anti powder,liquid,gas and cloner fix
+Version 1.5.1: anti powder, liquid, gas and cloner fix
 Version 1.5.2: bomb
 Version 1.6.0: 20 new elements (snow, ice, lava, obsidian, glass, gunpowder, fuse, tnt, rubber, sponge, smoke, toxic gas, virus, salt, saltwater, concrete, cooler, methane, mud, plasma); acid now properly dissolves materials; oil now correctly floats on water
+Version 1.7.0: 30 new elements, JSON save/load, 60+ new reactions
+
+  NEW ELEMENTS (v1.7.0):
+    Powders:  Charcoal, Sulfur, Coal, Chalk, Gravel, Rust
+    Solids:   Steel, Diamond, Wax, Ceramic, Brick, Crystal
+    Liquids:  Alcohol, Mercury, Honey, Tar, Slime, Blood
+    Gasses:   Hydrogen, Oxygen, Nitrogen, Propane, Fog
+    Extras:   Lightning, Antimatter, Ember, Gel, Void, NitroGel, Superacid
+
+  NEW REACTIONS (v1.7.0):
+    Acid + Steam            = Toxic Gas
+    Acid + Alcohol          = Explosion
+    Superacid + Steam       = Toxic Gas
+    Superacid + Lava        = Plasma burst
+    Superacid dissolves:    Rubber, Glass, Obsidian, Steel, Crystal, Brick, Ceramic, Diamond (slowly)
+    Water + Sulfur          = Acid
+    Water + Salt            = Saltwater  (existing, now also produces Crystal on evap)
+    Water + Nitrogen        = Ice
+    Saltwater + Cooler      = Ice
+    Saltwater evap          = Steam + Salt or Crystal (random)
+    Steam + Cooler          = Fog
+    Steam + Acid            = Toxic Gas
+    Fog + Heat              = Steam
+    Fog + Cold/Nitrogen/Ice = Water
+    Fog + Acid              = Toxic Gas
+    Sand + Heater/Lava/Coal = Glass
+    Wood burn               = Fire + Charcoal (nearby)
+    Mud + sustained heat    = Brick
+    Mud + brief heat        = Dirt
+    Oil + extreme heat      = Tar
+    Ice + Lava              = Obsidian + Steam
+    Snow/Ice + Lava         = Water
+    Lava + Nitrogen         = Stone
+    Stone + Superacid       = destroyed
+    Charcoal (burning)      → Ember + Smoke → Ash
+    Coal (burning)          → heats neighbors, melts water, emts smoke → Ash
+    Sulfur + Fire/Lava      = Toxic Gas
+    Wax + Fire/Lava         = Oil
+    Steel + Water/Saltwater = Rust (over time)
+    Steel + Heat            = conducts heat to neighbors
+    Rust + Steel + Water    = spreads Rust
+    Mercury + Heat          = Toxic Gas
+    Mercury                 sinks through Water/Alcohol/Blood
+    Alcohol + Fire          = burst of Fire + Steam
+    Alcohol + Water         = Water (dilution)
+    Alcohol + Acid          = Explosion
+    Honey                   very slow flow, burns to fire
+    Tar + Fire              = Fire + lots of Smoke
+    Slime + Water           = Slime spreads
+    Slime + Fire            = destroyed
+    Hydrogen + Fire (+ O₂)  = huge explosion; near Oxygen produces Water
+    Oxygen + Fire           = fire spreads faster
+    Nitrogen + Fire         = extinguished
+    Nitrogen + Water/Saltw  = Ice
+    Nitrogen + Lava         = Stone
+    Propane + Fire/Spark    = Explosion (sinks as heavy gas)
+    Lightning               destroys path, ignites everything, triggers Fuse/Gunpowder/TNT/Methane/Bomb
+    Ember + Water           = extinguished
+    Ember dies              → puff of Smoke
+    Gel                     absorbs Water/Blood, very slow flow
+    NitroGel + nearly anything = massive explosion
+    Void                    spreads, consumes all, then dissipates
+    Antimatter              destroys everything including fire-immune materials
+    Crystal                 grows in Saltwater
+    Blood + Water           = dilutes to Water
+    Blood + Fire            = Smoke
+    Sponge                  now also absorbs Blood and Slime
+    Virus                   now killed by Fire (existing) + Void
