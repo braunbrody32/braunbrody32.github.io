@@ -205,7 +205,7 @@ Bomb.prototype.update = function() {
     if (ny<gridHeight&&grid[this.x][ny]===null) { grid[this.x][this.y]=null; this.y=ny; grid[this.x][this.y]=this; }
     if (isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Plasma)) {
         let bx=this.x,by=this.y; this.destroy();
-        for (let i=-5;i<=5;i++) for (let j=-5;j<=5;j++) {
+        for (let i=-20;i<=20;i++) for (let j=-20;j<=20;j++) {
             let nx=bx+i,ny2=by+j;
             if (nx>=0&&nx<gridWidth&&ny2>=0&&ny2<gridHeight) {
                 if (grid[nx][ny2]) particles=particles.filter(p=>p!==grid[nx][ny2]);
