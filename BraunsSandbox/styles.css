@@ -9,12 +9,33 @@ canvas { border: 1px solid #ffffff; display: block; margin: 20px auto; backgroun
 #antigas { background-color: rgb(255, 0, 225); color: rgb(0, 0, 0); padding: 10px; cursor: pointer; }
 #wood { background-color: rgb(124, 74, 7); color: white; padding: 10px; cursor: pointer; }
 #ash { background-color: rgb(136, 136, 136); color: white; padding: 10px; cursor: pointer; }
-#water { background-color: blue; color: white; padding: 10px; cursor: pointer; }
+#water { background-color: #1E90FF; color: white; padding: 10px; cursor: pointer; }
 #bomb { background-color: rgb(2, 111, 11); color: white; padding: 10px; cursor: pointer; }
-#oil { background-color: rgb(0, 0, 0); color: white; padding: 10px; cursor: pointer; }
+#oil { background-color: rgb(50, 35, 0); color: white; padding: 10px; cursor: pointer; }
 #acid { background-color: rgb(0, 255, 0); color: rgb(0, 0, 0); padding: 10px; cursor: pointer; }
 #steam { background-color: grey; color: white; padding: 10px; cursor: pointer; }
 #fire { background-color: orangered; color: white; padding: 10px; cursor: pointer; }
 #heater { background-color: rgb(116, 99, 92); color: white; padding: 10px; cursor: pointer; }
 #cloner { background-color: rgb(169, 171, 101); color: white; padding: 10px; cursor: pointer; }
-#destroyer { background-color: rgb(0, 0, 0); color: white; padding: 10px; cursor: pointer; }
+#destroyer { background-color: rgb(30, 30, 30); color: white; padding: 10px; cursor: pointer; border: 1px solid #555; }
+/* New elements */
+#snow { background-color: #E8F0FF; color: #333; padding: 10px; cursor: pointer; }
+#ice { background-color: #A0D8EF; color: #333; padding: 10px; cursor: pointer; }
+#lava { background-color: #FF4500; color: white; padding: 10px; cursor: pointer; }
+#obsidian { background-color: #2a1040; color: white; padding: 10px; cursor: pointer; }
+#glass { background-color: #c8eef5; color: #333; padding: 10px; cursor: pointer; }
+#gunpowder { background-color: #2f2f2f; color: white; padding: 10px; cursor: pointer; }
+#fuse { background-color: #8B4513; color: white; padding: 10px; cursor: pointer; }
+#tnt { background-color: #cc0000; color: white; padding: 10px; cursor: pointer; }
+#rubber { background-color: #1a1a1a; color: white; padding: 10px; cursor: pointer; border: 1px solid #555; }
+#sponge { background-color: #d4aa00; color: #333; padding: 10px; cursor: pointer; }
+#smoke { background-color: #555555; color: white; padding: 10px; cursor: pointer; }
+#toxicgas { background-color: #88dd00; color: #000; padding: 10px; cursor: pointer; }
+#virus { background-color: #ff00aa; color: white; padding: 10px; cursor: pointer; }
+#salt { background-color: #F0F0F0; color: #333; padding: 10px; cursor: pointer; }
+#saltwater { background-color: #4488cc; color: white; padding: 10px; cursor: pointer; }
+#concrete { background-color: #aaaaaa; color: #333; padding: 10px; cursor: pointer; }
+#cooler { background-color: #00ccff; color: #000; padding: 10px; cursor: pointer; }
+#methane { background-color: #aaffaa; color: #000; padding: 10px; cursor: pointer; }
+#mud { background-color: #4a2c00; color: white; padding: 10px; cursor: pointer; }
+#plasma { background-color: #ee44ff; color: white; padding: 10px; cursor: pointer; }
