@@ -377,6 +377,126 @@
     text-align: center;
   }
   .info-panel span { color: var(--mc-gold); }
+
+  /* ═══════════════ TABS ═══════════════ */
+  .tab-bar {
+    display: flex;
+    background: #0a0a0a;
+    border-bottom: 3px solid #000;
+    padding: 0 10px;
+    gap: 2px;
+  }
+  .tab-btn {
+    font-family: var(--font);
+    font-size: 8px;
+    color: #555;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 9px 14px;
+    cursor: pointer;
+    margin-bottom: -3px;
+    transition: color .12s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover  { color: #aaa; }
+  .tab-btn.active { color: var(--mc-gold); border-bottom-color: var(--mc-gold); }
+
+  .tab-panel         { display: none; }
+  .tab-panel.active  { display: flex; }
+
+  /* recipes panel — restore original layout behaviour */
+  #tab-recipes.active {
+    flex: 1;
+    overflow: hidden;
+    height: calc(100vh - 84px);  /* header + tab-bar */
+  }
+
+  /* ═══════════════ PERIODIC TABLE PANEL ═══════════════ */
+  #tab-periodic.active {
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    padding: 18px 12px 32px;
+    background: #0b0b18;
+    height: calc(100vh - 84px);
+  }
+  .pt-heading {
+    font-size: 10px;
+    color: var(--mc-gold);
+    text-shadow: 2px 2px #000;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+
+  /* Grid: 18 cols × N rows, each cell 34×34 */
+  .pt-grid {
+    display: grid;
+    grid-template-columns: repeat(18, 34px);
+    gap: 2px;
+  }
+
+  .pt-cell {
+    width: 34px; height: 34px;
+    border: 1px solid #2a2a2a;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: default;
+    position: relative;
+    transition: transform .08s, border-color .08s, z-index 0s;
+  }
+  .pt-cell:not(.pt-empty):hover {
+    transform: scale(1.22);
+    z-index: 20;
+    border-color: #fff !important;
+  }
+  .pt-num  { font-size: 4px; color: rgba(255,255,255,0.45); line-height: 1.1; }
+  .pt-sym  { font-size: 10px; color: #fff; line-height: 1.2; text-shadow: 1px 1px #000; font-weight: bold; }
+  .pt-name { font-size: 4px; color: rgba(255,255,255,0.6); line-height: 1; overflow:hidden; max-width:32px; text-align:center; }
+  .pt-empty { border: none !important; background: transparent !important; cursor: default; }
+  .pt-empty:hover { transform: none !important; }
+
+  /* sandbox gold glow */
+  .pt-sandbox { border-color: var(--mc-gold) !important; box-shadow: 0 0 5px var(--mc-gold); }
+
+  /* category backgrounds */
+  .pt-alkali     { background: #5c1a1a; }
+  .pt-alkearth   { background: #4a2900; }
+  .pt-transition { background: #152738; }
+  .pt-post       { background: #143520; }
+  .pt-metalloid  { background: #282800; }
+  .pt-nonmetal   { background: #00281a; }
+  .pt-halogen    { background: #141448; }
+  .pt-noble      { background: #280028; }
+  .pt-lanthanide { background: #162616; }
+  .pt-actinide   { background: #381a00; }
+  .pt-unknown    { background: #222222; }
+
+  /* legend */
+  .pt-legend {
+    display: flex; flex-wrap: wrap;
+    gap: 10px; margin-top: 14px;
+    justify-content: center; max-width: 700px;
+  }
+  .pt-legend-item { display:flex; align-items:center; gap:5px; font-size:6px; color:#999; }
+  .pt-legend-swatch { width:14px; height:14px; border:1px solid #444; flex-shrink:0; }
+
+  /* floating tooltip */
+  #pt-tooltip {
+    position: fixed;
+    background: #0e000eee;
+    color: #eee;
+    font-family: var(--font);
+    font-size: 7px;
+    padding: 9px 12px;
+    border: 1px solid #773399;
+    z-index: 9999;
+    pointer-events: none;
+    display: none;
+    line-height: 2;
+    max-width: 210px;
+  }
+
 </style>
 </head>
 <body>
@@ -386,7 +506,13 @@
   <h1>Element Sandbox — Recipe Book</h1>
 </header>
 
-<div class="layout">
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('recipes')">📖 Recipes</button>
+  <button class="tab-btn"        onclick="switchTab('periodic')">⚗ Periodic Table</button>
+</div>
+
+<div id="tab-recipes" class="tab-panel active">
+<div class="layout" style="height:100%;flex:1">
   <aside>
     <div class="sidebar-search">
       <input type="text" id="search" placeholder="Search recipes..." oninput="filterRecipes(this.value)">
@@ -400,7 +526,17 @@
       Select a recipe from the sidebar
     </div>
   </main>
+</div><!-- .layout -->
+</div><!-- #tab-recipes -->
+
+<!-- ═══════════════════ PERIODIC TABLE PANEL ═══════════════════ -->
+<div id="tab-periodic" class="tab-panel">
+  <div class="pt-heading">⚗ Periodic Table of Elements</div>
+  <div class="pt-grid" id="pt-grid"></div>
+  <div class="pt-legend" id="pt-legend"></div>
 </div>
+
+<div id="pt-tooltip"></div>
 
 <script>
 // ─────────────────────────────────────────────
@@ -701,6 +837,248 @@ function showRecipe(idx) {
 
 // Init
 buildSidebar();
+
+
+// ════════════════════════════════════════════════════════════
+// TAB SWITCHER
+// ════════════════════════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.textContent.toLowerCase().includes(name === 'recipes' ? '📖' : '⚗')) b.classList.add('active');
+  });
+  // simpler: match by index
+  const btns = document.querySelectorAll('.tab-btn');
+  btns[0].classList.toggle('active', name==='recipes');
+  btns[1].classList.toggle('active', name==='periodic');
+}
+
+// ════════════════════════════════════════════════════════════
+// PERIODIC TABLE DATA
+// Each entry: {n, sym, name, cat, col, row, sandbox?, desc}
+// col/row = position in standard 18-col layout
+// row 8 = lanthanide series, row 9 = actinide series (below gap)
+// ════════════════════════════════════════════════════════════
+const PT_ELEMENTS = [
+  // Period 1
+  {n:1,  sym:'H',  name:'Hydrogen',      cat:'nonmetal',  col:1,  row:1, sandbox:'Hydrogen',       desc:'Lightest element. Highly explosive.'},
+  {n:2,  sym:'He', name:'Helium',         cat:'noble',     col:18, row:1,                           desc:'Inert noble gas. Lighter than air.'},
+  // Period 2
+  {n:3,  sym:'Li', name:'Lithium',        cat:'alkali',    col:1,  row:2,                           desc:'Soft metal. Reacts with water.'},
+  {n:4,  sym:'Be', name:'Beryllium',      cat:'alkearth',  col:2,  row:2,                           desc:'Toxic alkaline earth metal.'},
+  {n:5,  sym:'B',  name:'Boron',          cat:'metalloid', col:13, row:2,                           desc:'Metalloid used in glass & ceramics.'},
+  {n:6,  sym:'C',  name:'Carbon',         cat:'nonmetal',  col:14, row:2, sandbox:'Coal / Charcoal / Diamond', desc:'Basis of organic chemistry.'},
+  {n:7,  sym:'N',  name:'Nitrogen',       cat:'nonmetal',  col:15, row:2, sandbox:'Nitrogen',       desc:'78% of air. Extinguishes fire. Freezes things.'},
+  {n:8,  sym:'O',  name:'Oxygen',         cat:'nonmetal',  col:16, row:2, sandbox:'Oxygen',         desc:'Feeds combustion. 21% of air.'},
+  {n:9,  sym:'F',  name:'Fluorine',       cat:'halogen',   col:17, row:2,                           desc:'Most reactive nonmetal.'},
+  {n:10, sym:'Ne', name:'Neon',           cat:'noble',     col:18, row:2,                           desc:'Noble gas. Glows orange-red in discharge.'},
+  // Period 3
+  {n:11, sym:'Na', name:'Sodium',         cat:'alkali',    col:1,  row:3,                           desc:'Explodes violently in water.'},
+  {n:12, sym:'Mg', name:'Magnesium',      cat:'alkearth',  col:2,  row:3,                           desc:'Burns with intense white light.'},
+  {n:13, sym:'Al', name:'Aluminium',      cat:'post',      col:13, row:3,                           desc:'Lightweight corrosion-resistant metal.'},
+  {n:14, sym:'Si', name:'Silicon',        cat:'metalloid', col:14, row:3, sandbox:'Sand (SiO₂)',    desc:'Basis of sand, glass, semiconductors.'},
+  {n:15, sym:'P',  name:'Phosphorus',     cat:'nonmetal',  col:15, row:3,                           desc:'White phosphorus ignites spontaneously.'},
+  {n:16, sym:'S',  name:'Sulfur',         cat:'nonmetal',  col:16, row:3, sandbox:'Sulfur',         desc:'Burns to toxic SO₂. Dissolves in water → acid.'},
+  {n:17, sym:'Cl', name:'Chlorine',       cat:'halogen',   col:17, row:3,                           desc:'Toxic yellow-green gas.'},
+  {n:18, sym:'Ar', name:'Argon',          cat:'noble',     col:18, row:3,                           desc:'Inert noble gas. Used in welding.'},
+  // Period 4
+  {n:19, sym:'K',  name:'Potassium',      cat:'alkali',    col:1,  row:4,                           desc:'Reacts explosively with water.'},
+  {n:20, sym:'Ca', name:'Calcium',        cat:'alkearth',  col:2,  row:4, sandbox:'Chalk / Concrete',desc:'Found in chalk, concrete, and bones.'},
+  {n:21, sym:'Sc', name:'Scandium',       cat:'transition',col:3,  row:4,                           desc:'Rare transition metal.'},
+  {n:22, sym:'Ti', name:'Titanium',       cat:'transition',col:4,  row:4,                           desc:'Very strong, lightweight metal.'},
+  {n:23, sym:'V',  name:'Vanadium',       cat:'transition',col:5,  row:4,                           desc:'Hard transition metal for alloys.'},
+  {n:24, sym:'Cr', name:'Chromium',       cat:'transition',col:6,  row:4,                           desc:'Makes stainless steel. Rust-resistant.'},
+  {n:25, sym:'Mn', name:'Manganese',      cat:'transition',col:7,  row:4,                           desc:'Used in steel alloys and batteries.'},
+  {n:26, sym:'Fe', name:'Iron',           cat:'transition',col:8,  row:4, sandbox:'Steel / Rust',   desc:'Rusts in water. Core of steel.'},
+  {n:27, sym:'Co', name:'Cobalt',         cat:'transition',col:9,  row:4,                           desc:'Blue pigment. Magnetic.'},
+  {n:28, sym:'Ni', name:'Nickel',         cat:'transition',col:10, row:4,                           desc:'Corrosion-resistant magnetic metal.'},
+  {n:29, sym:'Cu', name:'Copper',         cat:'transition',col:11, row:4, sandbox:'Wire',           desc:'Best natural conductor. Used in wire.'},
+  {n:30, sym:'Zn', name:'Zinc',           cat:'transition',col:12, row:4,                           desc:'Galvanises steel to prevent rust.'},
+  {n:31, sym:'Ga', name:'Gallium',        cat:'post',      col:13, row:4,                           desc:'Melts in your hand (30 °C).'},
+  {n:32, sym:'Ge', name:'Germanium',      cat:'metalloid', col:14, row:4,                           desc:'Early semiconductor material.'},
+  {n:33, sym:'As', name:'Arsenic',        cat:'metalloid', col:15, row:4,                           desc:'Toxic metalloid. Historic poison.'},
+  {n:34, sym:'Se', name:'Selenium',       cat:'nonmetal',  col:16, row:4,                           desc:'Used in photocells and glass.'},
+  {n:35, sym:'Br', name:'Bromine',        cat:'halogen',   col:17, row:4,                           desc:'Only liquid nonmetal at room temperature.'},
+  {n:36, sym:'Kr', name:'Krypton',        cat:'noble',     col:18, row:4,                           desc:'Noble gas used in flash lamps.'},
+  // Period 5
+  {n:37, sym:'Rb', name:'Rubidium',       cat:'alkali',    col:1,  row:5,                           desc:'Soft alkali metal.'},
+  {n:38, sym:'Sr', name:'Strontium',      cat:'alkearth',  col:2,  row:5,                           desc:'Burns bright red in fireworks.'},
+  {n:39, sym:'Y',  name:'Yttrium',        cat:'transition',col:3,  row:5,                           desc:'Used in LEDs and phosphors.'},
+  {n:40, sym:'Zr', name:'Zirconium',      cat:'transition',col:4,  row:5,                           desc:'Highly corrosion-resistant.'},
+  {n:41, sym:'Nb', name:'Niobium',        cat:'transition',col:5,  row:5,                           desc:'Used in superconducting alloys.'},
+  {n:42, sym:'Mo', name:'Molybdenum',     cat:'transition',col:6,  row:5,                           desc:'High melting point. In steel alloys.'},
+  {n:43, sym:'Tc', name:'Technetium',     cat:'transition',col:7,  row:5,                           desc:'First synthetic element. Radioactive.'},
+  {n:44, sym:'Ru', name:'Ruthenium',      cat:'transition',col:8,  row:5,                           desc:'Platinum group metal. Hard.'},
+  {n:45, sym:'Rh', name:'Rhodium',        cat:'transition',col:9,  row:5,                           desc:'Catalytic converters. Very rare.'},
+  {n:46, sym:'Pd', name:'Palladium',      cat:'transition',col:10, row:5,                           desc:'Absorbs hydrogen. Catalysis.'},
+  {n:47, sym:'Ag', name:'Silver',         cat:'transition',col:11, row:5,                           desc:'Highest electrical conductivity of all metals.'},
+  {n:48, sym:'Cd', name:'Cadmium',        cat:'transition',col:12, row:5,                           desc:'Toxic. Used in older batteries.'},
+  {n:49, sym:'In', name:'Indium',         cat:'post',      col:13, row:5,                           desc:'Extremely soft post-transition metal.'},
+  {n:50, sym:'Sn', name:'Tin',            cat:'post',      col:14, row:5,                           desc:'Used in solder and tin cans.'},
+  {n:51, sym:'Sb', name:'Antimony',       cat:'metalloid', col:15, row:5,                           desc:'Flame retardants and alloys.'},
+  {n:52, sym:'Te', name:'Tellurium',      cat:'metalloid', col:16, row:5,                           desc:'Brittle metalloid with garlic odour.'},
+  {n:53, sym:'I',  name:'Iodine',         cat:'halogen',   col:17, row:5,                           desc:'Purple vapour. Antiseptic.'},
+  {n:54, sym:'Xe', name:'Xenon',          cat:'noble',     col:18, row:5,                           desc:'Noble gas. Used in ion engines.'},
+  // Period 6
+  {n:55, sym:'Cs', name:'Caesium',        cat:'alkali',    col:1,  row:6,                           desc:'Most reactive stable metal.'},
+  {n:56, sym:'Ba', name:'Barium',         cat:'alkearth',  col:2,  row:6,                           desc:'Green fireworks. Toxic in compounds.'},
+  {n:57, sym:'La', name:'*',              cat:'lanthanide',col:3,  row:6,                           desc:'Lanthanide series — see row below.'},
+  {n:72, sym:'Hf', name:'Hafnium',        cat:'transition',col:4,  row:6,                           desc:'Used in nuclear reactor control rods.'},
+  {n:73, sym:'Ta', name:'Tantalum',       cat:'transition',col:5,  row:6,                           desc:'Highly corrosion-resistant. Used in electronics.'},
+  {n:74, sym:'W',  name:'Tungsten',       cat:'transition',col:6,  row:6,                           desc:'Highest melting point of all metals: 3422 °C.'},
+  {n:75, sym:'Re', name:'Rhenium',        cat:'transition',col:7,  row:6,                           desc:'One of the rarest and densest metals.'},
+  {n:76, sym:'Os', name:'Osmium',         cat:'transition',col:8,  row:6,                           desc:'Densest naturally occurring element.'},
+  {n:77, sym:'Ir', name:'Iridium',        cat:'transition',col:9,  row:6,                           desc:'Most corrosion-resistant metal.'},
+  {n:78, sym:'Pt', name:'Platinum',       cat:'transition',col:10, row:6,                           desc:'Precious catalyst metal.'},
+  {n:79, sym:'Au', name:'Gold',           cat:'transition',col:11, row:6,                           desc:'Noble metal. Resists all acids.'},
+  {n:80, sym:'Hg', name:'Mercury',        cat:'transition',col:12, row:6, sandbox:'Mercury',        desc:'Liquid metal at room temperature. Toxic.'},
+  {n:81, sym:'Tl', name:'Thallium',       cat:'post',      col:13, row:6,                           desc:'Toxic post-transition metal.'},
+  {n:82, sym:'Pb', name:'Lead',           cat:'post',      col:14, row:6,                           desc:'Dense, soft metal. Radiation shielding.'},
+  {n:83, sym:'Bi', name:'Bismuth',        cat:'post',      col:15, row:6,                           desc:'Low toxicity heavy metal. Pepto-Bismol.'},
+  {n:84, sym:'Po', name:'Polonium',       cat:'post',      col:16, row:6,                           desc:'Highly radioactive. Discovered by Curie.'},
+  {n:85, sym:'At', name:'Astatine',       cat:'halogen',   col:17, row:6,                           desc:'Rarest naturally occurring element.'},
+  {n:86, sym:'Rn', name:'Radon',          cat:'noble',     col:18, row:6,                           desc:'Radioactive noble gas from decay chains.'},
+  // Period 7
+  {n:87, sym:'Fr', name:'Francium',       cat:'alkali',    col:1,  row:7,                           desc:'Most unstable naturally occurring element.'},
+  {n:88, sym:'Ra', name:'Radium',         cat:'alkearth',  col:2,  row:7,                           desc:'Radioactive. Glows faintly green.'},
+  {n:89, sym:'Ac', name:'**',             cat:'actinide',  col:3,  row:7,                           desc:'Actinide series — see row below.'},
+  {n:104,sym:'Rf', name:'Rutherfordium',  cat:'transition',col:4,  row:7,                           desc:'Synthetic. Very short half-life.'},
+  {n:105,sym:'Db', name:'Dubnium',        cat:'transition',col:5,  row:7,                           desc:'Synthetic transuranium element.'},
+  {n:106,sym:'Sg', name:'Seaborgium',     cat:'transition',col:6,  row:7,                           desc:'Synthetic. Named after Glenn Seaborg.'},
+  {n:107,sym:'Bh', name:'Bohrium',        cat:'transition',col:7,  row:7,                           desc:'Synthetic. Named after Niels Bohr.'},
+  {n:108,sym:'Hs', name:'Hassium',        cat:'transition',col:8,  row:7,                           desc:'Synthetic element.'},
+  {n:109,sym:'Mt', name:'Meitnerium',     cat:'unknown',   col:9,  row:7,                           desc:'Synthetic. Named after Lise Meitner.'},
+  {n:110,sym:'Ds', name:'Darmst.',        cat:'unknown',   col:10, row:7,                           desc:'Darmstadtium. Synthetic element.'},
+  {n:111,sym:'Rg', name:'Roentgenium',    cat:'unknown',   col:11, row:7,                           desc:'Synthetic. Named after Wilhelm Röntgen.'},
+  {n:112,sym:'Cn', name:'Copernicium',    cat:'transition',col:12, row:7,                           desc:'Synthetic. Named after Copernicus.'},
+  {n:113,sym:'Nh', name:'Nihonium',       cat:'post',      col:13, row:7,                           desc:'Synthetic. Named after Japan (Nihon).'},
+  {n:114,sym:'Fl', name:'Flerovium',      cat:'post',      col:14, row:7,                           desc:'Synthetic. Named after Flerov Laboratory.'},
+  {n:115,sym:'Mc', name:'Moscovium',      cat:'post',      col:15, row:7,                           desc:'Synthetic. Named after Moscow.'},
+  {n:116,sym:'Lv', name:'Livermorium',    cat:'post',      col:16, row:7,                           desc:'Synthetic. Named after Livermore Lab.'},
+  {n:117,sym:'Ts', name:'Tennessine',     cat:'halogen',   col:17, row:7,                           desc:'Synthetic. Named after Tennessee.'},
+  {n:118,sym:'Og', name:'Oganesson',      cat:'noble',     col:18, row:7,                           desc:'Heaviest known element.'},
+  // Lanthanides (displayed in row 8, cols 4–17)
+  {n:57, sym:'La', name:'Lanthanum',      cat:'lanthanide',col:4,  row:8, desc:'Soft rare earth metal.'},
+  {n:58, sym:'Ce', name:'Cerium',         cat:'lanthanide',col:5,  row:8, desc:'Most abundant rare earth.'},
+  {n:59, sym:'Pr', name:'Praseodymium',   cat:'lanthanide',col:6,  row:8, desc:'Used in strong magnets.'},
+  {n:60, sym:'Nd', name:'Neodymium',      cat:'lanthanide',col:7,  row:8, desc:'Strongest permanent magnets.'},
+  {n:61, sym:'Pm', name:'Promethium',     cat:'lanthanide',col:8,  row:8, desc:'Radioactive rare earth.'},
+  {n:62, sym:'Sm', name:'Samarium',       cat:'lanthanide',col:9,  row:8, desc:'Nuclear reactor control.'},
+  {n:63, sym:'Eu', name:'Europium',       cat:'lanthanide',col:10, row:8, desc:'Red/blue phosphors in screens.'},
+  {n:64, sym:'Gd', name:'Gadolinium',     cat:'lanthanide',col:11, row:8, desc:'MRI contrast agent.'},
+  {n:65, sym:'Tb', name:'Terbium',        cat:'lanthanide',col:12, row:8, desc:'Green phosphor.'},
+  {n:66, sym:'Dy', name:'Dysprosium',     cat:'lanthanide',col:13, row:8, desc:'Used in high-power lasers.'},
+  {n:67, sym:'Ho', name:'Holmium',        cat:'lanthanide',col:14, row:8, desc:'Highest magnetic moment of any element.'},
+  {n:68, sym:'Er', name:'Erbium',         cat:'lanthanide',col:15, row:8, desc:'Used in fibre-optic amplifiers.'},
+  {n:69, sym:'Tm', name:'Thulium',        cat:'lanthanide',col:16, row:8, desc:'Rarest stable lanthanide.'},
+  {n:70, sym:'Yb', name:'Ytterbium',      cat:'lanthanide',col:17, row:8, desc:'Used in atomic clocks.'},
+  {n:71, sym:'Lu', name:'Lutetium',       cat:'lanthanide',col:18, row:8, desc:'Densest rare earth metal.'},
+  // Actinides (row 9, cols 4–17)
+  {n:89, sym:'Ac', name:'Actinium',       cat:'actinide',  col:4,  row:9, desc:'Radioactive. Glows blue in dark.'},
+  {n:90, sym:'Th', name:'Thorium',        cat:'actinide',  col:5,  row:9, desc:'Fertile nuclear material.'},
+  {n:91, sym:'Pa', name:'Protactinium',   cat:'actinide',  col:6,  row:9, desc:'Rare and highly radioactive.'},
+  {n:92, sym:'U',  name:'Uranium',        cat:'actinide',  col:7,  row:9, sandbox:'Uranium',  desc:'Nuclear fuel. Emits radiation.'},
+  {n:93, sym:'Np', name:'Neptunium',      cat:'actinide',  col:8,  row:9, desc:'First transuranium element.'},
+  {n:94, sym:'Pu', name:'Plutonium',      cat:'actinide',  col:9,  row:9, desc:'Nuclear weapon material.'},
+  {n:95, sym:'Am', name:'Americium',      cat:'actinide',  col:10, row:9, desc:'In smoke detectors.'},
+  {n:96, sym:'Cm', name:'Curium',         cat:'actinide',  col:11, row:9, desc:'Radioactive. Glows purple.'},
+  {n:97, sym:'Bk', name:'Berkelium',      cat:'actinide',  col:12, row:9, desc:'Synthetic transuranium.'},
+  {n:98, sym:'Cf', name:'Californium',    cat:'actinide',  col:13, row:9, desc:'Neutron emitter. Cancer therapy.'},
+  {n:99, sym:'Es', name:'Einsteinium',    cat:'actinide',  col:14, row:9, desc:'Named after Einstein.'},
+  {n:100,sym:'Fm', name:'Fermium',        cat:'actinide',  col:15, row:9, desc:'Named after Enrico Fermi.'},
+  {n:101,sym:'Md', name:'Mendelevium',    cat:'actinide',  col:16, row:9, desc:'Named after Mendeleev.'},
+  {n:102,sym:'No', name:'Nobelium',       cat:'actinide',  col:17, row:9, desc:'Named after Alfred Nobel.'},
+  {n:103,sym:'Lr', name:'Lawrencium',     cat:'actinide',  col:18, row:9, desc:'Last actinide. Named after E.O. Lawrence.'},
+];
+
+const PT_CAT_BG = {
+  alkali:'#5c1a1a', alkearth:'#4a2900', transition:'#152738',
+  post:'#143520',   metalloid:'#282800', nonmetal:'#00281a',
+  halogen:'#141448',noble:'#280028',    lanthanide:'#162616',
+  actinide:'#381a00',unknown:'#222222'
+};
+const PT_LEGEND_LABELS = {
+  alkali:'Alkali Metal', alkearth:'Alkaline Earth', transition:'Transition Metal',
+  post:'Post-Transition', metalloid:'Metalloid', nonmetal:'Nonmetal',
+  halogen:'Halogen', noble:'Noble Gas', lanthanide:'Lanthanide',
+  actinide:'Actinide', unknown:'Unknown'
+};
+
+function buildPeriodicTable() {
+  const gridEl   = document.getElementById('pt-grid');
+  const legendEl = document.getElementById('pt-legend');
+  const tooltip  = document.getElementById('pt-tooltip');
+
+  // Build position lookup for rows 1-7 (18 cols each)
+  const posMap = new Map();
+  PT_ELEMENTS.forEach(el => posMap.set(`${el.row},${el.col}`, el));
+
+  function makeCell(el) {
+    const div = document.createElement('div');
+    const sb  = el && el.sandbox;
+    div.className = el
+      ? `pt-cell pt-${el.cat}${sb ? ' pt-sandbox' : ''}`
+      : 'pt-cell pt-empty';
+    if (el) {
+      div.innerHTML =
+        `<span class="pt-num">${el.n}</span>` +
+        `<span class="pt-sym">${el.sym}</span>` +
+        `<span class="pt-name">${el.name.length > 10 ? el.sym : el.name}</span>`;
+      div.addEventListener('mousemove', e => {
+        tooltip.style.display = 'block';
+        tooltip.style.left = (e.clientX + 16) + 'px';
+        tooltip.style.top  = (e.clientY + 16) + 'px';
+        const sbLine = sb ? `<br>🎮 <span style="color:#ffaa00">${sb}</span>` : '';
+        tooltip.innerHTML = `<b>${el.n}. ${el.name} (${el.sym})</b><br>${el.desc}${sbLine}`;
+      });
+      div.addEventListener('mouseleave', () => tooltip.style.display = 'none');
+    }
+    return div;
+  }
+
+  // Rows 1–7 (main table)
+  for (let row = 1; row <= 7; row++) {
+    for (let col = 1; col <= 18; col++) {
+      gridEl.appendChild(makeCell(posMap.get(`${row},${col}`) || null));
+    }
+  }
+
+  // Blank spacer row
+  for (let col = 1; col <= 18; col++) {
+    const sp = document.createElement('div');
+    sp.className = 'pt-cell pt-empty';
+    gridEl.appendChild(sp);
+  }
+
+  // Lanthanide row (row 8, cols 1–3 empty, 4–18 filled)
+  for (let col = 1; col <= 18; col++) {
+    gridEl.appendChild(makeCell(col <= 3 ? null : (posMap.get(`8,${col}`) || null)));
+  }
+
+  // Actinide row (row 9)
+  for (let col = 1; col <= 18; col++) {
+    gridEl.appendChild(makeCell(col <= 3 ? null : (posMap.get(`9,${col}`) || null)));
+  }
+
+  // Legend
+  const cats = Object.keys(PT_LEGEND_LABELS);
+  cats.forEach(cat => {
+    const item = document.createElement('div');
+    item.className = 'pt-legend-item';
+    item.innerHTML = `<div class="pt-legend-swatch" style="background:${PT_CAT_BG[cat]}"></div><span>${PT_LEGEND_LABELS[cat]}</span>`;
+    legendEl.appendChild(item);
+  });
+  // Sandbox note
+  const sbNote = document.createElement('div');
+  sbNote.className = 'pt-legend-item';
+  sbNote.innerHTML = `<div class="pt-legend-swatch" style="background:#222;border:1px solid #ffaa00;box-shadow:0 0 4px #ffaa00"></div><span style="color:#ffaa00">In Game ✦</span>`;
+  legendEl.appendChild(sbNote);
+}
+
+buildPeriodicTable();
+
 </script>
 </body>
 </html>
