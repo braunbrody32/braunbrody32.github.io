@@ -986,7 +986,7 @@ function buildPeriodicTable() {
   const posMap = new Map();
   PT_ELEMENTS.forEach(el => posMap.set(`${el.row},${el.col}`, el));
 
-  function makeCell(el) {
+function makeCell(el) {
     const div = document.createElement('div');
     const sb  = el && el.sandbox;
     div.className = el
@@ -997,14 +997,30 @@ function buildPeriodicTable() {
         `<span class="pt-num">${el.n}</span>` +
         `<span class="pt-sym">${el.sym}</span>` +
         `<span class="pt-name">${el.name.length > 10 ? el.sym : el.name}</span>`;
+      
+      // Change the cursor to a pointer so it feels like a button
+      div.style.cursor = 'pointer';
+
       div.addEventListener('mousemove', e => {
         tooltip.style.display = 'block';
         tooltip.style.left = (e.clientX + 16) + 'px';
         tooltip.style.top  = (e.clientY + 16) + 'px';
         const sbLine = sb ? `<br>🎮 <span style="color:#ffaa00">${sb}</span>` : '';
-        tooltip.innerHTML = `<b>${el.n}. ${el.name} (${el.sym})</b><br>${el.desc}${sbLine}`;
+        // Added a tiny "Click for Wikipedia" hint to the tooltip
+        tooltip.innerHTML = `<b>${el.n}. ${el.name} (${el.sym})</b><br>${el.desc}${sbLine}<br><br><span style="color:#88aaff; font-size:6px;">Click to view on Wikipedia...</span>`;
       });
+      
       div.addEventListener('mouseleave', () => tooltip.style.display = 'none');
+      
+      // Open Wikipedia page on click
+      div.addEventListener('click', () => {
+        let wikiName = el.name;
+        // Handle the * and ** placeholders for the Lanthanide and Actinide series
+        if (wikiName === '*') wikiName = 'Lanthanide';
+        if (wikiName === '**') wikiName = 'Actinide';
+        
+        window.open(`https://en.wikipedia.org/wiki/${wikiName}`, '_blank');
+      });
     }
     return div;
   }
