@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Element Sandbox — Recipe Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --mc-bg:        #1a1a2e;
+    --mc-panel:     #2d2d2d;
+    --mc-panel2:    #3a3a3a;
+    --mc-slot:      #8b8b8b;
+    --mc-slot-in:   #373737;
+    --mc-slot-hi:   #ffffff22;
+    --mc-border-lt: #ffffff55;
+    --mc-border-dk: #00000088;
+    --mc-text:      #dddddd;
+    --mc-gold:      #ffaa00;
+    --mc-wood:      #6b3d1e;
+    --mc-wood2:     #8B4513;
+    --font:         'Press Start 2P', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; image-rendering: pixelated; }
+
+  body {
+    background: var(--mc-bg);
+    color: var(--mc-text);
+    font-family: var(--font);
+    font-size: 10px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  header {
+    background: #111;
+    border-bottom: 3px solid #000;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  header h1 {
+    font-size: 13px;
+    color: var(--mc-gold);
+    text-shadow: 2px 2px #000;
+    letter-spacing: 1px;
+  }
+  .back-link {
+    font-family: var(--font);
+    font-size: 8px;
+    color: #aaa;
+    text-decoration: none;
+    background: var(--mc-panel2);
+    padding: 6px 10px;
+    border: 2px solid #555;
+    border-bottom-color: #222;
+    border-right-color: #222;
+    cursor: pointer;
+    transition: background .1s;
+  }
+  .back-link:hover { background: #4a4a4a; color: #fff; }
+
+  /* ── Layout ── */
+  .layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    height: calc(100vh - 50px);
+  }
+
+  /* ── Sidebar ── */
+  aside {
+    width: 240px;
+    min-width: 240px;
+    background: #111;
+    border-right: 3px solid #000;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .sidebar-search {
+    padding: 8px;
+    background: #1a1a1a;
+    border-bottom: 2px solid #000;
+  }
+  .sidebar-search input {
+    width: 100%;
+    background: var(--mc-slot-in);
+    border: 2px solid #555;
+    border-top-color: #222;
+    border-left-color: #222;
+    color: #fff;
+    font-family: var(--font);
+    font-size: 7px;
+    padding: 6px 8px;
+    outline: none;
+  }
+  .sidebar-search input::placeholder { color: #666; }
+
+  .sidebar-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 4px 0;
+  }
+  .sidebar-list::-webkit-scrollbar { width: 8px; }
+  .sidebar-list::-webkit-scrollbar-track { background: #111; }
+  .sidebar-list::-webkit-scrollbar-thumb { background: #555; border: 2px solid #111; }
+
+  .category-header {
+    font-size: 7px;
+    color: var(--mc-gold);
+    padding: 8px 10px 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-top: 1px solid #333;
+    margin-top: 4px;
+  }
+  .category-header:first-child { border-top: none; margin-top: 0; }
+
+  .recipe-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--mc-text);
+    font-family: var(--font);
+    font-size: 7px;
+    padding: 7px 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: background .1s;
+  }
+  .recipe-btn:hover  { background: #2a2a2a; color: #fff; }
+  .recipe-btn.active { background: #3a3a3a; color: var(--mc-gold); }
+
+  .recipe-btn .dot {
+    width: 12px;
+    height: 12px;
+    border: 1px solid #00000066;
+    flex-shrink: 0;
+    image-rendering: pixelated;
+  }
+
+  /* ── Main area ── */
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: radial-gradient(ellipse at center, #1e2a3a 0%, #0d0d1a 100%);
+    overflow-y: auto;
+  }
+
+  .placeholder {
+    text-align: center;
+    color: #444;
+    font-size: 9px;
+    line-height: 2.5;
+  }
+  .placeholder .big { font-size: 48px; display: block; margin-bottom: 16px; }
+
+  /* ── Crafting Table ── */
+  .crafting-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    animation: fadeIn .2s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+  .recipe-title {
+    font-size: 11px;
+    color: var(--mc-gold);
+    text-shadow: 2px 2px #000;
+    text-align: center;
+  }
+  .recipe-note {
+    font-size: 7px;
+    color: #888;
+    text-align: center;
+    max-width: 420px;
+    line-height: 2;
+    margin-top: -8px;
+  }
+
+  /* The big crafting table panel */
+  .crafting-table {
+    background: linear-gradient(135deg, #3e2a1a 0%, #2a1a0a 50%, #3e2a1a 100%);
+    border: 4px solid #000;
+    border-bottom-color: #000;
+    border-right-color: #000;
+    border-top-color: #6b4c2a;
+    border-left-color: #6b4c2a;
+    padding: 20px 28px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    position: relative;
+    box-shadow: 0 8px 32px #00000088, inset 0 1px 0 #7a5c3a44;
+  }
+
+  /* Wood grain overlay */
+  .crafting-table::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(90deg, transparent 0px, transparent 18px, #00000008 18px, #00000008 19px),
+      repeating-linear-gradient(0deg, transparent 0px, transparent 12px, #00000010 12px, #00000010 13px);
+    pointer-events: none;
+  }
+
+  .grid-label {
+    font-size: 7px;
+    color: #8b6a3a;
+    text-align: center;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+
+  .grid-3x3 {
+    display: grid;
+    grid-template-columns: repeat(3, 52px);
+    grid-template-rows: repeat(3, 52px);
+    gap: 4px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .slot {
+    width: 52px;
+    height: 52px;
+    background: var(--mc-slot-in);
+    border: 2px solid #000;
+    border-top-color: #222;
+    border-left-color: #222;
+    border-bottom-color: #888;
+    border-right-color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: border-color .1s;
+  }
+  .slot.filled {
+    border-top-color: #555;
+    border-left-color: #555;
+    border-bottom-color: #bbb;
+    border-right-color: #bbb;
+  }
+  .slot.filled:hover { border-color: #fff8; }
+
+  .slot-inner {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 5.5px;
+    text-align: center;
+    color: #fff;
+    text-shadow: 1px 1px #000;
+    line-height: 1.3;
+    padding: 2px;
+    word-break: break-word;
+    overflow: hidden;
+  }
+
+  .elem-block {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #000;
+    border-top-color: #ffffff44;
+    border-left-color: #ffffff44;
+    flex-shrink: 0;
+  }
+  .elem-label {
+    font-size: 5px;
+    text-align: center;
+    line-height: 1.2;
+    color: #eee;
+    text-shadow: 1px 1px #000;
+    max-width: 40px;
+    overflow: hidden;
+  }
+
+  /* Arrow */
+  .arrow-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .arrow-label { font-size: 6px; color: #8b6a3a; }
+  .arrow {
+    width: 40px;
+    height: 20px;
+    background: var(--mc-gold);
+    clip-path: polygon(0 30%, 60% 30%, 60% 0%, 100% 50%, 60% 100%, 60% 70%, 0 70%);
+    filter: drop-shadow(2px 2px 0 #000);
+    animation: pulse-arrow 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse-arrow {
+    0%,100% { opacity: 1; }
+    50%      { opacity: .5; }
+  }
+
+  /* Result slot — bigger */
+  .result-slot {
+    width: 64px;
+    height: 64px;
+    background: var(--mc-slot-in);
+    border: 3px solid #000;
+    border-top-color: #222;
+    border-left-color: #222;
+    border-bottom-color: #aaa;
+    border-right-color: #aaa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+  .result-slot .slot-inner {
+    width: 52px;
+    height: 52px;
+  }
+  .result-slot .elem-block {
+    width: 36px;
+    height: 36px;
+  }
+  .result-slot .elem-label { font-size: 5.5px; }
+
+  /* Tooltip */
+  .slot[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #100010ee;
+    color: #fff;
+    font-family: var(--font);
+    font-size: 7px;
+    padding: 5px 8px;
+    border: 1px solid #884499;
+    white-space: nowrap;
+    z-index: 100;
+    pointer-events: none;
+    line-height: 1.8;
+    text-shadow: 1px 1px #000;
+  }
+
+  /* ── Info panel below table ── */
+  .info-panel {
+    background: #1a1a1a;
+    border: 2px solid #333;
+    padding: 12px 18px;
+    max-width: 420px;
+    width: 100%;
+    font-size: 7px;
+    color: #aaa;
+    line-height: 2.2;
+    text-align: center;
+  }
+  .info-panel span { color: var(--mc-gold); }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="back-link">← Back</a>
+  <h1>Element Sandbox — Recipe Book</h1>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="sidebar-search">
+      <input type="text" id="search" placeholder="Search recipes..." oninput="filterRecipes(this.value)">
+    </div>
+    <div class="sidebar-list" id="sidebar-list"></div>
+  </aside>
+
+  <main id="main">
+    <div class="placeholder">
+      <span class="big">:)</span>
+      Select a recipe from the sidebar
+    </div>
+  </main>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// Element color palette (matches styles.css)
+// ─────────────────────────────────────────────
+const COLORS = {
+  Dirt:       '#7a3b1a', Sand:       '#DDB88D', Ash:        '#888888',
+  Snow:       '#E8F0FF', Salt:       '#F0F0F0', Gunpowder:  '#2f2f2f',
+  Mud:        '#4a2c00', 'Anti-Powder':'#FF00FF',Charcoal:  '#1a1a1a',
+  Sulfur:     '#c8b400', Coal:       '#111111', Chalk:      '#f0f0f0',
+  Gravel:     '#787878', Rust:       '#8B4010', Stone:      '#636363',
+  Wood:       '#7C4A07', Ice:        '#A0D8EF', Obsidian:   '#2a1040',
+  Glass:      '#c8eef5', Rubber:     '#1a1a1a', Sponge:     '#d4aa00',
+  Fuse:       '#8B4513', Concrete:   '#aaaaaa', Steel:      '#b0b8c0',
+  Diamond:    '#c8f0ff', Wax:        '#fffacd', Ceramic:    '#e8d8c0',
+  Brick:      '#8B3500', Crystal:    '#aaffff', Water:      '#1E90FF',
+  Oil:        '#322300', Acid:       '#00FF04', Lava:       '#FF4500',
+  Saltwater:  '#4488cc', 'Anti-Liquid':'#A128BF',Alcohol:   '#d4f0ff',
+  Mercury:    '#c8c8cc', Honey:      '#d4a000', Tar:        '#0a0a0a',
+  Slime:      '#00aa44', Blood:      '#cc0000', Steam:      '#d1d1d1',
+  Smoke:      '#555555', 'Toxic Gas': '#88dd00', Methane:   '#aaffaa',
+  'Anti-Gas': '#c767de', Hydrogen:   '#eeffee', Oxygen:     '#eeeeff',
+  Nitrogen:   '#c0c8ff', Propane:    '#ffffcc', Fog:        '#e8e8e8',
+  Heater:     '#736251', Cooler:     '#00ccff', Fire:       '#FF4900',
+  Ember:      '#ff6600', Bomb:       '#1d612c', TNT:        '#cc0000',
+  NitroGel:   '#80ff40', Virus:      '#ff00aa', Plasma:     '#ee44ff',
+  Lightning:  '#ffff44', Cloner:     '#A9AB65', Destroyer:  '#404040',
+  Gel:        '#88ff88', Superacid:  '#dd00ff', Antimatter: '#220022',
+  Void:       '#050005',
+};
+
+function col(name) { return COLORS[name] || '#666666'; }
+
+// ─────────────────────────────────────────────
+// Recipe data
+// grid: array of {row,col,elem} — 3x3, 0-indexed
+// For simple 2-ingredient recipes: put A at [1,0], B at [1,1]
+// ─────────────────────────────────────────────
+const RECIPES = [
+  // ── Powders ────────────────────────────────
+  { cat:'Powders', result:'Mud',      note:'Dirt slowly absorbs nearby water',
+    grid:[{r:1,c:0,e:'Dirt'},{r:1,c:1,e:'Water'}] },
+  { cat:'Powders', result:'Dirt',     note:'Mud dries out near brief heat',
+    grid:[{r:1,c:0,e:'Mud'},{r:1,c:1,e:'Fire'}] },
+  { cat:'Powders', result:'Glass',    note:'Sand melts under extreme heat',
+    grid:[{r:1,c:0,e:'Sand'},{r:1,c:1,e:'Heater'}] },
+  { cat:'Powders', result:'Glass',    note:'Sand + Lava melts into glass',     altLabel:'Glass (Lava)',
+    grid:[{r:1,c:0,e:'Sand'},{r:1,c:1,e:'Lava'}] },
+  { cat:'Powders', result:'Rust',     note:'Steel slowly corrodes in water. Saltwater or Blood speeds it up',
+    grid:[{r:1,c:0,e:'Steel'},{r:1,c:1,e:'Water'}] },
+  { cat:'Powders', result:'Charcoal', note:'Wood ignites and drops Charcoal in adjacent cells',
+    grid:[{r:1,c:0,e:'Wood'},{r:1,c:1,e:'Fire'}] },
+  { cat:'Powders', result:'Ash',      note:'Charcoal burns out into Ash after ~500 frames',
+    grid:[{r:1,c:0,e:'Charcoal'},{r:0,c:0,e:'Fire'},{r:0,c:1,e:'Fire'},{r:2,c:0,e:'Fire'},{r:2,c:1,e:'Fire'}] },
+  { cat:'Powders', result:'Ash',      altLabel:'Ash (Coal)', note:'Coal burns out into Ash after ~800 frames',
+    grid:[{r:1,c:0,e:'Coal'},{r:0,c:0,e:'Fire'},{r:0,c:1,e:'Fire'},{r:2,c:0,e:'Fire'},{r:2,c:1,e:'Fire'}] },
+
+  // ── Solids ─────────────────────────────────
+  { cat:'Solids', result:'Ice',       note:'Water freezes on contact with Cooler',
+    grid:[{r:1,c:0,e:'Water'},{r:1,c:1,e:'Cooler'}] },
+  { cat:'Solids', result:'Ice',       altLabel:'Ice (Nitrogen)', note:'Nitrogen flash-freezes water',
+    grid:[{r:1,c:0,e:'Water'},{r:1,c:1,e:'Nitrogen'}] },
+  { cat:'Solids', result:'Ice',       altLabel:'Ice (Saltwater)', note:'Saltwater also freezes with Cooler',
+    grid:[{r:1,c:0,e:'Saltwater'},{r:1,c:1,e:'Cooler'}] },
+  { cat:'Solids', result:'Obsidian',  note:'Lava solidifies when touching water',
+    grid:[{r:1,c:0,e:'Lava'},{r:1,c:1,e:'Water'}] },
+  { cat:'Solids', result:'Obsidian',  altLabel:'Obsidian (Ice)', note:'Ice + Lava react to form Obsidian + Steam burst',
+    grid:[{r:1,c:0,e:'Ice'},{r:1,c:1,e:'Lava'}] },
+  { cat:'Solids', result:'Stone',     note:'Cooler solidifies lava into stone',
+    grid:[{r:1,c:0,e:'Lava'},{r:1,c:1,e:'Cooler'}] },
+  { cat:'Solids', result:'Stone',     altLabel:'Stone (Nitrogen)', note:'Nitrogen rapidly cools lava',
+    grid:[{r:1,c:0,e:'Lava'},{r:1,c:1,e:'Nitrogen'}] },
+  { cat:'Solids', result:'Brick',     note:'Mud that stays near heat long enough fires into brick',
+    grid:[{r:0,c:0,e:'Heater'},{r:0,c:1,e:'Heater'},{r:0,c:2,e:'Heater'},
+          {r:1,c:1,e:'Mud'},
+          {r:2,c:0,e:'Heater'},{r:2,c:1,e:'Heater'},{r:2,c:2,e:'Heater'}] },
+  { cat:'Solids', result:'Crystal',   note:'Crystal slowly grows by converting adjacent saltwater',
+    grid:[{r:1,c:0,e:'Saltwater'},{r:1,c:1,e:'Crystal'},{r:1,c:2,e:'Saltwater'}] },
+
+  // ── Liquids ────────────────────────────────
+  { cat:'Liquids', result:'Water',    note:'Ice melts back to water near heat',
+    grid:[{r:1,c:0,e:'Ice'},{r:1,c:1,e:'Fire'}] },
+  { cat:'Liquids', result:'Water',    altLabel:'Water (Snow)', note:'Snow melts near fire or lava',
+    grid:[{r:1,c:0,e:'Snow'},{r:1,c:1,e:'Lava'}] },
+  { cat:'Liquids', result:'Water',    altLabel:'Water (Fog)', note:'Cold condenses fog into water',
+    grid:[{r:1,c:0,e:'Fog'},{r:1,c:1,e:'Cooler'}] },
+  { cat:'Liquids', result:'Saltwater',note:'Salt dissolves into water',
+    grid:[{r:1,c:0,e:'Water'},{r:1,c:1,e:'Salt'}] },
+  { cat:'Liquids', result:'Acid',     note:'Sulfur dissolves in water to form sulfuric acid',
+    grid:[{r:1,c:0,e:'Water'},{r:1,c:1,e:'Sulfur'}] },
+  { cat:'Liquids', result:'Oil',      note:'Wax melts into oil',
+    grid:[{r:1,c:0,e:'Wax'},{r:1,c:1,e:'Heater'}] },
+  { cat:'Liquids', result:'Tar',      note:'Oil cracks into tar at very high temperatures (≥200°)',
+    grid:[{r:0,c:0,e:'Heater'},{r:0,c:1,e:'Heater'},{r:0,c:2,e:'Heater'},
+          {r:1,c:1,e:'Oil'},
+          {r:2,c:0,e:'Heater'},{r:2,c:1,e:'Heater'},{r:2,c:2,e:'Heater'}] },
+
+  // ── Gases ──────────────────────────────────
+  { cat:'Gases', result:'Steam',      note:'Water boils into steam near fire',
+    grid:[{r:1,c:0,e:'Water'},{r:1,c:1,e:'Fire'}] },
+  { cat:'Gases', result:'Steam',      altLabel:'Steam (Saltwater)', note:'Saltwater evaporates at 110°C',
+    grid:[{r:1,c:0,e:'Saltwater'},{r:1,c:1,e:'Fire'}] },
+  { cat:'Gases', result:'Smoke',      note:'Wood emits smoke as it heats up before igniting',
+    grid:[{r:1,c:0,e:'Wood'},{r:1,c:1,e:'Heater'}] },
+  { cat:'Gases', result:'Smoke',      altLabel:'Smoke (Tar)', note:'Tar burns with lots of smoke',
+    grid:[{r:1,c:0,e:'Tar'},{r:1,c:1,e:'Fire'}] },
+  { cat:'Gases', result:'Toxic Gas',  note:'Sulfur combustion produces toxic fumes',
+    grid:[{r:1,c:0,e:'Sulfur'},{r:1,c:1,e:'Fire'}] },
+  { cat:'Gases', result:'Toxic Gas',  altLabel:'Toxic Gas (Acid)', note:'Acid reacts with steam to make toxic gas',
+    grid:[{r:1,c:0,e:'Acid'},{r:1,c:1,e:'Steam'}] },
+  { cat:'Gases', result:'Toxic Gas',  altLabel:'Toxic Gas (Mercury)', note:'Heated mercury evaporates into toxic vapor',
+    grid:[{r:1,c:0,e:'Mercury'},{r:1,c:1,e:'Heater'}] },
+  { cat:'Gases', result:'Fog',        note:'Steam cools and condenses into fog',
+    grid:[{r:1,c:0,e:'Steam'},{r:1,c:1,e:'Cooler'}] },
+
+  // ── Fire & Energy ──────────────────────────
+  { cat:'Fire & Energy', result:'Fire', note:'Wood catches fire when temperature ≥ 100°C',
+    grid:[{r:1,c:0,e:'Wood'},{r:0,c:0,e:'Heater'},{r:0,c:1,e:'Heater'},{r:2,c:0,e:'Heater'},{r:2,c:1,e:'Heater'}] },
+  { cat:'Fire & Energy', result:'Fire', altLabel:'Fire (Oil)', note:'Oil ignites at temperature ≥ 150°C',
+    grid:[{r:1,c:0,e:'Oil'},{r:0,c:0,e:'Heater'},{r:0,c:1,e:'Heater'},{r:2,c:0,e:'Heater'},{r:2,c:1,e:'Heater'}] },
+  { cat:'Fire & Energy', result:'Fire', altLabel:'Fire (Honey)', note:'Honey slowly catches fire',
+    grid:[{r:1,c:0,e:'Honey'},{r:1,c:1,e:'Lava'}] },
+  { cat:'Fire & Energy', result:'Ember', note:'Charcoal sheds embers while burning',
+    grid:[{r:1,c:0,e:'Charcoal'},{r:1,c:1,e:'Fire'}] },
+  { cat:'Fire & Energy', result:'Plasma', note:'Violent reaction — Superacid + Lava produces a plasma burst',
+    grid:[{r:1,c:0,e:'Lava'},{r:1,c:1,e:'Superacid'}] },
+
+  // ── Explosions ─────────────────────────────
+  { cat:'Explosions', result:'Explosion', altLabel:'Explosion (Gunpowder)', note:'Gunpowder explodes on contact with fire — radius ~4',
+    grid:[{r:1,c:0,e:'Gunpowder'},{r:1,c:1,e:'Fire'}] },
+  { cat:'Explosions', result:'Explosion', altLabel:'Explosion (Bomb)', note:'Bomb explodes — radius ~20',
+    grid:[{r:1,c:0,e:'Bomb'},{r:1,c:1,e:'Fire'}] },
+  { cat:'Explosions', result:'Explosion', altLabel:'Explosion (TNT)', note:'TNT explodes — radius ~10, denser than Bomb',
+    grid:[{r:1,c:0,e:'TNT'},{r:1,c:1,e:'Fire'}] },
+  { cat:'Explosions', result:'Explosion', altLabel:'Explosion (Methane)', note:'Methane explodes — radius ~6, fills area with fire',
+    grid:[{r:1,c:0,e:'Methane'},{r:1,c:1,e:'Fire'}] },
+  { cat:'Explosions', result:'Explosion', altLabel:'Explosion (Hydrogen)', note:'Hydrogen explodes — radius ~10. Near Oxygen produces Water',
+    grid:[{r:0,c:1,e:'Oxygen'},{r:1,c:0,e:'Hydrogen'},{r:1,c:1,e:'Fire'}] },
+  { cat:'Explosions', result:'Explosion', altLabel:'Explosion (Propane)', note:'Propane explodes — radius ~8, heavy gas that sinks and pools',
+    grid:[{r:1,c:0,e:'Propane'},{r:1,c:1,e:'Fire'}] },
+  { cat:'Explosions', result:'Explosion', altLabel:'Explosion (NitroGel)', note:'Massive explosion radius ~18 — triggered by almost everything',
+    grid:[{r:0,c:0,e:'Fire'},{r:0,c:1,e:'Acid'},{r:0,c:2,e:'Lava'},
+          {r:1,c:1,e:'NitroGel'},
+          {r:2,c:0,e:'Plasma'},{r:2,c:1,e:'Ember'},{r:2,c:2,e:'Lightning'}] },
+  { cat:'Explosions', result:'Explosion', altLabel:'Explosion (Acid+Alcohol)', note:'Acid triggers alcohol ignition',
+    grid:[{r:1,c:0,e:'Acid'},{r:1,c:1,e:'Alcohol'}] },
+  { cat:'Explosions', result:'Fire',      altLabel:'Fire Burst (Alcohol)', note:'Alcohol ignites — burst of fire + steam, radius ~5',
+    grid:[{r:1,c:0,e:'Alcohol'},{r:1,c:1,e:'Fire'}] },
+
+  // ── Special ────────────────────────────────
+  { cat:'Special', result:'Rust',       altLabel:'Rust Spreading', note:'Rust spreads corrosion to adjacent steel in water',
+    grid:[{r:1,c:0,e:'Rust'},{r:1,c:1,e:'Steel'},{r:1,c:2,e:'Water'}] },
+  { cat:'Special', result:'Slime',      altLabel:'Slime Spreading', note:'Slime slowly converts adjacent water cells',
+    grid:[{r:1,c:0,e:'Water'},{r:1,c:1,e:'Slime'},{r:1,c:2,e:'Water'}] },
+  { cat:'Special', result:'Crystal',    altLabel:'Crystal Growth', note:'Crystal converts neighboring saltwater — evap yields Salt or Crystal',
+    grid:[{r:0,c:0,e:'Saltwater'},{r:0,c:1,e:'Saltwater'},{r:0,c:2,e:'Saltwater'},
+          {r:1,c:0,e:'Saltwater'},{r:1,c:1,e:'Crystal'},{r:1,c:2,e:'Saltwater'},
+          {r:2,c:0,e:'Saltwater'},{r:2,c:1,e:'Saltwater'},{r:2,c:2,e:'Saltwater'}] },
+  { cat:'Special', result:'Water',      altLabel:'Blood Dilution', note:'Blood dilutes into water over time',
+    grid:[{r:1,c:0,e:'Blood'},{r:1,c:1,e:'Water'}] },
+  { cat:'Special', result:'Water',      altLabel:'Alcohol Dilution', note:'Alcohol dilutes into water on contact',
+    grid:[{r:1,c:0,e:'Alcohol'},{r:1,c:1,e:'Water'}] },
+  { cat:'Special', result:'Void',       altLabel:'Void Spreading', note:'Void consumes all neighbors then dissipates',
+    grid:[{r:0,c:0,e:'Dirt'},{r:0,c:1,e:'Stone'},{r:0,c:2,e:'Water'},
+          {r:1,c:0,e:'Fire'},{r:1,c:1,e:'Void'},{r:1,c:2,e:'Sand'},
+          {r:2,c:0,e:'Lava'},{r:2,c:1,e:'Ice'},{r:2,c:2,e:'Wood'}] },
+];
+
+// ─────────────────────────────────────────────
+// Build sidebar
+// ─────────────────────────────────────────────
+let activeIdx = -1;
+
+function buildSidebar(filter='') {
+  const list = document.getElementById('sidebar-list');
+  list.innerHTML = '';
+  const lower = filter.toLowerCase();
+
+  const categories = [...new Set(RECIPES.map(r=>r.cat))];
+  let anyVisible = false;
+
+  categories.forEach(cat => {
+    const items = RECIPES.map((r,i)=>({r,i})).filter(({r})=> r.cat===cat &&
+      (r.altLabel||r.result).toLowerCase().includes(lower));
+    if (!items.length) return;
+    anyVisible = true;
+
+    const hdr = document.createElement('div');
+    hdr.className = 'category-header';
+    hdr.textContent = cat;
+    list.appendChild(hdr);
+
+    items.forEach(({r,i}) => {
+      const btn = document.createElement('button');
+      btn.className = 'recipe-btn' + (i===activeIdx?' active':'');
+      btn.dataset.idx = i;
+
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      dot.style.background = col(r.result);
+      if (['Charcoal','Tar','Void','Coal','Oil'].includes(r.result)) dot.style.border='1px solid #555';
+
+      const lbl = document.createElement('span');
+      lbl.textContent = r.altLabel || r.result;
+
+      btn.appendChild(dot);
+      btn.appendChild(lbl);
+      btn.onclick = () => showRecipe(i);
+      list.appendChild(btn);
+    });
+  });
+
+  if (!anyVisible) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'padding:20px;color:#444;font-size:7px;text-align:center;line-height:2';
+    empty.textContent = 'No recipes found';
+    list.appendChild(empty);
+  }
+}
+
+function filterRecipes(val) { buildSidebar(val); }
+
+// ─────────────────────────────────────────────
+// Render crafting table
+// ─────────────────────────────────────────────
+function showRecipe(idx) {
+  activeIdx = idx;
+  buildSidebar(document.getElementById('search').value);
+
+  const r = RECIPES[idx];
+  const main = document.getElementById('main');
+
+  // Build a 3x3 map
+  const map = {};
+  r.grid.forEach(g => { map[`${g.r},${g.c}`] = g.e; });
+
+  // Build grid HTML
+  let gridHTML = '';
+  for (let row=0; row<3; row++) {
+    for (let col=0; col<3; col++) {
+      const elem = map[`${row},${col}`];
+      if (elem) {
+        gridHTML += `
+          <div class="slot filled" data-tip="${elem}">
+            <div class="slot-inner">
+              <div class="elem-block" style="background:${COLORS[elem]||'#666'};${
+                ['Charcoal','Tar','Void','Coal','Oil','Wood','Mud'].includes(elem)
+                  ? 'border-top-color:#ffffff22;border-left-color:#ffffff22;'
+                  : ''
+              }"></div>
+              <div class="elem-label">${elem}</div>
+            </div>
+          </div>`;
+      } else {
+        gridHTML += `<div class="slot"></div>`;
+      }
+    }
+  }
+
+  // Determine result color
+  const resultName = r.result === 'Explosion' ? 'Fire' : r.result;
+  const resultColor = COLORS[resultName] || '#888';
+  const resultLabel = r.result;
+
+  main.innerHTML = `
+    <div class="crafting-wrap">
+      <div class="recipe-title">${r.altLabel || r.result}</div>
+      <div class="recipe-note">${r.note}</div>
+      <div class="crafting-table">
+        <div style="position:relative;z-index:1">
+          <div class="grid-label">INGREDIENTS</div>
+          <div class="grid-3x3">${gridHTML}</div>
+        </div>
+        <div class="arrow-wrap">
+          <div class="arrow-label">YIELDS</div>
+          <div class="arrow"></div>
+        </div>
+        <div style="position:relative;z-index:1">
+          <div class="grid-label">RESULT</div>
+          <div class="result-slot" data-tip="${resultLabel}">
+            <div class="slot-inner">
+              <div class="elem-block" style="width:40px;height:40px;background:${resultColor};${
+                ['Charcoal','Tar','Void','Coal','Oil','Antimatter'].includes(resultLabel)
+                  ? 'border-top-color:#ffffff22;border-left-color:#ffffff22;'
+                  : ''
+              }"></div>
+              <div class="elem-label" style="font-size:6px">${resultLabel}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <span>Tip:</span> Reactions are probability-based and may require
+        sustained contact to trigger. Some results take multiple frames.
+      </div>
+    </div>`;
+}
+
+// Init
+buildSidebar();
+</script>
+</body>
+</html>
