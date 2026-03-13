@@ -83,3 +83,19 @@ a {color: white}
 #superacid  { background-color: #dd00ff; color: white; padding: 10px; cursor: pointer; }
 #antimatter { background-color: #220022; color: #cc88ff; padding: 10px; cursor: pointer; border: 1px solid #660066; }
 #void       { background-color: #050005; color: #880088; padding: 10px; cursor: pointer; border: 1px solid #440044; }
+
+/* === Mix Tool === */
+#mix        { background-color: #006655; color: #00ffcc; padding: 10px; cursor: pointer; }
+
+/* === Electricity (v1.8) === */
+#wire       { background-color: #442200; color: #ffcc00; padding: 10px; cursor: pointer; }
+#battery    { background-color: #113311; color: #33cc33; padding: 10px; cursor: pointer; }
+#pump       { background-color: #112288; color: #88bbff; padding: 10px; cursor: pointer; }
+#base       { background-color: #1133ee; color: white;   padding: 10px; cursor: pointer; }
+
+/* === Atomic (v1.8) === */
+#proton     { background-color: #cc1111; color: white; padding: 10px; cursor: pointer; }
+#electron   { background-color: #2244cc; color: white; padding: 10px; cursor: pointer; }
+
+/* === Life (v1.8) === */
+#human      { background-color: #cc9966; color: #222; padding: 10px; cursor: pointer; }
