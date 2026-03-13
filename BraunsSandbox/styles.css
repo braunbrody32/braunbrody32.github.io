@@ -1,5 +1,6 @@
 body { background-color: #000000; color: white; text-align: center; }
 canvas { border: 1px solid #ffffff; display: block; margin: 20px auto; background: #111; }
+a {color: white}
 
 /* === Tools === */
 #erase      { background-color: red; color: white; padding: 10px; cursor: pointer; }
