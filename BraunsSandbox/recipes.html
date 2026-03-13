@@ -946,6 +946,23 @@ const PT_ELEMENTS = [
   {n:89, sym:'Ac', name:'**',             cat:'actinide',  col:3,  row:7,                           desc:'Actinide series — see row below.'},
   {n:92, sym:'U',  name:'Uranium',        cat:'actinide',  col:7,  row:9, sandbox:'Uranium',        desc:'Heavy radioactive element used for nuclear power.'},
   {n:118,sym:'Og', name:'Oganesson',      cat:'noble',     col:18, row:7},
+
+  // Lanthanides (displayed in row 8, cols 4–17)
+  {n:57, sym:'La', name:'Lanthanum',      cat:'lanthanide',col:4,  row:8, desc:'Soft rare earth metal.'},
+  {n:58, sym:'Ce', name:'Cerium',         cat:'lanthanide',col:5,  row:8, desc:'Most abundant rare earth.'},
+  {n:59, sym:'Pr', name:'Praseodymium',   cat:'lanthanide',col:6,  row:8, desc:'Used in strong magnets.'},
+  {n:60, sym:'Nd', name:'Neodymium',      cat:'lanthanide',col:7,  row:8, desc:'Strongest permanent magnets.'},
+  {n:61, sym:'Pm', name:'Promethium',     cat:'lanthanide',col:8,  row:8, desc:'Radioactive rare earth.'},
+  {n:62, sym:'Sm', name:'Samarium',       cat:'lanthanide',col:9,  row:8, desc:'Nuclear reactor control.'},
+  {n:63, sym:'Eu', name:'Europium',       cat:'lanthanide',col:10, row:8, desc:'Red/blue phosphors in screens.'},
+  {n:64, sym:'Gd', name:'Gadolinium',     cat:'lanthanide',col:11, row:8, desc:'MRI contrast agent.'},
+  {n:65, sym:'Tb', name:'Terbium',        cat:'lanthanide',col:12, row:8, desc:'Green phosphor.'},
+  {n:66, sym:'Dy', name:'Dysprosium',     cat:'lanthanide',col:13, row:8, desc:'Used in high-power lasers.'},
+  {n:67, sym:'Ho', name:'Holmium',        cat:'lanthanide',col:14, row:8, desc:'Highest magnetic moment of any element.'},
+  {n:68, sym:'Er', name:'Erbium',         cat:'lanthanide',col:15, row:8, desc:'Used in fibre-optic amplifiers.'},
+  {n:69, sym:'Tm', name:'Thulium',        cat:'lanthanide',col:16, row:8, desc:'Rarest stable lanthanide.'},
+  {n:70, sym:'Yb', name:'Ytterbium',      cat:'lanthanide',col:17, row:8, desc:'Used in atomic clocks.'},
+  {n:71, sym:'Lu', name:'Lutetium',       cat:'lanthanide',col:18, row:8, desc:'Densest rare earth metal.'},
   // Actinides (row 9, cols 4–17)
   {n:89, sym:'Ac', name:'Actinium',       cat:'actinide',  col:4,  row:9, desc:'Radioactive. Glows blue in dark.'},
   {n:90, sym:'Th', name:'Thorium',        cat:'actinide',  col:5,  row:9, desc:'Fertile nuclear material.'},
@@ -986,7 +1003,7 @@ function buildPeriodicTable() {
   const posMap = new Map();
   PT_ELEMENTS.forEach(el => posMap.set(`${el.row},${el.col}`, el));
 
-function makeCell(el) {
+  function makeCell(el) {
     const div = document.createElement('div');
     const sb  = el && el.sandbox;
     div.className = el
@@ -1024,6 +1041,7 @@ function makeCell(el) {
     }
     return div;
   }
+
 
   // Rows 1–7 (main table)
   for (let row = 1; row <= 7; row++) {
