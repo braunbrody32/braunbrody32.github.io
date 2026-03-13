@@ -29,7 +29,7 @@ function Acid(gx, gy) { this.x=gx; this.y=gy; this.direction=Math.random()<.5?1:
 function Water(gx, gy) { this.x=gx; this.y=gy; this.temp=17; this.color="#1E90FF"; this.direction=Math.random()>.5?1:-1; }
 function Oil(gx, gy) { this.x=gx; this.y=gy; this.temp=20; this.finalColor=Math.random()<.5?"#4a3800":"#3d2f00"; this.direction=Math.random()>.5?1:-1; }
 function Fire(gx, gy) { this.x=gx; this.y=gy; this.finalColor=Math.random()<.5?"#FF4900":"#F04602"; this.direction=Math.random()>.5?1:-1; this.frameDelay=3; this.life=getRandomInt(50); }
-function Heater(gx, gy) { this.x=gx; this.y=gy; this.finalColor=Math.random()<.5?"#736251":"#665747"; }
+function Heater(gx, gy) { this.x=gx; this.y=gy; this.powered=false; this.finalColor=Math.random()<.5?"#736251":"#665747"; }
 function Steam(gx, gy) { this.x=gx; this.y=gy; this.finalColor=Math.random()<.5?"#d1d1d1":"#e8e8e8"; this.direction=Math.random()>.5?1:-1; this.frameDelay=3; this.life=250+Math.random()*100; }
 
 // ============================================================
@@ -51,7 +51,7 @@ function Virus(gx, gy) { this.x=gx; this.y=gy; this.finalColor=Math.random()<.5?
 function Salt(gx, gy) { this.x=gx; this.y=gy; this.finalColor=Math.random()<.5?"#F5F5F5":"#EEEEEE"; }
 function Saltwater(gx, gy) { this.x=gx; this.y=gy; this.temp=17; this.finalColor=Math.random()<.5?"#4488cc":"#3377bb"; this.direction=Math.random()>.5?1:-1; }
 function Concrete(gx, gy) { this.x=gx; this.y=gy; this.hardened=false; this.hardenTimer=180+Math.random()*60; this.finalColor=Math.random()<.5?"#aaaaaa":"#999999"; this.direction=Math.random()>.5?1:-1; }
-function Cooler(gx, gy) { this.x=gx; this.y=gy; this.finalColor=Math.random()<.5?"#00ccff":"#00aaee"; }
+function Cooler(gx, gy) { this.x=gx; this.y=gy; this.powered=false; this.finalColor=Math.random()<.5?"#00ccff":"#00aaee"; }
 function Methane(gx, gy) { this.x=gx; this.y=gy; this.finalColor=Math.random()<.5?"#aaffaa":"#99ee99"; this.direction=Math.random()>.5?1:-1; this.frameDelay=2; this.life=300+Math.random()*100; }
 function Mud(gx, gy) { this.x=gx; this.y=gy; this.heatTimer=0; this.finalColor=Math.random()<.5?"#4a2c00":"#3d2500"; }
 function Plasma(gx, gy) { this.x=gx; this.y=gy; this.finalColor=Math.random()<.5?"#ee44ff":"#cc22ee"; this.direction=Math.random()>.5?1:-1; this.frameDelay=1; this.life=80+Math.random()*40; }
@@ -89,6 +89,25 @@ function Rust(gx,gy){this.x=gx;this.y=gy;this.finalColor=Math.random()<.5?"#8B40
 function Blood(gx,gy){this.x=gx;this.y=gy;this.direction=Math.random()>.5?1:-1;this.finalColor=Math.random()<.5?"#cc0000":"#aa0000";}
 function NitroGel(gx,gy){this.x=gx;this.y=gy;this.finalColor=Math.random()<.5?"#80ff40":"#70ee30";}
 function Superacid(gx,gy){this.x=gx;this.y=gy;this.direction=Math.random()>.5?1:-1;this.finalColor=Math.random()<.5?"#dd00ff":"#cc00ee";}
+// ============================================================
+// CONSTRUCTORS - v1.8
+// ============================================================
+function Wire(gx,gy){this.x=gx;this.y=gy;this.powered=false;this.finalColor='#996600';}
+function Battery(gx,gy){this.x=gx;this.y=gy;this.finalColor='#22bb22';}
+function Pump(gx,gy){this.x=gx;this.y=gy;this.powered=false;this.pumpTimer=0;this.finalColor='#1144bb';}
+function Base(gx,gy){this.x=gx;this.y=gy;this.direction=Math.random()>.5?1:-1;this.finalColor=Math.random()<.5?'#2244ff':'#1a33ee';}
+function Proton(gx,gy){this.x=gx;this.y=gy;this.life=800+Math.floor(Math.random()*400);this.finalColor=Math.random()<.5?'#ff3333':'#ee1111';}
+function Electron(gx,gy){this.x=gx;this.y=gy;this.direction=Math.random()>.5?1:-1;this.life=800+Math.floor(Math.random()*400);this.finalColor=Math.random()<.5?'#4488ff':'#3377ee';}
+function Human(gx,gy){
+    this.x=gx; this.y=gy;      // y = body/feet cell; y-1 = head cell
+    this.vx=Math.random()<.5?-1:1;
+    this.moveTimer=0;
+    this.throwTimer=Math.floor(Math.random()*60);
+    this.drownTimer=0;
+    this.finalColor='#ffcc88';
+}
+
+
 
 // ============================================================
 // HELPERS
@@ -122,7 +141,8 @@ const ALL_TYPES = [
     Charcoal,Sulfur,Coal,Chalk,Gravel,Steel,Diamond,Wax,Ceramic,Brick,
     Alcohol,Mercury,Honey,Tar,Slime,
     Hydrogen,Oxygen,Nitrogen,Propane,Fog,
-    Lightning,Antimatter,Ember,Gel,Void,Crystal,Rust,Blood,NitroGel,Superacid
+    Lightning,Antimatter,Ember,Gel,Void,Crystal,Rust,Blood,NitroGel,Superacid,
+    Wire,Battery,Pump,Base,Proton,Electron,Human
 ];
 ALL_TYPES.forEach(T => { T.prototype.destroy = function() { removeParticle(this); }; });
 
@@ -267,7 +287,7 @@ Bomb.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Void)) { this.destroy(); return; }
     let ny=this.y+1;
     if (ny<gridHeight&&grid[this.x][ny]===null) { grid[this.x][this.y]=null; this.y=ny; grid[this.x][this.y]=this; }
-    if (isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Plasma)||isNextTo(this,Ember)||isNextTo(this,Lightning)) {
+    if (isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Plasma)||isNextTo(this,Ember)||isNextTo(this,Lightning)) {
         let bx=this.x,by=this.y; this.destroy(); explode(bx,by,20);
     }
     powderFall(this);
@@ -279,7 +299,7 @@ Destroyer.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fillR
 
 Wood.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Acid)||isNextTo(this,Plasma)||isNextTo(this,Superacid)||isNextTo(this,Void)) { this.destroy(); return; }
-    if (isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Ember)||isNextTo(this,Coal)) { this.temp+=12; }
+    if (isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Ember)||isNextTo(this,Coal)) { this.temp+=12; }
     else if (this.temp>20) { this.temp-=0.5; }
     if (this.temp>=100) {
         const cx=this.x,cy=this.y; this.destroy();
@@ -303,11 +323,15 @@ Wood.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fillRect(t
 Heater.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Plasma)||isNextTo(this,Void)) { this.destroy(); return; }
 };
-Heater.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fillRect(this.x*cellSize,this.y*cellSize,cellSize,cellSize); };
+Heater.prototype.draw = function() {
+    ctx.fillStyle=this.powered?'#ffaa55':this.finalColor;
+    ctx.fillRect(this.x*cellSize,this.y*cellSize,cellSize,cellSize);
+    if(this.powered){ctx.strokeStyle='rgba(255,170,80,0.7)';ctx.lineWidth=2;ctx.strokeRect(this.x*cellSize+1,this.y*cellSize+1,cellSize-2,cellSize-2);}
+};
 
 Sand.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Acid)||isNextTo(this,ToxicGas)||isNextTo(this,Plasma)||isNextTo(this,Superacid)||isNextTo(this,Void)) { this.destroy(); return; }
-    if ((isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Coal))&&Math.random()<.01) {
+    if ((isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Coal))&&Math.random()<.01) {
         const cx=this.x,cy=this.y; this.destroy();
         let gl=new Glass(cx,cy); particles.push(gl); grid[cx][cy]=gl; return;
     }
@@ -336,7 +360,7 @@ Water.prototype.update = function() {
         let sw=new Saltwater(cx,cy); particles.push(sw); grid[cx][cy]=sw; return;
     }
     // Cooler → Ice
-    if (isNextTo(this,Cooler)&&Math.random()<.05) {
+    if (isNextToActiveCooler(this)&&Math.random()<.05) {
         const cx=this.x,cy=this.y; this.destroy();
         let ic=new Ice(cx,cy); particles.push(ic); grid[cx][cy]=ic; return;
     }
@@ -360,7 +384,7 @@ Water.prototype.update = function() {
         let bl=getNeighbor(this,Blood);
         if (bl) { bl.destroy(); }
     }
-    let htg=isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Ember)||isNextTo(this,Coal)||isNextTo(this,Steel)&&this.temp>50;
+    let htg=isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Ember)||isNextTo(this,Coal)||isNextTo(this,Steel)&&this.temp>50;
     if (htg) { this.temp+=10; } else if (this.temp>17) { this.temp-=0.5; }
     if (this.temp>=100) {
         const cx=this.x,cy=this.y; this.destroy();
@@ -426,7 +450,7 @@ Acid.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fillRect(t
 Oil.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Acid)||isNextTo(this,Plasma)||isNextTo(this,Superacid)) { this.destroy(); return; }
     if (isNextTo(this,Void)&&Math.random()<.02) { this.destroy(); return; }
-    if (isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Ember)) { this.temp+=10; }
+    if (isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Ember)) { this.temp+=10; }
     else if (this.temp>20) { this.temp-=0.5; }
     // Extreme heat turns oil to tar
     if (this.temp>=200) {
@@ -480,7 +504,7 @@ Steam.prototype.update = function() {
         let tg=new ToxicGas(cx,cy); particles.push(tg); grid[cx][cy]=tg; return;
     }
     // Fog condenses from steam + cold
-    if (isNextTo(this,Cooler)&&Math.random()<.05) {
+    if (isNextToActiveCooler(this)&&Math.random()<.05) {
         const cx=this.x,cy=this.y; this.destroy();
         let fg=new Fog(cx,cy); particles.push(fg); grid[cx][cy]=fg; return;
     }
@@ -525,7 +549,7 @@ Fire.prototype.update = function() {
     if (isNextTo(this,Destroyer)) { this.destroy(); return; }
     // Nitrogen extinguishes fire
     if (isNextTo(this,Nitrogen)&&Math.random()<.15) { this.destroy(); return; }
-    this.life--; if (this.life<=0) { this.destroy(); return; }
+    this.life--; if (this.life<=0) { const fx=this.x,fy=this.y-1; this.destroy(); if(fy>=0&&!grid[fx][fy]){let sm=new Smoke(fx,fy);particles.push(sm);grid[fx][fy]=sm;} return; }
     if (frameCount%this.frameDelay!==0) return;
     let ny=this.y-1;
     if (ny>=0) {
@@ -568,7 +592,7 @@ Cloner.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fillRect
 // ============================================================
 Snow.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Acid)||isNextTo(this,ToxicGas)||isNextTo(this,Plasma)||isNextTo(this,Superacid)||isNextTo(this,Void)) { this.destroy(); return; }
-    if ((isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Ember)||isNextTo(this,Coal))&&Math.random()<.05) {
+    if ((isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Ember)||isNextTo(this,Coal))&&Math.random()<.05) {
         const cx=this.x,cy=this.y; this.destroy();
         let w=new Water(cx,cy); particles.push(w); grid[cx][cy]=w; return;
     }
@@ -583,7 +607,7 @@ Snow.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fillRect(t
 
 Ice.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Acid)||isNextTo(this,Plasma)||isNextTo(this,Superacid)||isNextTo(this,Void)) { this.destroy(); return; }
-    if ((isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Ember)||isNextTo(this,Coal))&&Math.random()<.02) {
+    if ((isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Ember)||isNextTo(this,Coal))&&Math.random()<.02) {
         const cx=this.x,cy=this.y; this.destroy();
         let w=new Water(cx,cy); particles.push(w); grid[cx][cy]=w; return;
     }
@@ -608,7 +632,7 @@ Lava.prototype.update = function() {
         const cx=this.x,cy=this.y; this.destroy();
         let ob=new Obsidian(cx,cy); particles.push(ob); grid[cx][cy]=ob; return;
     }
-    if (isNextTo(this,Cooler)&&Math.random()<.05) {
+    if (isNextToActiveCooler(this)&&Math.random()<.05) {
         const cx=this.x,cy=this.y; this.destroy();
         let st=new Stone(cx,cy); particles.push(st); grid[cx][cy]=st; return;
     }
@@ -682,7 +706,7 @@ Fuse.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fillRect(t
 
 TNT.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Void)) { this.destroy(); return; }
-    if (isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Plasma)||isNextTo(this,Ember)||isNextTo(this,Lightning)) {
+    if (isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Plasma)||isNextTo(this,Ember)||isNextTo(this,Lightning)) {
         let bx=this.x,by=this.y; this.destroy(); explode(bx,by,10);
     }
     powderFall(this);
@@ -780,7 +804,7 @@ Salt.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fillRect(t
 
 Saltwater.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Acid)||isNextTo(this,Plasma)||isNextTo(this,Superacid)) { this.destroy(); return; }
-    if (isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Ember)) { this.temp+=10; }
+    if (isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Ember)) { this.temp+=10; }
     else if (this.temp>17) { this.temp-=0.5; }
     if (this.temp>=110) {
         const cx=this.x,cy=this.y; this.destroy();
@@ -798,7 +822,7 @@ Saltwater.prototype.update = function() {
         return;
     }
     // Cooler → Ice
-    if (isNextTo(this,Cooler)&&Math.random()<.03) {
+    if (isNextToActiveCooler(this)&&Math.random()<.03) {
         const cx=this.x,cy=this.y; this.destroy();
         let ic=new Ice(cx,cy); particles.push(ic); grid[cx][cy]=ic; return;
     }
@@ -817,16 +841,20 @@ Concrete.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fillRe
 
 Cooler.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Plasma)||isNextTo(this,Void)) { this.destroy(); return; }
-    if (isNextTo(this,Lava)&&Math.random()<.01) {
+    if (this.powered&&isNextTo(this,Lava)&&Math.random()<.01) {
         let lv=getNeighbor(this,Lava);
         if (lv) { const lx=lv.x,ly=lv.y; lv.destroy(); let st=new Stone(lx,ly); particles.push(st); grid[lx][ly]=st; }
     }
 };
-Cooler.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fillRect(this.x*cellSize,this.y*cellSize,cellSize,cellSize); };
+Cooler.prototype.draw = function() {
+    ctx.fillStyle=this.powered?'#44eeff':this.finalColor;
+    ctx.fillRect(this.x*cellSize,this.y*cellSize,cellSize,cellSize);
+    if(this.powered){ctx.strokeStyle='rgba(80,230,255,0.7)';ctx.lineWidth=2;ctx.strokeRect(this.x*cellSize+1,this.y*cellSize+1,cellSize-2,cellSize-2);}
+};
 
 Methane.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Plasma)||isNextTo(this,Void)) { this.destroy(); return; }
-    if (isNextTo(this,Fire)||isNextTo(this,Lava)||isNextTo(this,Heater)||isNextTo(this,Ember)||isNextTo(this,Lightning)) {
+    if (isNextTo(this,Fire)||isNextTo(this,Lava)||isNextToActiveHeater(this)||isNextTo(this,Ember)||isNextTo(this,Lightning)) {
         let bx=this.x,by=this.y; this.destroy(); explode(bx,by,6);
         return;
     }
@@ -843,7 +871,7 @@ Methane.prototype.draw = function() {
 
 Mud.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Acid)||isNextTo(this,Plasma)||isNextTo(this,Superacid)||isNextTo(this,Void)) { this.destroy(); return; }
-    const nearHeat = isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Coal)||isNextTo(this,Ember);
+    const nearHeat = isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Coal)||isNextTo(this,Ember);
     if (nearHeat) {
         this.heatTimer++;
         // Sustained heat → brick
@@ -934,7 +962,7 @@ Charcoal.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fillRe
 // SULFUR - powder, burns to toxic gas, dissolves in water → acid
 Sulfur.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Acid)||isNextTo(this,Plasma)||isNextTo(this,Superacid)||isNextTo(this,Void)) { this.destroy(); return; }
-    if ((isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Ember))&&Math.random()<.08) {
+    if ((isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Ember))&&Math.random()<.08) {
         const cx=this.x,cy=this.y; this.destroy();
         let tg=new ToxicGas(cx,cy); particles.push(tg); grid[cx][cy]=tg;
         for (let [dx,dy] of DIRS) {
@@ -1009,7 +1037,7 @@ Steel.prototype.update = function() {
     if (isNextTo(this,Superacid)&&Math.random()<.04) { this.destroy(); return; }
     if (isNextTo(this,Acid)&&Math.random()<.008) { this.destroy(); return; }
     // Heat conduction
-    this.hot = isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Coal)||isNextTo(this,Ember);
+    this.hot = isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Coal)||isNextTo(this,Ember);
     if (this.hot) {
         for (let [dx,dy] of DIRS) {
             let nx=this.x+dx,ny=this.y+dy;
@@ -1050,7 +1078,7 @@ Diamond.prototype.draw = function() {
 // WAX - solid, melts to oil near heat
 Wax.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Acid)||isNextTo(this,Plasma)||isNextTo(this,Superacid)||isNextTo(this,Void)) { this.destroy(); return; }
-    if ((isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Ember)||isNextTo(this,Coal))&&Math.random()<.03) {
+    if ((isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Ember)||isNextTo(this,Coal))&&Math.random()<.03) {
         const cx=this.x,cy=this.y; this.destroy();
         let o=new Oil(cx,cy); particles.push(o); grid[cx][cy]=o; return;
     }
@@ -1083,7 +1111,7 @@ Brick.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fillRect(
 // ALCOHOL - liquid, very flammable, evaporates, ignites into burst
 Alcohol.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Plasma)||isNextTo(this,Superacid)||isNextTo(this,Void)) { this.destroy(); return; }
-    if (isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Ember)||isNextTo(this,Lightning)) { this.temp+=20; }
+    if (isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Ember)||isNextTo(this,Lightning)) { this.temp+=20; }
     else if (this.temp>20) { this.temp-=0.5; }
     if (this.temp>=80) {
         // Alcohol ignites: burst of fire + steam
@@ -1124,7 +1152,7 @@ Mercury.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Antimatter)||isNextTo(this,Void)) { this.destroy(); return; }
     if (isNextTo(this,Superacid)&&Math.random()<.02) { this.destroy(); return; }
     // Emits toxic gas when heated
-    if ((isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Coal))&&Math.random()<.03) {
+    if ((isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Coal))&&Math.random()<.03) {
         let sy=this.y-1;
         if (sy>=0&&grid[this.x][sy]===null) { let tg=new ToxicGas(this.x,sy); particles.push(tg); grid[this.x][sy]=tg; }
     }
@@ -1188,7 +1216,7 @@ Honey.prototype.draw = function() {
 Tar.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Plasma)||isNextTo(this,Superacid)||isNextTo(this,Void)) { this.destroy(); return; }
     if (isNextTo(this,Acid)&&Math.random()<.02) { this.destroy(); return; }
-    if (isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Ember)||isNextTo(this,Coal)) { this.temp+=15; }
+    if (isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Ember)||isNextTo(this,Coal)) { this.temp+=15; }
     else if (this.temp>20) { this.temp-=0.3; }
     if (this.temp>=120) {
         // Burns intensely with lots of smoke
@@ -1332,7 +1360,7 @@ Nitrogen.prototype.draw = function() {
 // PROPANE - heavy gas, sinks and explodes
 Propane.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Plasma)||isNextTo(this,Void)) { this.destroy(); return; }
-    if (isNextTo(this,Fire)||isNextTo(this,Ember)||isNextTo(this,Lava)||isNextTo(this,Lightning)||isNextTo(this,Heater)) {
+    if (isNextTo(this,Fire)||isNextTo(this,Ember)||isNextTo(this,Lava)||isNextTo(this,Lightning)||isNextToActiveHeater(this)) {
         let bx=this.x,by=this.y; this.destroy(); explode(bx,by,8);
         return;
     }
@@ -1358,11 +1386,11 @@ Propane.prototype.draw = function() {
 // FOG - thin gas, condenses to water with cold, becomes steam with heat
 Fog.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Plasma)||isNextTo(this,Void)) { this.destroy(); return; }
-    if ((isNextTo(this,Fire)||isNextTo(this,Heater)||isNextTo(this,Lava)||isNextTo(this,Coal))&&Math.random()<.05) {
+    if ((isNextTo(this,Fire)||isNextToActiveHeater(this)||isNextTo(this,Lava)||isNextTo(this,Coal))&&Math.random()<.05) {
         const cx=this.x,cy=this.y; this.destroy();
         let st=new Steam(cx,cy); particles.push(st); grid[cx][cy]=st; return;
     }
-    if ((isNextTo(this,Cooler)||isNextTo(this,Nitrogen)||isNextTo(this,Ice))&&Math.random()<.05) {
+    if ((isNextToActiveCooler(this)||isNextTo(this,Nitrogen)||isNextTo(this,Ice))&&Math.random()<.05) {
         const cx=this.x,cy=this.y; this.destroy();
         let w=new Water(cx,cy); particles.push(w); grid[cx][cy]=w; return;
     }
@@ -1620,7 +1648,7 @@ Blood.prototype.draw = function() {
 // NITROGEL - explosive gel, triggered by many things
 NitroGel.prototype.update = function() {
     if (isNextTo(this,Destroyer)) { this.destroy(); return; }
-    if (isNextTo(this,Fire)||isNextTo(this,Ember)||isNextTo(this,Heater)||isNextTo(this,Lava)||
+    if (isNextTo(this,Fire)||isNextTo(this,Ember)||isNextToActiveHeater(this)||isNextTo(this,Lava)||
         isNextTo(this,Acid)||isNextTo(this,Superacid)||isNextTo(this,Plasma)||isNextTo(this,Lightning)) {
         let bx=this.x,by=this.y; this.destroy(); explode(bx,by,18);
         return;
@@ -1673,6 +1701,428 @@ Superacid.prototype.draw = function() {
     if (Math.random()<0.2) {
         ctx.fillStyle="rgba(255,255,255,0.4)";
         ctx.fillRect((this.x)*cellSize+2,(this.y)*cellSize+2,3,3);
+    }
+};
+
+
+// ============================================================
+// BRUSH SIZE & MIX TOOL
+// ============================================================
+let brushSize = 1; // radius in cells
+let isMixing = false;
+
+canvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    if (e.deltaY < 0) brushSize = Math.min(10, brushSize + 1);
+    else              brushSize = Math.max(1,  brushSize - 1);
+}, { passive: false });
+
+function eraseArea(x, y) {
+    const cx = Math.floor(x/cellSize), cy = Math.floor(y/cellSize);
+    for (let dx=-brushSize+1; dx<brushSize; dx++) {
+        for (let dy=-brushSize+1; dy<brushSize; dy++) {
+            const gx=cx+dx, gy=cy+dy;
+            if (gx<0||gx>=gridWidth||gy<0||gy>=gridHeight) continue;
+            const t=grid[gx][gy];
+            if (t) { const idx=particles.indexOf(t); if(idx>-1) particles.splice(idx,1); grid[gx][gy]=null; }
+        }
+    }
+}
+
+function spawnArea(x, y, Ctor) {
+    const cx = Math.floor(x/cellSize), cy = Math.floor(y/cellSize);
+    for (let dx=-brushSize+1; dx<brushSize; dx++) {
+        for (let dy=-brushSize+1; dy<brushSize; dy++) {
+            const gx=cx+dx, gy=cy+dy;
+            if (gx<0||gx>=gridWidth||gy<0||gy>=gridHeight) continue;
+            if (!grid[gx][gy]) { let p=new Ctor(gx,gy); particles.push(p); grid[gx][gy]=p; }
+        }
+    }
+}
+
+function mixArea(x, y) {
+    const cx = Math.floor(x/cellSize), cy = Math.floor(y/cellSize);
+    const cells = [];
+    for (let dx=-brushSize; dx<=brushSize; dx++) {
+        for (let dy=-brushSize; dy<=brushSize; dy++) {
+            const gx=cx+dx, gy=cy+dy;
+            if (gx>=0&&gx<gridWidth&&gy>=0&&gy<gridHeight) cells.push([gx,gy]);
+        }
+    }
+    // Shuffle particle positions
+    for (let i=cells.length-1; i>0; i--) {
+        const j=Math.floor(Math.random()*(i+1));
+        const [ax,ay]=cells[i], [bx,by]=cells[j];
+        const pa=grid[ax][ay], pb=grid[bx][by];
+        grid[ax][ay]=pb; grid[bx][by]=pa;
+        if(pa){pa.x=bx;pa.y=by;}
+        if(pb){pb.x=ax;pb.y=ay;}
+    }
+}
+
+function drawBrushCursor() {
+    if (mouseX===undefined||mouseY===undefined) return;
+    const cx=Math.floor(mouseX/cellSize), cy=Math.floor(mouseY/cellSize);
+    ctx.strokeStyle = selected==='mix' ? 'rgba(0,255,200,0.7)' : selected==='erase' ? 'rgba(255,80,80,0.7)' : 'rgba(255,255,255,0.5)';
+    ctx.lineWidth=1;
+    const s=brushSize, r=cellSize;
+    ctx.strokeRect((cx-s+1)*r,(cy-s+1)*r,(s*2-2)*r,(s*2-2)*r);
+    // Brush size label
+    ctx.fillStyle='rgba(255,255,255,0.7)';
+    ctx.font='9px monospace';
+    ctx.fillText('\u2A2F'+brushSize, (cx+s)*r+2, (cy-s+1)*r+10);
+}
+
+// ============================================================
+// ELECTRICITY HELPERS
+// ============================================================
+function isNextToActiveHeater(p) {
+    for (let [dx,dy] of DIRS) {
+        let nx=p.x+dx, ny=p.y+dy;
+        if (nx>=0&&nx<gridWidth&&ny>=0&&ny<gridHeight) {
+            let n=grid[nx][ny];
+            if (n instanceof Heater && n.powered) return true;
+        }
+    }
+    return false;
+}
+function isNextToActiveCooler(p) {
+    for (let [dx,dy] of DIRS) {
+        let nx=p.x+dx, ny=p.y+dy;
+        if (nx>=0&&nx<gridWidth&&ny>=0&&ny<gridHeight) {
+            let n=grid[nx][ny];
+            if (n instanceof Cooler && n.powered) return true;
+        }
+    }
+    return false;
+}
+
+function propagateElectricity() {
+    // Reset powered state
+    for (const p of particles) {
+        if (!p.isDead && (p instanceof Wire || p instanceof Heater || p instanceof Cooler || p instanceof Pump))
+            p.powered = false;
+    }
+    // BFS from batteries
+    const visited = new Set(), queue = [];
+    for (const p of particles) {
+        if (!p.isDead && p instanceof Battery) { visited.add(p); queue.push(p); }
+    }
+    while (queue.length) {
+        const curr = queue.shift();
+        for (let [dx,dy] of DIRS) {
+            let nx=curr.x+dx, ny=curr.y+dy;
+            if (nx<0||nx>=gridWidth||ny<0||ny>=gridHeight) continue;
+            const n = grid[nx][ny];
+            if (!n || visited.has(n)) continue;
+            if (n instanceof Wire) {
+                n.powered = true; visited.add(n); queue.push(n);
+            } else if (n instanceof Heater || n instanceof Cooler || n instanceof Pump) {
+                n.powered = true; visited.add(n);
+                // Heater/Cooler/Pump don't propagate but can daisy-chain through wire
+            }
+        }
+    }
+}
+
+// ============================================================
+// v1.8 UPDATE / DRAW PROTOTYPES
+// ============================================================
+Wire.prototype.update = function() {
+    if (isNextTo(this,Destroyer)||isNextTo(this,Plasma)||isNextTo(this,Void)) { this.destroy(); return; }
+    if ((isNextTo(this,Acid)||isNextTo(this,Superacid))&&Math.random()<.02) { this.destroy(); return; }
+};
+Wire.prototype.draw = function() {
+    ctx.fillStyle = this.powered ? '#ffcc00' : '#442200';
+    ctx.fillRect(this.x*cellSize, this.y*cellSize, cellSize, cellSize);
+    ctx.fillStyle = this.powered ? '#fff5aa' : '#885500';
+    ctx.fillRect(this.x*cellSize+3, this.y*cellSize+3, cellSize-6, cellSize-6);
+    if (this.powered) {
+        ctx.globalAlpha = 0.25 + 0.15*Math.sin(frameCount*0.4 + this.x*0.7);
+        ctx.fillStyle = '#ffee44';
+        ctx.fillRect(this.x*cellSize, this.y*cellSize, cellSize, cellSize);
+        ctx.globalAlpha = 1;
+    }
+};
+
+Battery.prototype.update = function() {
+    if (isNextTo(this,Destroyer)||isNextTo(this,Plasma)||isNextTo(this,Void)) { this.destroy(); return; }
+    if ((isNextTo(this,Acid)||isNextTo(this,Superacid))&&Math.random()<.04) {
+        const bx=this.x,by=this.y; this.destroy(); explode(bx,by,3); return;
+    }
+};
+Battery.prototype.draw = function() {
+    const x=this.x*cellSize, y=this.y*cellSize, s=cellSize;
+    ctx.fillStyle='#113311'; ctx.fillRect(x,y,s,s);
+    ctx.fillStyle='#33cc33'; ctx.fillRect(x+2,y+2,s-4,s-4);
+    ctx.fillStyle='#ffffff'; ctx.fillRect(x+s/2-1,y+2,2,s-4); ctx.fillRect(x+2,y+s/2-1,s-4,2);
+};
+
+Pump.prototype.update = function() {
+    if (isNextTo(this,Destroyer)||isNextTo(this,Plasma)||isNextTo(this,Void)) { this.destroy(); return; }
+    if (!this.powered) return;
+    this.pumpTimer++;
+    if (this.pumpTimer < 3) return;
+    this.pumpTimer = 0;
+    const isFluid = p => p && (
+        p instanceof Water || p instanceof Oil || p instanceof Acid || p instanceof Lava ||
+        p instanceof Saltwater || p instanceof Alcohol || p instanceof Blood || p instanceof Slime ||
+        p instanceof Mercury || p instanceof Honey || p instanceof Tar || p instanceof Base
+    );
+    // Pull fluid from below into this cell's position, then shift column upward
+    const below = (this.y+1 < gridHeight) ? grid[this.x][this.y+1] : null;
+    if (isFluid(below)) {
+        // Walk up the column and shift every fluid up one
+        for (let gy = this.y-1; gy >= 0; gy--) {
+            const cur = grid[this.x][gy];
+            const up  = gy-1 >= 0 ? grid[this.x][gy-1] : null;
+            if (!isFluid(cur)) break;
+            if (!up) { grid[this.x][gy]=null; cur.y=gy-1; grid[this.x][gy-1]=cur; }
+        }
+        // Now move below up into the cell above pump
+        const dest = this.y-1;
+        if (dest >= 0 && !grid[this.x][dest]) {
+            grid[this.x][below.y]=null; below.y=dest; grid[this.x][dest]=below;
+        }
+    }
+};
+Pump.prototype.draw = function() {
+    const x=this.x*cellSize, y=this.y*cellSize, s=cellSize;
+    ctx.fillStyle = this.powered ? '#2255ee' : '#112288';
+    ctx.fillRect(x, y, s, s);
+    // Animated upward arrow
+    const phase = this.powered ? (Math.floor(frameCount/5) % 4) : -1;
+    for (let i=0; i<3; i++) {
+        ctx.globalAlpha = (i===phase) ? 1.0 : 0.25;
+        ctx.fillStyle = '#88bbff';
+        ctx.fillRect(x+3, y+s-5-(i*3), s-6, 2);
+    }
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.moveTo(x+s/2,y+1); ctx.lineTo(x+s/2-4,y+7); ctx.lineTo(x+s/2+4,y+7); ctx.closePath(); ctx.fill();
+};
+
+Base.prototype.update = function() {
+    if (isNextTo(this,Destroyer)||isNextTo(this,Plasma)||isNextTo(this,Void)) { this.destroy(); return; }
+    // Neutralise acid → water + salt
+    for (let [dx,dy] of DIRS) {
+        let nx=this.x+dx, ny=this.y+dy;
+        if (nx<0||nx>=gridWidth||ny<0||ny>=gridHeight) continue;
+        const n=grid[nx][ny];
+        if (n instanceof Acid && Math.random()<.08) {
+            const bx=this.x,by=this.y,ax=n.x,ay=n.y;
+            this.destroy(); n.destroy();
+            const w=new Water(bx,by); particles.push(w); grid[bx][by]=w;
+            const s=new Salt(ax,ay);  particles.push(s); grid[ax][ay]=s;
+            return;
+        }
+        if (n instanceof Superacid && Math.random()<.04) {
+            const bx=this.x,by=this.y,ax=n.x,ay=n.y;
+            this.destroy(); n.destroy();
+            const w=new Water(bx,by); particles.push(w); grid[bx][by]=w;
+            const tg=new ToxicGas(ax,ay); particles.push(tg); grid[ax][ay]=tg;
+            return;
+        }
+    }
+    if (isNextTo(this,Water)&&Math.random()<.001) {
+        const cx=this.x,cy=this.y; this.destroy();
+        const w=new Water(cx,cy); particles.push(w); grid[cx][cy]=w; return;
+    }
+    liquidFlow(this);
+};
+Base.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fillRect(this.x*cellSize,this.y*cellSize,cellSize,cellSize); };
+
+Proton.prototype.update = function() {
+    if (isNextTo(this,Destroyer)||isNextTo(this,Acid)||isNextTo(this,Plasma)||isNextTo(this,Superacid)||isNextTo(this,Void)) { this.destroy(); return; }
+    // Proton + Electron → annihilate into energy (fire burst)
+    for (let [dx,dy] of DIRS) {
+        let nx=this.x+dx,ny=this.y+dy;
+        if (nx<0||nx>=gridWidth||ny<0||ny>=gridHeight) continue;
+        if (grid[nx][ny] instanceof Electron) {
+            const bx=this.x,by=this.y; this.destroy(); grid[nx][ny].destroy();
+            for (let fx=bx-2;fx<=bx+2;fx++) for (let fy=by-2;fy<=by+2;fy++) {
+                if (fx>=0&&fx<gridWidth&&fy>=0&&fy<gridHeight&&!grid[fx][fy]) {
+                    const f=new Fire(fx,fy); particles.push(f); grid[fx][fy]=f;
+                }
+            }
+            return;
+        }
+    }
+    this.life--;
+    if (this.life<=0) { this.destroy(); return; }
+    powderFall(this);
+};
+Proton.prototype.draw = function() {
+    ctx.fillStyle=this.finalColor;
+    ctx.fillRect(this.x*cellSize,this.y*cellSize,cellSize,cellSize);
+    ctx.fillStyle='rgba(255,100,100,0.4)';
+    ctx.fillRect(this.x*cellSize+1,this.y*cellSize+1,cellSize-2,cellSize-2);
+};
+
+Electron.prototype.update = function() {
+    if (isNextTo(this,Destroyer)||isNextTo(this,Plasma)||isNextTo(this,Void)) { this.destroy(); return; }
+    // Electrons power adjacent wire cells
+    for (let [dx,dy] of DIRS) {
+        let nx=this.x+dx,ny=this.y+dy;
+        if (nx>=0&&nx<gridWidth&&ny>=0&&ny<gridHeight&&grid[nx][ny] instanceof Wire) grid[nx][ny].powered=true;
+    }
+    this.life--;
+    if (this.life<=0) { this.destroy(); return; }
+    powderFall(this);
+};
+Electron.prototype.draw = function() {
+    ctx.fillStyle=this.finalColor;
+    ctx.fillRect(this.x*cellSize,this.y*cellSize,cellSize,cellSize);
+    ctx.fillStyle='rgba(100,180,255,0.35)';
+    ctx.fillRect(this.x*cellSize+1,this.y*cellSize+1,cellSize-2,cellSize-2);
+};
+
+Human.prototype.update = function() {
+    const hY = this.y - 1;   // head row
+    const ib  = (x,y) => x>=0&&x<gridWidth&&y>=0&&y<gridHeight;
+    const at  = (x,y) => ib(x,y) ? grid[x][y] : null;
+
+    // ── classify cells ──────────────────────────────────────
+    const isFluid   = p => p instanceof Water||p instanceof Saltwater||
+                           p instanceof Alcohol||p instanceof Blood||p instanceof Slime||
+                           p instanceof Honey||p instanceof Mercury||p instanceof Oil;
+    const isGas     = p => p instanceof Steam||p instanceof Smoke||p instanceof ToxicGas||
+                           p instanceof Methane||p instanceof Hydrogen||p instanceof Oxygen||
+                           p instanceof Nitrogen||p instanceof Propane||p instanceof Fog||
+                           p instanceof AntiGas||p instanceof Electron||p instanceof Proton;
+    const isPassable= p => !p || isFluid(p) || isGas(p);
+    const isSolid   = p => p && !isFluid(p) && !isGas(p) && !(p instanceof Human);
+
+    // ── DEATH: fire / lava ───────────────────────────────────
+    const fireDirs = [];
+    for(const [dx,dy] of DIRS){
+        let n=at(this.x+dx,this.y+dy); if(n instanceof Fire||n instanceof Lava||n instanceof Ember) fireDirs.push(true);
+        if(hY>=0){n=at(this.x+dx,hY+dy); if(n instanceof Fire||n instanceof Lava||n instanceof Ember) fireDirs.push(true);}
+    }
+    if(fireDirs.length){
+        const bx=this.x,by=this.y; this.destroy();
+        if(ib(bx,by)&&!grid[bx][by]){const f=new Fire(bx,by);particles.push(f);grid[bx][by]=f;}
+        if(ib(bx,hY)&&!grid[bx][hY]){const f=new Fire(bx,hY);particles.push(f);grid[bx][hY]=f;}
+        return;
+    }
+
+    // ── DEATH: chemicals / special ──────────────────────────
+    const deadly = p => p instanceof Acid||p instanceof Superacid||p instanceof Plasma||
+                        p instanceof Void||p instanceof Destroyer||p instanceof Antimatter||
+                        p instanceof ToxicGas||p instanceof Lightning||p instanceof Virus;
+    for(const [dx,dy] of DIRS){
+        if(deadly(at(this.x+dx,this.y+dy))||deadly(at(this.x+dx,hY+dy))){ this.destroy(); return; }
+    }
+
+    // ── DROWNING ─────────────────────────────────────────────
+    const bodyCell = at(this.x, this.y);
+    const headCell = at(this.x, hY);
+    const submerged = isFluid(bodyCell) || isFluid(headCell);
+    if(submerged){ this.drownTimer=(this.drownTimer||0)+1; }
+    else          { this.drownTimer=0; }
+    if(this.drownTimer > 90){ this.destroy(); return; }   // ~1.5s underwater
+
+    // ── MOVEMENT TICK ────────────────────────────────────────
+    this.moveTimer++;
+    if(this.moveTimer < 5) return;
+    this.moveTimer = 0;
+
+    // ── GRAVITY ──────────────────────────────────────────────
+    const belowBody = at(this.x, this.y+1);
+    if(this.y+1 < gridHeight && isPassable(belowBody) && !(belowBody instanceof Human)){
+        grid[this.x][this.y]=null; this.y++; grid[this.x][this.y]=this; return;
+    }
+
+    // ── RANDOM TURN ──────────────────────────────────────────
+    if(Math.random() < 0.06) this.vx *= -1;
+
+    // ── HORIZONTAL WALK ──────────────────────────────────────
+    const nx = this.x + this.vx;
+    if(ib(nx, this.y) && ib(nx, hY)){
+        const bodyFwd = at(nx, this.y);
+        const headFwd = at(nx, hY);
+        if(isPassable(bodyFwd) && isPassable(headFwd)){
+            // Need solid floor ahead (or at bottom)
+            if(isSolid(at(nx, this.y+1)) || this.y+1>=gridHeight){
+                grid[this.x][this.y]=null; this.x=nx; grid[this.x][this.y]=this;
+            } else { this.vx *= -1; }   // ledge — turn
+        } else if(isSolid(bodyFwd) && isPassable(at(this.x,hY-1)) && isPassable(at(nx,hY-1))){
+            // Climb 1 step — step up then forward
+            grid[this.x][this.y]=null; this.y--; this.x=nx; grid[this.x][this.y]=this;
+        } else { this.vx *= -1; }
+    } else { this.vx *= -1; }
+
+    // ── THROW SAND ───────────────────────────────────────────
+    this.throwTimer++;
+    if(this.throwTimer > 70 && Math.random() < 0.25){
+        this.throwTimer = 0;
+        // Arc: 2 cells ahead, 1 cell above head
+        const tx = this.x + this.vx * 2;
+        const ty = hY - 1;
+        if(ib(tx,ty) && !grid[tx][ty]){
+            const s=new Sand(tx,ty); particles.push(s); grid[tx][ty]=s;
+        } else {
+            // Fallback: drop at feet
+            const fx=this.x, fy=this.y+1;
+            if(ib(fx,fy)&&!grid[fx][fy]){const s=new Sand(fx,fy);particles.push(s);grid[fx][fy]=s;}
+        }
+    }
+};
+
+Human.prototype.draw = function() {
+    const s  = cellSize;
+    const bx = this.x * s;        // body pixel x
+    const by = this.y * s;        // body pixel y  (lower/feet cell)
+    const hy = (this.y - 1) * s;  // head pixel y  (upper cell)
+
+    // ── Body — green shirt ───────────────────────────────────
+    ctx.fillStyle = '#336633';
+    ctx.fillRect(bx+1, by+1, s-2, s-2);
+    // shirt collar detail
+    ctx.fillStyle = '#2a5a2a';
+    ctx.fillRect(bx+3, by+1, s-6, 2);
+
+    // ── Arms (animate with walk) ─────────────────────────────
+    const armSwing = Math.floor(frameCount / 5) % 2;
+    ctx.fillStyle = '#ffcc88';
+    if(armSwing){ ctx.fillRect(bx,    by+2, 2, 5); ctx.fillRect(bx+s-2, by+4, 2, 5); }
+    else        { ctx.fillRect(bx,    by+4, 2, 5); ctx.fillRect(bx+s-2, by+2, 2, 5); }
+
+    // ── Legs (animate opposite to arms) ─────────────────────
+    const legSwing = armSwing;
+    ctx.fillStyle = '#223366';
+    if(legSwing){ ctx.fillRect(bx+2,  by+s-4, 3, 4); ctx.fillRect(bx+s-5,by+s-3, 3, 3); }
+    else        { ctx.fillRect(bx+2,  by+s-3, 3, 3); ctx.fillRect(bx+s-5,by+s-4, 3, 4); }
+
+    // ── Head — tan skin ──────────────────────────────────────
+    ctx.fillStyle = '#ffcc88';
+    ctx.fillRect(bx+2, hy+1, s-4, s-2);
+
+    // ── Hair ─────────────────────────────────────────────────
+    ctx.fillStyle = '#4a2800';
+    ctx.fillRect(bx+2, hy+1, s-4, 3);
+
+    // ── Eyes (direction-aware) ───────────────────────────────
+    ctx.fillStyle = '#111';
+    if(this.vx > 0){
+        ctx.fillRect(bx+s-5, hy+4, 2, 2);
+        ctx.fillRect(bx+s-3, hy+4, 1, 2);
+    } else {
+        ctx.fillRect(bx+2,   hy+4, 2, 2);
+        ctx.fillRect(bx+4,   hy+4, 1, 2);
+    }
+
+    // ── Mouth (tiny line) ────────────────────────────────────
+    ctx.fillStyle = '#cc8855';
+    ctx.fillRect(bx+4, hy+s-4, s-8, 1);
+
+    // ── Drown blue tint overlay ──────────────────────────────
+    if(this.drownTimer > 30){
+        ctx.globalAlpha = Math.min(0.65, (this.drownTimer-30)/60 * 0.65);
+        ctx.fillStyle = '#2266ff';
+        ctx.fillRect(bx+1, by+1, s-2, s-2);
+        ctx.fillRect(bx+2, hy+1, s-4, s-2);
+        ctx.globalAlpha = 1;
     }
 };
 
@@ -1733,23 +2183,12 @@ function loadFromJSON(inputElement) {
 // ============================================================
 // ERASE
 // ============================================================
-function erase(x, y) {
-    const gx=Math.floor(x/cellSize), gy=Math.floor(y/cellSize);
-    if (gx>=0&&gx<gridWidth&&gy>=0&&gy<gridHeight) {
-        const t=grid[gx][gy];
-        if (t!==null) { const idx=particles.indexOf(t); if (idx>-1) particles.splice(idx,1); grid[gx][gy]=null; }
-    }
-}
+function erase(x, y) { eraseArea(x, y); }
 
 // ============================================================
 // SPAWN
 // ============================================================
-function spawnParticle(x, y, Ctor) {
-    const gx=Math.floor(x/cellSize), gy=Math.floor(y/cellSize);
-    if (gx>=0&&gx<gridWidth&&gy>=0&&gy<gridHeight&&grid[gx][gy]===null) {
-        let p=new Ctor(gx,gy); particles.push(p); grid[gx][gy]=p;
-    }
-}
+function spawnParticle(x, y, Ctor) { spawnArea(x, y, Ctor); }
 // Original spawns
 function spawnDirt(x,y){spawnParticle(x,y,Dirt);}
 function spawnAntiPowder(x,y){spawnParticle(x,y,AntiPowder);}
@@ -1820,6 +2259,23 @@ function spawnBlood(x,y){spawnParticle(x,y,Blood);}
 function spawnNitroGel(x,y){spawnParticle(x,y,NitroGel);}
 function spawnSuperacid(x,y){spawnParticle(x,y,Superacid);}
 
+// v1.8 spawns
+function spawnWire(x,y){spawnArea(x,y,Wire);}
+function spawnBattery(x,y){spawnArea(x,y,Battery);}
+function spawnPump(x,y){spawnArea(x,y,Pump);}
+function spawnBase(x,y){spawnArea(x,y,Base);}
+function spawnProton(x,y){spawnArea(x,y,Proton);}
+function spawnElectron(x,y){spawnArea(x,y,Electron);}
+function spawnHuman(x,y){
+    const cx=Math.floor(x/cellSize), cy=Math.floor(y/cellSize);
+    for(let dx=-brushSize+1;dx<brushSize;dx++){
+        const bx=cx+dx;
+        if(bx<0||bx>=gridWidth||cy<0||cy>=gridHeight||cy-1<0) continue;
+        if(!grid[bx][cy]&&!grid[bx][cy-1]){
+            const h=new Human(bx,cy); particles.push(h); grid[bx][cy]=h;
+        }
+    }
+}
 // ============================================================
 // SELECTION
 // ============================================================
@@ -1894,6 +2350,15 @@ function bloodSelected(){setSelected("blood");}
 function nitrogelSelected(){setSelected("nitrogel");}
 function superacidSelected(){setSelected("superacid");}
 
+// v1.8
+function wireSelected(){setSelected("wire");}
+function batterySelected(){setSelected("battery");}
+function pumpSelected(){setSelected("pump");}
+function baseSelected(){setSelected("base");}
+function protonSelected(){setSelected("proton");}
+function electronSelected(){setSelected("electron");}
+function humanSelected(){setSelected("human");}
+function mixSelected(){setSelected("mix");}
 // ============================================================
 // MOUSE
 // ============================================================
@@ -1919,7 +2384,9 @@ const SPAWN_MAP = {
     alcohol:spawnAlcohol, mercury:spawnMercury, honey:spawnHoney, tar:spawnTar, slime:spawnSlime,
     hydrogen:spawnHydrogen, oxygen:spawnOxygen, nitrogen:spawnNitrogen, propane:spawnPropane, fog:spawnFog,
     lightning:spawnLightning, antimatter:spawnAntimatter, ember:spawnEmber, gel:spawnGel, void:spawnVoid,
-    crystal:spawnCrystal, rust:spawnRust, blood:spawnBlood, nitrogel:spawnNitroGel, superacid:spawnSuperacid
+    crystal:spawnCrystal, rust:spawnRust, blood:spawnBlood, nitrogel:spawnNitroGel, superacid:spawnSuperacid,
+    wire:spawnWire, battery:spawnBattery, pump:spawnPump, base:spawnBase,
+    proton:spawnProton, electron:spawnElectron, human:spawnHuman
 };
 
 // ============================================================
@@ -1929,12 +2396,15 @@ function update() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
     frameCount++;
     if (isMouseDown) {
-        if (selected==="erase") erase(mouseX,mouseY);
+        if (selected==="erase") eraseArea(mouseX,mouseY);
+        else if (selected==="mix") mixArea(mouseX,mouseY);
         else if (SPAWN_MAP[selected]) SPAWN_MAP[selected](mouseX,mouseY);
     }
+    propagateElectricity();
     for (let i=particles.length-1;i>=0;i--) { if (!particles[i].isDead) particles[i].update(); }
     for (let i=0;i<particles.length;i++) { if (!particles[i].isDead) particles[i].draw(); }
     particles=particles.filter(p=>!p.isDead);
+    drawBrushCursor();
     requestAnimationFrame(update);
 }
 update();
