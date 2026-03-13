@@ -1696,7 +1696,10 @@ function saveToJSON() {
     const blob = new Blob([JSON.stringify(data,null,0)], {type:'application/json'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `sandbox_save_${Date.now()}.json`;
+    const defaultName = `sandbox_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}`;
+    const rawName = prompt('💾  Save File\n\nEnter a file name (without extension):', defaultName);
+    if (rawName === null) return;
+    a.download = (rawName.trim() || defaultName) + '.json';
     a.click();
     URL.revokeObjectURL(a.href);
 }
