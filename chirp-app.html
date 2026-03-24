@@ -424,6 +424,25 @@ async function initApp() {
   if (sess) {
     currentUser = {access_token:sess.access_token, id:sess.user.id};
     await loadProfile(sess.user.id);
+    if (!currentProfile) {
+      const meta = sess.user?.user_metadata || {};
+      const username = meta.username || (sess.user?.email||'user').split('@')[0].replace(/[^a-z0-9_]/gi,'').toLowerCase();
+      const display_name = meta.display_name || username;
+      try {
+        await fetch(SB_URL+'/rest/v1/profiles', {
+          method:'POST',
+          headers:{...hdrs(sess.access_token),'Prefer':'return=representation'},
+          body:JSON.stringify({id:sess.user.id, username, display_name, color:randomColor()})
+        });
+        await loadProfile(sess.user.id);
+      } catch {}
+    }
+    if (!currentProfile) {
+      localStorage.removeItem('chirp_sess');
+      currentUser = null;
+      document.getElementById('auth').style.display='flex';
+      return;
+    }
     showApp();
   } else {
     document.getElementById('auth').style.display='flex';
@@ -431,7 +450,8 @@ async function initApp() {
 }
 async function loadProfile(uid) {
   const d = await sbGet('profiles',`id=eq.${uid}&select=*`);
-  currentProfile = Array.isArray(d)?d[0]:d;
+  const found = Array.isArray(d) ? d[0] : (d && d.id ? d : null);
+  if (found) currentProfile = found;
 }
 
 // ── AUTH UI ──
@@ -448,6 +468,18 @@ window.doSignIn = async function() {
   try {
     const d = await authPost('/token?grant_type=password',{email,password:pass});
     saveSession(d); await loadProfile(d.user.id);
+    if (!currentProfile) {
+      const meta = d.user?.user_metadata || {};
+      const username = meta.username || email.split('@')[0].replace(/[^a-z0-9_]/gi,'').toLowerCase();
+      const display_name = meta.display_name || username;
+      await fetch(SB_URL+'/rest/v1/profiles', {
+        method:'POST',
+        headers:{...hdrs(d.access_token),'Prefer':'return=representation'},
+        body:JSON.stringify({id:d.user.id, username, display_name, color:randomColor()})
+      });
+      await loadProfile(d.user.id);
+    }
+    if (!currentProfile) { showAuthErr('Could not load profile. Try signing up again.'); setBtnLoad('in-btn','Sign In',false); return; }
     document.getElementById('auth').style.display='none'; showApp();
   } catch(e) { showAuthErr(e.message); }
   setBtnLoad('in-btn','Sign In',false);
@@ -525,6 +557,7 @@ window.updateChar=function(ta,charId,btnId){
   document.getElementById(btnId).disabled=ta.value.trim().length===0||rem<0;
 };
 window.submitPost=async function(){
+  if(!currentProfile){toast('Session expired — please sign in again.');return;}
   const ta=document.getElementById('compose-ta'); const body=ta.value.trim();
   if(!body||body.length>280)return;
   ta.value=''; updateChar(ta,'compose-char','compose-post');
@@ -625,6 +658,7 @@ window.toggleReplies=async function(btn,postId){
   const rBtn=document.createElement('button'); rBtn.className='reply-send'; rBtn.textContent='Reply';
   const replyList=document.createElement('div'); replyList.id='rlist-'+postId;
   rBtn.onclick=async()=>{
+    if(!currentProfile){toast('Session expired — please sign in again.');return;}
     const body=rTa.value.trim(); if(!body)return; rTa.value='';
     await sbPost('posts',{user_id:currentProfile.id,username:currentProfile.username,display_name:currentProfile.display_name,color:currentProfile.color,body,parent_id:postId});
     const rc=btn.querySelector('.rc'); rc.textContent=(parseInt(rc.textContent)||0)+1;
