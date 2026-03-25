@@ -16,12 +16,12 @@
 html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
-/* ── SETUP ── */
+/* SETUP */
 #setup{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-.setup-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:36px;width:100%;max-width:640px}
+.setup-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:36px;width:100%;max-width:660px}
 .setup-logo{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent);margin-bottom:4px}
 .setup-sub{color:var(--muted2);font-size:14px;margin-bottom:24px}
-.setup-steps{counter-reset:steps;display:flex;flex-direction:column;gap:14px;margin-bottom:16px}
+.setup-steps{display:flex;flex-direction:column;gap:14px;margin-bottom:16px}
 .step{display:flex;gap:14px;font-size:14px;line-height:1.7;color:var(--muted2);align-items:flex-start}
 .step-num{background:var(--accent);color:#fff;border-radius:50%;width:22px;height:22px;min-width:22px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-top:2px}
 .step b{color:var(--text)}
@@ -34,7 +34,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .apply-btn:hover{background:var(--accent2)}
 #setup-error{color:var(--danger);font-size:13px;margin-top:10px;display:none}
 
-/* ── AUTH ── */
+/* AUTH */
 #auth{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px}
 .auth-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:40px;width:100%;max-width:400px}
 .auth-logo{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--accent);margin-bottom:4px}
@@ -51,10 +51,9 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .auth-btn:disabled{opacity:.4;cursor:default}
 .auth-err{color:var(--danger);font-size:13px;margin-top:10px;text-align:center;display:none}
 
-/* ── APP ── */
+/* APP */
 #app{display:none;max-width:1100px;margin:0 auto;min-height:100vh}
 .app-inner{display:flex;min-height:100vh}
-
 .sidebar{width:220px;min-width:220px;border-right:1px solid var(--border);padding:20px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow-y:auto}
 .logo{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--accent);padding:6px 10px 18px;letter-spacing:-.5px}
 .nav-btn{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;border:none;background:none;color:var(--muted2);cursor:pointer;font-size:15px;font-weight:500;width:100%;text-align:left;transition:all .15s;font-family:'DM Sans',sans-serif}
@@ -80,17 +79,25 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .tab:hover{color:var(--text)}
 
+/* COMPOSE */
 .compose{border-bottom:1px solid var(--border);padding:16px 20px;display:flex;gap:12px}
-.compose-wrap{flex:1}
+.compose-wrap{flex:1;min-width:0}
 .compose-ta{background:transparent;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;width:100%;min-height:72px;resize:none;line-height:1.55}
 .compose-ta::placeholder{color:var(--muted2)}
-.compose-foot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:10px;margin-top:6px}
+.media-preview-wrap{position:relative;display:inline-block;margin-top:8px;max-width:100%}
+.media-preview-wrap img{max-height:220px;max-width:100%;border-radius:12px;display:block;border:1px solid var(--border)}
+.media-clear-btn{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.75);border:none;color:#fff;width:24px;height:24px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.compose-foot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:10px;margin-top:8px}
+.compose-foot-left{display:flex;align-items:center;gap:10px}
+.media-btn{background:none;border:none;color:var(--accent);cursor:pointer;font-size:20px;padding:2px;line-height:1;transition:opacity .15s}
+.media-btn:hover{opacity:.6}
 .char-count{font-size:12px;color:var(--muted2);font-variant-numeric:tabular-nums}
 .char-count.warn{color:#f59e0b}.char-count.over{color:var(--danger)}
 .post-btn-sm{background:var(--accent);color:#fff;border:none;border-radius:50px;padding:8px 18px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s}
 .post-btn-sm:hover:not(:disabled){background:var(--accent2)}
 .post-btn-sm:disabled{opacity:.35;cursor:default}
 
+/* POSTS */
 .post{border-bottom:1px solid var(--border);padding:14px 20px;transition:background .12s;animation:fadeIn .25s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .post:hover{background:var(--bg2)}
@@ -99,7 +106,8 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .post-meta{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap;margin-bottom:4px;cursor:pointer}
 .post-name{font-weight:700;font-size:15px}
 .post-handle,.post-time{color:var(--muted2);font-size:13px}
-.post-text{font-size:15px;line-height:1.6;white-space:pre-wrap;word-break:break-word;margin-bottom:10px}
+.post-text{font-size:15px;line-height:1.6;white-space:pre-wrap;word-break:break-word;margin-bottom:8px}
+.post-img{width:100%;max-height:420px;object-fit:cover;border-radius:14px;display:block;margin-bottom:10px;border:1px solid var(--border);cursor:zoom-in}
 .post-actions{display:flex;gap:20px}
 .act{display:flex;align-items:center;gap:5px;color:var(--muted2);cursor:pointer;font-size:13px;border:none;background:none;font-family:'DM Sans',sans-serif;padding:0;transition:color .15s}
 .act:hover.act-like{color:var(--danger)}
@@ -108,6 +116,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .act.liked{color:var(--danger)}
 .act-icon{font-size:16px}
 
+/* SIDEBAR RIGHT */
 .right{width:290px;min-width:290px;padding:16px;overflow-y:auto;max-height:100vh}
 .rbox{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}
 .rbox-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:12px}
@@ -126,18 +135,23 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .follow-btn{background:none;border:1px solid var(--border);border-radius:50px;color:var(--text);cursor:pointer;padding:5px 12px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
 .follow-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
 
-.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;cursor:pointer}
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;cursor:pointer;overflow:hidden}
 
+/* REPLIES */
 .replies-section{background:var(--bg2);border:1px solid var(--border);border-radius:14px;margin:8px 20px 16px;overflow:hidden}
 .replies-header{padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px}
-.replies-compose{display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border)}
-.reply-ta{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;resize:none;min-height:44px;transition:border .15s}
+.replies-compose{display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);align-items:flex-start;flex-wrap:wrap}
+.reply-ta{flex:1;min-width:120px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;resize:none;min-height:44px;transition:border .15s}
 .reply-ta:focus{border-color:var(--accent)}
-.reply-send{background:var(--accent);color:#fff;border:none;border-radius:50px;padding:0 14px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;align-self:flex-end;height:34px;transition:all .15s;white-space:nowrap}
-.reply-send:hover{background:var(--accent2)}
+.reply-img-preview{max-height:120px;border-radius:8px;display:block;margin:4px 0;border:1px solid var(--border)}
+.reply-send{background:var(--accent);color:#fff;border:none;border-radius:50px;padding:0 14px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;height:34px;transition:all .15s;white-space:nowrap;align-self:flex-end}
+.reply-send:hover:not(:disabled){background:var(--accent2)}
+.reply-send:disabled{opacity:.4;cursor:default}
 .reply-post{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;animation:fadeIn .2s ease}
 .reply-post:last-child{border-bottom:none}
+.reply-post-img{max-width:100%;max-height:260px;border-radius:10px;display:block;margin-top:6px;border:1px solid var(--border);cursor:zoom-in}
 
+/* MODALS */
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
 .user-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;width:100%;max-width:380px;overflow:hidden;animation:fadeIn .2s ease;position:relative}
 .card-banner{height:90px;background:linear-gradient(135deg,#111f60,#07090f)}
@@ -148,16 +162,26 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .card-bio{font-size:14px;color:var(--muted2);line-height:1.5;margin-bottom:10px}
 .card-stats{display:flex;gap:16px;font-size:13px}
 .card-close{position:absolute;top:10px;right:14px;background:rgba(0,0,0,.4);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.edit-modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;width:100%;max-width:420px;padding:28px;animation:fadeIn .2s ease;position:relative}
+.edit-modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;width:100%;max-width:440px;padding:28px;animation:fadeIn .2s ease;position:relative;max-height:90vh;overflow-y:auto}
 .edit-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:20px}
 
+/* AVATAR UPLOAD */
+.av-upload-outer{text-align:center;margin-bottom:20px}
+.av-upload-ring{width:76px;height:76px;border-radius:50%;margin:0 auto 8px;cursor:pointer;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;border:2px solid var(--border)}
+.av-upload-ring:hover .av-overlay{opacity:1}
+.av-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:22px;opacity:0;transition:opacity .15s;border-radius:50%}
+.av-hint{font-size:12px;color:var(--muted2)}
+
+/* IMAGE VIEWER */
+.img-fullscreen{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:500;display:flex;align-items:center;justify-content:center;cursor:zoom-out}
+.img-fullscreen img{max-width:94vw;max-height:94vh;object-fit:contain;border-radius:8px}
+
+/* MISC */
 .loading{text-align:center;padding:40px;color:var(--muted2);font-size:14px}
 .spinner{width:26px;height:26px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#172040;border:1px solid #3060d0;border-radius:10px;padding:12px 22px;font-size:14px;font-weight:500;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap}
 #toast.show{transform:translateX(-50%) translateY(0)}
-
 .prof-banner{height:110px;background:linear-gradient(135deg,#111f60,#07090f)}
 .prof-info{padding:0 20px 16px;border-bottom:1px solid var(--border)}
 .prof-av-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:-28px;margin-bottom:10px}
@@ -189,17 +213,19 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 <div id="setup">
   <div class="setup-card">
     <div class="setup-logo">🐦 Chirp</div>
-    <div class="setup-sub">Powered by Supabase — free forever, no credit card</div>
+    <div class="setup-sub">Powered by Supabase — free forever, no credit card needed</div>
     <div class="setup-steps">
-      <div class="step"><div class="step-num">1</div><div>Go to <b>supabase.com</b> → <b>New project</b> (sign in with GitHub, name it anything, set a DB password)</div></div>
-      <div class="step"><div class="step-num">2</div><div>In the left sidebar click <b>SQL Editor</b> → paste &amp; run this:</div></div>
+      <div class="step"><div class="step-num">1</div><div>Go to <b>supabase.com</b> → <b>New project</b> (sign in with GitHub, name it anything)</div></div>
+      <div class="step"><div class="step-num">2</div><div>Go to <b>SQL Editor</b> → paste &amp; run this (creates tables, auto-count triggers, and a public media bucket):</div></div>
     </div>
-    <div class="sql-box">create table profiles (
+    <div class="sql-box">-- Tables
+create table profiles (
   id uuid primary key references auth.users,
   username text unique not null,
   display_name text not null,
   bio text default '',
   color text default '#5b8fff',
+  avatar_url text,
   created_at timestamptz default now()
 );
 create table posts (
@@ -208,7 +234,8 @@ create table posts (
   username text not null,
   display_name text not null,
   color text not null,
-  body text not null,
+  body text not null default '',
+  image_url text,
   like_count int default 0,
   reply_count int default 0,
   parent_id uuid references posts default null,
@@ -224,26 +251,74 @@ create table follows (
   following_id uuid references profiles,
   primary key (follower_id, following_id)
 );
+
+-- RLS
 alter table profiles enable row level security;
-alter table posts enable row level security;
-alter table likes enable row level security;
-alter table follows enable row level security;
-create policy "public read" on profiles for select using (true);
-create policy "own insert" on profiles for insert with check (auth.uid()=id);
-create policy "own update" on profiles for update using (auth.uid()=id);
-create policy "public read" on posts for select using (true);
-create policy "auth insert" on posts for insert with check (auth.uid() is not null);
-create policy "own delete" on posts for delete using (auth.uid()=user_id);
-create policy "public read" on likes for select using (true);
-create policy "auth manage" on likes for all using (auth.uid()=user_id);
-create policy "public read" on follows for select using (true);
-create policy "auth manage" on follows for all using (auth.uid()=follower_id);</div>
+alter table posts    enable row level security;
+alter table likes    enable row level security;
+alter table follows  enable row level security;
+
+create policy "pub read"         on profiles for select using (true);
+create policy "own insert"       on profiles for insert with check (auth.uid()=id);
+create policy "own update"       on profiles for update using (auth.uid()=id);
+
+create policy "pub read"         on posts    for select using (true);
+create policy "auth insert"      on posts    for insert with check (auth.uid() is not null);
+create policy "auth update"      on posts    for update using (auth.uid() is not null);
+create policy "own delete"       on posts    for delete using (auth.uid()=user_id);
+
+create policy "pub read"         on likes    for select using (true);
+create policy "auth like insert" on likes    for insert with check (auth.uid()=user_id);
+create policy "auth like delete" on likes    for delete using (auth.uid()=user_id);
+
+create policy "pub read"         on follows  for select using (true);
+create policy "auth fol insert"  on follows  for insert with check (auth.uid()=follower_id);
+create policy "auth fol delete"  on follows  for delete using (auth.uid()=follower_id);
+
+-- Trigger: auto-update like_count (runs as DB owner, bypasses RLS)
+create or replace function trg_like_count()
+returns trigger language plpgsql security definer as $$
+begin
+  if TG_OP='INSERT' then
+    update posts set like_count = like_count + 1 where id = NEW.post_id;
+  else
+    update posts set like_count = greatest(0, like_count - 1) where id = OLD.post_id;
+  end if;
+  return null;
+end;$$;
+create trigger on_like after insert or delete on likes
+  for each row execute function trg_like_count();
+
+-- Trigger: auto-update reply_count
+create or replace function trg_reply_count()
+returns trigger language plpgsql security definer as $$
+begin
+  if TG_OP='INSERT' and NEW.parent_id is not null then
+    update posts set reply_count = reply_count + 1 where id = NEW.parent_id;
+  elsif TG_OP='DELETE' and OLD.parent_id is not null then
+    update posts set reply_count = greatest(0, reply_count - 1) where id = OLD.parent_id;
+  end if;
+  return null;
+end;$$;
+create trigger on_reply after insert or delete on posts
+  for each row execute function trg_reply_count();
+
+-- Public storage bucket for images and GIFs
+insert into storage.buckets (id, name, public)
+  values ('chirp', 'chirp', true)
+  on conflict (id) do nothing;
+
+create policy "pub read chirp"    on storage.objects for select using (bucket_id='chirp');
+create policy "auth upload chirp" on storage.objects for insert
+  with check (bucket_id='chirp' and auth.uid() is not null);
+create policy "own delete chirp"  on storage.objects for delete
+  using (bucket_id='chirp' and auth.uid()::text = owner);</div>
     <div class="setup-steps" style="margin-top:12px">
       <div class="step"><div class="step-num">3</div><div>Go to <b>Project Settings → API</b> → copy your <b>Project URL</b> and <b>anon public</b> key:</div></div>
     </div>
     <div class="field-row">
       <div><div class="field-label">Project URL (https://vnpkknawnwuzkxkedfmh.supabase.co)</div><input class="field-input" id="sb-url" placeholder="https://xxxx.supabase.co" type="url"></div>
-      <div><div class="field-label">Anon Public Key(eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZucGtrbmF3bnd1emt4a2VkZm1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTY3NDksImV4cCI6MjA4OTg3Mjc0OX0._NXiD_YoHPVmqN9nMMygq2_lqaLU6dTWw-7WoiGsJQM)</div><input class="field-input" id="sb-key" placeholder="eyJh..."></div>
+      <div><div class="field-label">Anon Public Key (eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZucGtrbmF3bnd1emt4a2VkZm1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTY3NDksImV4cCI6MjA4OTg3Mjc0OX0._NXiD_YoHPVmqN9nMMygq2_lqaLU6dTWw-7WoiGsJQM)</div><input class="field-input" id="sb-key" placeholder="eyJh..."></div>
     </div>
     <button class="apply-btn" onclick="applyConfig()">Launch Chirp →</button>
     <div id="setup-error"></div>
@@ -307,20 +382,30 @@ create policy "auth manage" on follows for all using (auth.uid()=follower_id);</
           <div class="av" id="compose-av" style="width:38px;height:38px;font-size:15px"></div>
           <div class="compose-wrap">
             <textarea class="compose-ta" id="compose-ta" placeholder="What's chirping?" oninput="updateChar(this,'compose-char','compose-post')"></textarea>
+            <div id="compose-preview-wrap" style="display:none" class="media-preview-wrap">
+              <img id="compose-preview-img" src="" alt="preview">
+              <button class="media-clear-btn" onclick="clearComposeMedia()">✕</button>
+            </div>
             <div class="compose-foot">
-              <span class="char-count" id="compose-char">280</span>
+              <div class="compose-foot-left">
+                <button class="media-btn" title="Add image / GIF" onclick="document.getElementById('compose-file-in').click()">🖼️</button>
+                <input type="file" id="compose-file-in" accept="image/*" style="display:none" onchange="onComposePick(this)">
+                <span class="char-count" id="compose-char">280</span>
+              </div>
               <button class="post-btn-sm" id="compose-post" onclick="submitPost()" disabled>Chirp</button>
             </div>
           </div>
         </div>
         <div id="posts-list"></div>
       </div>
+
       <!-- EXPLORE -->
       <div id="view-explore" style="display:none">
         <div class="feed-header"><div class="feed-title">Explore</div></div>
         <div class="explore-search"><input class="search-in" style="width:100%" type="text" placeholder="Search chirps…" id="explore-q" oninput="schedSearch()"></div>
         <div id="explore-results"><div class="loading">Start typing to search…</div></div>
       </div>
+
       <!-- PROFILE -->
       <div id="view-profile" style="display:none">
         <div class="feed-header"><div class="feed-title">Profile</div></div>
@@ -355,228 +440,269 @@ create policy "auth manage" on follows for all using (auth.uid()=follower_id);</
 let SB_URL='', SB_KEY='';
 let currentUser=null, currentProfile=null;
 let feedTab='all', likedSet=new Set(), searchTimer=null;
+let composeFile=null; // pending upload for next chirp
 
 // ── CONFIG ──
-function applyConfig() {
-  SB_URL = document.getElementById('sb-url').value.trim().replace(/\/$/,'');
-  SB_KEY = document.getElementById('sb-key').value.trim();
-  const err = document.getElementById('setup-error');
-  if (!SB_URL||!SB_KEY) { err.textContent='Fill in both fields.'; err.style.display='block'; return; }
-  if (!SB_URL.startsWith('https://')) { err.textContent='URL must start with https://'; err.style.display='block'; return; }
-  localStorage.setItem('chirp_url', SB_URL); localStorage.setItem('chirp_key', SB_KEY);
-  err.style.display='none';
-  initApp();
+function applyConfig(){
+  SB_URL=document.getElementById('sb-url').value.trim().replace(/\/$/,'');
+  SB_KEY=document.getElementById('sb-key').value.trim();
+  const err=document.getElementById('setup-error');
+  if(!SB_URL||!SB_KEY){err.textContent='Fill in both fields.';err.style.display='block';return;}
+  if(!SB_URL.startsWith('https://')){err.textContent='URL must start with https://';err.style.display='block';return;}
+  localStorage.setItem('chirp_url',SB_URL);localStorage.setItem('chirp_key',SB_KEY);
+  err.style.display='none'; initApp();
 }
-
-window.addEventListener('DOMContentLoaded', () => {
-  const url=localStorage.getItem('chirp_url'), key=localStorage.getItem('chirp_key');
-  if (url&&key) { SB_URL=url; SB_KEY=key; initApp(); }
+window.addEventListener('DOMContentLoaded',()=>{
+  const url=localStorage.getItem('chirp_url'),key=localStorage.getItem('chirp_key');
+  if(url&&key){SB_URL=url;SB_KEY=key;initApp();}
 });
 
 // ── HTTP HELPERS ──
-function hdrs(token) {
-  return {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+(token||SB_KEY)};
-}
-async function sbFetch(path, opts={}, token) {
-  const r = await fetch(SB_URL+path, {headers:hdrs(token), ...opts});
-  const t = await r.text(); let d; try{d=JSON.parse(t)}catch{d=t}
-  if (!r.ok) throw new Error(d?.message||d?.error_description||JSON.stringify(d).slice(0,120));
+function hdrs(token){return{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+(token||SB_KEY)};}
+async function sbFetch(path,opts={},token){
+  const r=await fetch(SB_URL+path,{headers:hdrs(token),...opts});
+  const t=await r.text();let d;try{d=JSON.parse(t)}catch{d=t}
+  if(!r.ok)throw new Error(d?.message||d?.error_description||JSON.stringify(d).slice(0,120));
   return d;
 }
-const tok = () => currentUser?.access_token;
-async function sbGet(table, q='') { return sbFetch('/rest/v1/'+table+'?'+q,{},tok()); }
-async function sbPost(table, body) { return sbFetch('/rest/v1/'+table,{method:'POST',body:JSON.stringify(body),headers:{...hdrs(tok()),'Prefer':'return=representation'}},tok()); }
-async function sbPatch(table, q, body) { return sbFetch('/rest/v1/'+table+'?'+q,{method:'PATCH',body:JSON.stringify(body),headers:{...hdrs(tok()),'Prefer':'return=representation'}},tok()); }
-async function sbDelete(table, q) { return sbFetch('/rest/v1/'+table+'?'+q,{method:'DELETE'},tok()); }
+const tok=()=>currentUser?.access_token;
+async function sbGet(tbl,q=''){return sbFetch('/rest/v1/'+tbl+'?'+q,{},tok());}
+async function sbPost(tbl,body){return sbFetch('/rest/v1/'+tbl,{method:'POST',body:JSON.stringify(body),headers:{...hdrs(tok()),'Prefer':'return=representation'}},tok());}
+async function sbPatch(tbl,q,body){return sbFetch('/rest/v1/'+tbl+'?'+q,{method:'PATCH',body:JSON.stringify(body),headers:{...hdrs(tok()),'Prefer':'return=representation'}},tok());}
+async function sbDelete(tbl,q){return sbFetch('/rest/v1/'+tbl+'?'+q,{method:'DELETE'},tok());}
+async function authPost(path,body){
+  const r=await fetch(SB_URL+'/auth/v1'+path,{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY},body:JSON.stringify(body)});
+  const d=await r.json();
+  if(!r.ok)throw new Error(d.error_description||d.msg||d.message||'Auth error');
+  return d;
+}
 
-async function authPost(path, body) {
-  const r = await fetch(SB_URL+'/auth/v1'+path, {method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY},body:JSON.stringify(body)});
-  const d = await r.json();
-  if (!r.ok) throw new Error(d.error_description||d.msg||d.message||'Auth error');
-  return d;
+// ── STORAGE ──
+async function uploadFile(file, storagePath){
+  const r=await fetch(`${SB_URL}/storage/v1/object/chirp/${storagePath}`,{
+    method:'POST',
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+tok(),'Content-Type':file.type,'x-upsert':'true'},
+    body:file
+  });
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.message||'Upload failed');}
+  return `${SB_URL}/storage/v1/object/public/chirp/${storagePath}`;
 }
 
 // ── SESSION ──
-async function getSession() {
-  const s = localStorage.getItem('chirp_sess');
-  if (!s) return null;
-  const sess = JSON.parse(s);
-  if (Date.now() > sess.expires_at*1000 - 30000) {
-    try {
-      const r = await fetch(SB_URL+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY},body:JSON.stringify({refresh_token:sess.refresh_token})});
-      const d = await r.json();
-      if (r.ok) { saveSession(d); return d; }
-    } catch {}
-    localStorage.removeItem('chirp_sess'); return null;
+async function getSession(){
+  const s=localStorage.getItem('chirp_sess');if(!s)return null;
+  const sess=JSON.parse(s);
+  if(Date.now()>sess.expires_at*1000-30000){
+    try{
+      const r=await fetch(SB_URL+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY},body:JSON.stringify({refresh_token:sess.refresh_token})});
+      const d=await r.json();if(r.ok){saveSession(d);return d;}
+    }catch{}
+    localStorage.removeItem('chirp_sess');return null;
   }
   return sess;
 }
-function saveSession(d) {
-  const sess = {access_token:d.access_token,refresh_token:d.refresh_token,expires_at:d.expires_at||Math.floor(Date.now()/1000)+(d.expires_in||3600),user:d.user};
-  localStorage.setItem('chirp_sess', JSON.stringify(sess));
-  currentUser = {access_token:d.access_token, id:d.user?.id};
+function saveSession(d){
+  const sess={access_token:d.access_token,refresh_token:d.refresh_token,expires_at:d.expires_at||Math.floor(Date.now()/1000)+(d.expires_in||3600),user:d.user};
+  localStorage.setItem('chirp_sess',JSON.stringify(sess));
+  currentUser={access_token:d.access_token,id:d.user?.id};
 }
 
 // ── INIT ──
-async function initApp() {
+async function initApp(){
   document.getElementById('setup').style.display='none';
-  const sess = await getSession();
-  if (sess) {
-    currentUser = {access_token:sess.access_token, id:sess.user.id};
+  const sess=await getSession();
+  if(sess){
+    currentUser={access_token:sess.access_token,id:sess.user.id};
     await loadProfile(sess.user.id);
-    if (!currentProfile) {
-      const meta = sess.user?.user_metadata || {};
-      const username = meta.username || (sess.user?.email||'user').split('@')[0].replace(/[^a-z0-9_]/gi,'').toLowerCase();
-      const display_name = meta.display_name || username;
-      try {
-        await fetch(SB_URL+'/rest/v1/profiles', {
-          method:'POST',
-          headers:{...hdrs(sess.access_token),'Prefer':'return=representation'},
-          body:JSON.stringify({id:sess.user.id, username, display_name, color:randomColor()})
-        });
+    if(!currentProfile){
+      const meta=sess.user?.user_metadata||{};
+      const username=meta.username||(sess.user?.email||'user').split('@')[0].replace(/[^a-z0-9_]/gi,'').toLowerCase();
+      const display_name=meta.display_name||username;
+      try{
+        await fetch(SB_URL+'/rest/v1/profiles',{method:'POST',headers:{...hdrs(sess.access_token),'Prefer':'return=representation'},body:JSON.stringify({id:sess.user.id,username,display_name,color:randomColor()})});
         await loadProfile(sess.user.id);
-      } catch {}
+      }catch{}
     }
-    if (!currentProfile) {
-      localStorage.removeItem('chirp_sess');
-      currentUser = null;
-      document.getElementById('auth').style.display='flex';
-      return;
-    }
+    if(!currentProfile){localStorage.removeItem('chirp_sess');currentUser=null;document.getElementById('auth').style.display='flex';return;}
     showApp();
-  } else {
-    document.getElementById('auth').style.display='flex';
-  }
+  }else{document.getElementById('auth').style.display='flex';}
 }
-async function loadProfile(uid) {
-  const d = await sbGet('profiles',`id=eq.${uid}&select=*`);
-  const found = Array.isArray(d) ? d[0] : (d && d.id ? d : null);
-  if (found) currentProfile = found;
+async function loadProfile(uid){
+  const d=await sbGet('profiles',`id=eq.${uid}&select=*`);
+  const found=Array.isArray(d)?d[0]:(d&&d.id?d:null);
+  if(found)currentProfile=found;
 }
 
 // ── AUTH UI ──
-window.authTab = function(tab) {
+window.authTab=function(tab){
   document.getElementById('form-in').style.display=tab==='in'?'block':'none';
   document.getElementById('form-up').style.display=tab==='up'?'block':'none';
   document.getElementById('tab-in').classList.toggle('active',tab==='in');
   document.getElementById('tab-up').classList.toggle('active',tab==='up');
   document.getElementById('auth-err').style.display='none';
 };
-window.doSignIn = async function() {
-  const email=document.getElementById('in-email').value.trim(), pass=document.getElementById('in-pass').value;
-  setBtnLoad('in-btn','Signing in…'); clearAuthErr();
-  try {
-    const d = await authPost('/token?grant_type=password',{email,password:pass});
-    saveSession(d); await loadProfile(d.user.id);
-    if (!currentProfile) {
-      const meta = d.user?.user_metadata || {};
-      const username = meta.username || email.split('@')[0].replace(/[^a-z0-9_]/gi,'').toLowerCase();
-      const display_name = meta.display_name || username;
-      await fetch(SB_URL+'/rest/v1/profiles', {
-        method:'POST',
-        headers:{...hdrs(d.access_token),'Prefer':'return=representation'},
-        body:JSON.stringify({id:d.user.id, username, display_name, color:randomColor()})
-      });
+window.doSignIn=async function(){
+  const email=document.getElementById('in-email').value.trim(),pass=document.getElementById('in-pass').value;
+  setBtnLoad('in-btn','Signing in…');clearAuthErr();
+  try{
+    const d=await authPost('/token?grant_type=password',{email,password:pass});
+    saveSession(d);await loadProfile(d.user.id);
+    if(!currentProfile){
+      const meta=d.user?.user_metadata||{};
+      const username=meta.username||email.split('@')[0].replace(/[^a-z0-9_]/gi,'').toLowerCase();
+      const display_name=meta.display_name||username;
+      await fetch(SB_URL+'/rest/v1/profiles',{method:'POST',headers:{...hdrs(d.access_token),'Prefer':'return=representation'},body:JSON.stringify({id:d.user.id,username,display_name,color:randomColor()})});
       await loadProfile(d.user.id);
     }
-    if (!currentProfile) { showAuthErr('Could not load profile. Try signing up again.'); setBtnLoad('in-btn','Sign In',false); return; }
-    document.getElementById('auth').style.display='none'; showApp();
-  } catch(e) { showAuthErr(e.message); }
+    if(!currentProfile){showAuthErr('Could not load profile. Try signing up again.');setBtnLoad('in-btn','Sign In',false);return;}
+    document.getElementById('auth').style.display='none';showApp();
+  }catch(e){showAuthErr(e.message);}
   setBtnLoad('in-btn','Sign In',false);
 };
-window.doSignUp = async function() {
-  const name=document.getElementById('up-name').value.trim(), uname=document.getElementById('up-user').value.trim().toLowerCase();
-  const email=document.getElementById('up-email').value.trim(), pass=document.getElementById('up-pass').value;
-  if (!name||!uname||!email||!pass) return showAuthErr('All fields required.');
-  if (uname.length<2) return showAuthErr('Username too short.');
-  if (pass.length<6) return showAuthErr('Password must be 6+ characters.');
-  setBtnLoad('up-btn','Creating account…'); clearAuthErr();
-  try {
-    const existing = await sbGet('profiles',`username=eq.${uname}&select=id`);
-    if (existing.length>0) { showAuthErr('Username taken.'); setBtnLoad('up-btn','Create Account',false); return; }
-    const d = await authPost('/signup',{email,password:pass,data:{display_name:name,username:uname}});
-    if (d.access_token) {
+window.doSignUp=async function(){
+  const name=document.getElementById('up-name').value.trim(),uname=document.getElementById('up-user').value.trim().toLowerCase();
+  const email=document.getElementById('up-email').value.trim(),pass=document.getElementById('up-pass').value;
+  if(!name||!uname||!email||!pass)return showAuthErr('All fields required.');
+  if(uname.length<2)return showAuthErr('Username too short.');
+  if(pass.length<6)return showAuthErr('Password must be 6+ characters.');
+  setBtnLoad('up-btn','Creating account…');clearAuthErr();
+  try{
+    const existing=await sbGet('profiles',`username=eq.${uname}&select=id`);
+    if(existing.length>0){showAuthErr('Username taken.');setBtnLoad('up-btn','Create Account',false);return;}
+    const d=await authPost('/signup',{email,password:pass,data:{display_name:name,username:uname}});
+    if(d.access_token){
       saveSession(d);
       await fetch(SB_URL+'/rest/v1/profiles',{method:'POST',headers:{...hdrs(d.access_token),'Prefer':'return=representation'},body:JSON.stringify({id:d.user.id,username:uname,display_name:name,color:randomColor()})});
       await loadProfile(d.user.id);
-      document.getElementById('auth').style.display='none'; showApp();
-    } else { showAuthErr('Account created! Check your email to confirm, then sign in.'); authTab('in'); }
-  } catch(e) { showAuthErr(e.message); }
+      document.getElementById('auth').style.display='none';showApp();
+    }else{showAuthErr('Account created! Check your email to confirm, then sign in.');authTab('in');}
+  }catch(e){showAuthErr(e.message);}
   setBtnLoad('up-btn','Create Account',false);
 };
-window.doSignOut = async function() {
-  try { await fetch(SB_URL+'/auth/v1/logout',{method:'POST',headers:hdrs(tok())}); } catch {}
+window.doSignOut=async function(){
+  try{await fetch(SB_URL+'/auth/v1/logout',{method:'POST',headers:hdrs(tok())});}catch{}
   localStorage.removeItem('chirp_sess');
-  currentUser=null; currentProfile=null; likedSet.clear();
+  currentUser=null;currentProfile=null;likedSet.clear();composeFile=null;
   document.getElementById('app').style.display='none';
   document.getElementById('auth').style.display='flex';
 };
-function setBtnLoad(id,txt,loading=true) { const b=document.getElementById(id); b.disabled=loading; b.textContent=txt; }
-function showAuthErr(msg) { const e=document.getElementById('auth-err'); e.textContent=msg; e.style.display='block'; }
-function clearAuthErr() { document.getElementById('auth-err').style.display='none'; }
+function setBtnLoad(id,txt,loading=true){const b=document.getElementById(id);b.disabled=loading;b.textContent=txt;}
+function showAuthErr(msg){const e=document.getElementById('auth-err');e.textContent=msg;e.style.display='block';}
+function clearAuthErr(){document.getElementById('auth-err').style.display='none';}
 
 // ── SHOW APP ──
-function showApp() {
+function showApp(){
   document.getElementById('app').style.display='block';
-  renderSidebar(); showView('home'); loadFeed(); loadTrending(); loadWhoToFollow();
+  renderSidebar();showView('home');loadFeed();loadTrending();loadWhoToFollow();
 }
-function renderSidebar() {
-  if (!currentProfile) return;
-  setAv('sb-av',currentProfile,34); setAv('compose-av',currentProfile,38);
+function renderSidebar(){
+  if(!currentProfile)return;
+  setAv('sb-av',currentProfile,34);setAv('compose-av',currentProfile,38);
   document.getElementById('sb-name').textContent=currentProfile.display_name;
   document.getElementById('sb-handle').textContent='@'+currentProfile.username;
 }
-function setAv(id,p,size=36) {
-  const el=document.getElementById(id); if(!el)return;
-  el.style.cssText=`width:${size}px;height:${size}px;font-size:${Math.floor(size*.38)}px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;cursor:pointer;`;
-  el.textContent=p.display_name[0].toUpperCase();
+// Renders an avatar into an existing DOM element by id
+function setAv(id,p,size=36){
+  const el=document.getElementById(id);if(!el)return;
+  el.style.cssText=`width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0;cursor:pointer;background:${p.color};`;
+  if(p.avatar_url){
+    el.innerHTML=`<img src="${esc(p.avatar_url)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
+  }else{
+    el.style.cssText+=`color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:${Math.floor(size*.38)}px;`;
+    el.textContent=(p.display_name||'?')[0].toUpperCase();
+  }
 }
-function makeAv(p,size=36) {
-  const d=document.createElement('div'); d.className='av';
-  d.style.cssText=`width:${size}px;height:${size}px;font-size:${Math.floor(size*.38)}px;background:${p.color};color:#fff;`;
-  d.textContent=p.display_name[0].toUpperCase();
-  d.onclick=()=>openUserCard(p.user_id||p.id); return d;
+// Creates a new avatar element
+function makeAv(p,size=36){
+  const d=document.createElement('div');d.className='av';
+  d.style.cssText=`width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0;cursor:pointer;background:${p.color};`;
+  if(p.avatar_url){
+    d.innerHTML=`<img src="${esc(p.avatar_url)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
+  }else{
+    d.style.cssText+=`color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:${Math.floor(size*.38)}px;`;
+    d.textContent=(p.display_name||'?')[0].toUpperCase();
+  }
+  d.onclick=()=>openUserCard(p.user_id||p.id);return d;
 }
 
 // ── NAV ──
-window.showView = function(v) {
+window.showView=function(v){
   ['home','explore','profile'].forEach(n=>{
     document.getElementById('view-'+n).style.display=n===v?'block':'none';
     document.getElementById('nav-'+n)?.classList.toggle('active',n===v);
   });
-  if(v==='profile') loadProfileView();
-  if(v==='explore') document.getElementById('explore-q').focus();
+  if(v==='profile')loadProfileView();
+  if(v==='explore')document.getElementById('explore-q').focus();
 };
 window.focusCompose=function(){showView('home');document.getElementById('compose-ta').focus();};
 
-// ── COMPOSE ──
+// ── COMPOSE MEDIA ──
+window.onComposePick=function(input){
+  const file=input.files[0];if(!file)return;
+  composeFile=file;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    document.getElementById('compose-preview-img').src=e.target.result;
+    document.getElementById('compose-preview-wrap').style.display='inline-block';
+    document.getElementById('compose-post').disabled=false; // can post with just image
+  };
+  reader.readAsDataURL(file);
+  input.value=''; // reset so same file can be re-picked
+};
+window.clearComposeMedia=function(){
+  composeFile=null;
+  document.getElementById('compose-preview-wrap').style.display='none';
+  document.getElementById('compose-preview-img').src='';
+  // re-evaluate button: only enable if there's text
+  const ta=document.getElementById('compose-ta');
+  updateChar(ta,'compose-char','compose-post');
+};
+
+// ── CHAR COUNT & BUTTON STATE ──
 window.updateChar=function(ta,charId,btnId){
   const rem=280-ta.value.length;
-  const el=document.getElementById(charId); el.textContent=rem;
+  const el=document.getElementById(charId);el.textContent=rem;
   el.className='char-count'+(rem<30?' warn':'')+(rem<0?' over':'');
-  document.getElementById(btnId).disabled=ta.value.trim().length===0||rem<0;
+  document.getElementById(btnId).disabled=(ta.value.trim().length===0&&!composeFile)||rem<0;
 };
+
+// ── SUBMIT CHIRP ──
 window.submitPost=async function(){
   if(!currentProfile){toast('Session expired — please sign in again.');return;}
-  const ta=document.getElementById('compose-ta'); const body=ta.value.trim();
-  if(!body||body.length>280)return;
-  ta.value=''; updateChar(ta,'compose-char','compose-post');
-  try {
-    await sbPost('posts',{user_id:currentProfile.id,username:currentProfile.username,display_name:currentProfile.display_name,color:currentProfile.color,body,parent_id:null});
-    toast('Chirp posted! 🐦'); loadFeed();
-  } catch(e){toast('Error: '+e.message);}
+  const ta=document.getElementById('compose-ta');
+  const body=ta.value.trim();
+  if(!body&&!composeFile)return;
+  if(body.length>280)return;
+
+  const btn=document.getElementById('compose-post');
+  btn.disabled=true;btn.textContent='Posting…';
+
+  let image_url=null;
+  if(composeFile){
+    try{
+      const ext=(composeFile.name.split('.').pop()||'jpg').toLowerCase();
+      image_url=await uploadFile(composeFile,`posts/${currentProfile.id}/${Date.now()}.${ext}`);
+    }catch(e){toast('Upload failed: '+e.message);btn.disabled=false;btn.textContent='Chirp';return;}
+  }
+
+  try{
+    await sbPost('posts',{user_id:currentProfile.id,username:currentProfile.username,display_name:currentProfile.display_name,color:currentProfile.color,body,image_url,parent_id:null});
+    ta.value='';clearComposeMedia();updateChar(ta,'compose-char','compose-post');
+    toast('Chirp posted! 🐦');loadFeed();
+  }catch(e){toast('Error: '+e.message);}
+  btn.textContent='Chirp';
 };
 
 // ── FEED ──
 window.setFeedTab=function(tab,el){
   feedTab=tab;
   document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active'); loadFeed();
+  el.classList.add('active');loadFeed();
 };
 async function loadFeed(){
   const list=document.getElementById('posts-list');
   list.innerHTML='<div class="loading"><div class="spinner"></div>Loading…</div>';
-  try {
+  try{
     let q='parent_id=is.null&order=created_at.desc&limit=50&select=*';
     if(feedTab==='following'){
       const fols=await sbGet('follows',`follower_id=eq.${currentProfile.id}&select=following_id`);
@@ -585,8 +711,8 @@ async function loadFeed(){
       q+=`&user_id=in.(${ids.join(',')})`;
     }
     const posts=await sbGet('posts',q);
-    await loadMyLikes(); renderPosts(posts,list);
-  } catch(e){list.innerHTML=`<div class="loading">Error: ${e.message}</div>`;}
+    await loadMyLikes();renderPosts(posts,list);
+  }catch(e){list.innerHTML=`<div class="loading">Error: ${e.message}</div>`;}
 }
 async function loadMyLikes(){
   if(!currentProfile)return;
@@ -599,21 +725,25 @@ function renderPosts(posts,container){
   posts.forEach(p=>container.appendChild(buildPost(p)));
 }
 function buildPost(p){
-  const div=document.createElement('div'); div.className='post';
+  const div=document.createElement('div');div.className='post';
   const liked=likedSet.has(p.id);
+  const imgHtml=p.image_url
+    ?`<img class="post-img" src="${esc(p.image_url)}" alt="media" loading="lazy" onclick="viewImg('${esc(p.image_url)}')">`
+    :'';
   div.innerHTML=`
     <div class="post-top">
       <div class="av-slot"></div>
       <div class="post-content">
-        <div class="post-meta">
+        <div class="post-meta" onclick="openUserCard('${p.user_id}')">
           <span class="post-name">${esc(p.display_name)}</span>
           <span class="post-handle">@${esc(p.username)}</span>
           <span class="post-time">· ${timeAgo(p.created_at)}</span>
         </div>
-        <div class="post-text">${esc(p.body)}</div>
+        ${p.body?`<div class="post-text">${esc(p.body)}</div>`:''}
+        ${imgHtml}
         <div class="post-actions">
           <button class="act act-reply" onclick="toggleReplies(this,'${p.id}')"><span class="act-icon">💬</span> <span class="rc">${p.reply_count||0}</span></button>
-          <button class="act act-like ${liked?'liked':''}" data-id="${p.id}" onclick="toggleLike(this,'${p.id}')"><span class="act-icon">${liked?'❤️':'🤍'}</span> <span class="lc">${p.like_count||0}</span></button>
+          <button class="act act-like ${liked?'liked':''}" onclick="toggleLike(this,'${p.id}')"><span class="act-icon">${liked?'❤️':'🤍'}</span> <span class="lc">${p.like_count||0}</span></button>
           ${p.user_id===currentProfile?.id?`<button class="act act-del" onclick="deletePost('${p.id}',this)"><span class="act-icon">🗑️</span></button>`:''}
         </div>
       </div>
@@ -623,20 +753,30 @@ function buildPost(p){
   return div;
 }
 
+// ── IMAGE VIEWER ──
+window.viewImg=function(url){
+  const overlay=document.createElement('div');overlay.className='img-fullscreen';
+  overlay.innerHTML=`<img src="${url}" alt="full image">`;
+  overlay.onclick=()=>overlay.remove();
+  document.body.appendChild(overlay);
+};
+
 // ── LIKES ──
+// Counts are auto-updated by DB trigger — no client-side patch needed.
 window.toggleLike=async function(btn,postId){
   if(!currentProfile)return;
   const liked=likedSet.has(postId);
-  const lc=btn.querySelector('.lc'); const ico=btn.querySelector('.act-icon');
+  const lc=btn.querySelector('.lc');const ico=btn.querySelector('.act-icon');
   const count=parseInt(lc.textContent)||0;
   if(liked){
-    likedSet.delete(postId); btn.classList.remove('liked'); ico.textContent='🤍'; lc.textContent=Math.max(0,count-1);
-    await sbDelete('likes',`user_id=eq.${currentProfile.id}&post_id=eq.${postId}`);
-    await sbPatch('posts',`id=eq.${postId}`,{like_count:Math.max(0,count-1)});
-  } else {
-    likedSet.add(postId); btn.classList.add('liked'); ico.textContent='❤️'; lc.textContent=count+1;
-    try { await sbPost('likes',{user_id:currentProfile.id,post_id:postId}); } catch {}
-    await sbPatch('posts',`id=eq.${postId}`,{like_count:count+1});
+    // optimistic
+    likedSet.delete(postId);btn.classList.remove('liked');ico.textContent='🤍';lc.textContent=Math.max(0,count-1);
+    try{await sbDelete('likes',`user_id=eq.${currentProfile.id}&post_id=eq.${postId}`);}
+    catch(e){likedSet.add(postId);btn.classList.add('liked');ico.textContent='❤️';lc.textContent=count;toast('Error: '+e.message);}
+  }else{
+    likedSet.add(postId);btn.classList.add('liked');ico.textContent='❤️';lc.textContent=count+1;
+    try{await sbPost('likes',{user_id:currentProfile.id,post_id:postId});}
+    catch(e){likedSet.delete(postId);btn.classList.remove('liked');ico.textContent='🤍';lc.textContent=count;toast('Error: '+e.message);}
   }
 };
 
@@ -644,46 +784,100 @@ window.toggleLike=async function(btn,postId){
 window.deletePost=async function(postId,btn){
   if(!confirm('Delete this chirp?'))return;
   await sbDelete('posts',`id=eq.${postId}`);
-  btn.closest('.post').remove(); toast('Deleted.');
+  btn.closest('.post').remove();toast('Deleted.');
 };
 
 // ── REPLIES ──
 window.toggleReplies=async function(btn,postId){
   const wrap=document.getElementById('replies-'+postId);
   if(wrap.style.display!=='none'){wrap.style.display='none';return;}
-  wrap.style.display='block'; wrap.innerHTML='';
-  const section=document.createElement('div'); section.className='replies-section';
-  const compRow=document.createElement('div'); compRow.className='replies-compose';
-  const rTa=document.createElement('textarea'); rTa.className='reply-ta'; rTa.placeholder='Reply…'; rTa.rows=1;
-  const rBtn=document.createElement('button'); rBtn.className='reply-send'; rBtn.textContent='Reply';
-  const replyList=document.createElement('div'); replyList.id='rlist-'+postId;
-  rBtn.onclick=async()=>{
-    if(!currentProfile){toast('Session expired — please sign in again.');return;}
-    const body=rTa.value.trim(); if(!body)return; rTa.value='';
-    await sbPost('posts',{user_id:currentProfile.id,username:currentProfile.username,display_name:currentProfile.display_name,color:currentProfile.color,body,parent_id:postId});
-    const rc=btn.querySelector('.rc'); rc.textContent=(parseInt(rc.textContent)||0)+1;
-    await sbPatch('posts',`id=eq.${postId}`,{reply_count:(parseInt(rc.textContent)||1)});
-    loadReplies(postId,replyList); toast('Reply posted!');
+  wrap.style.display='block';wrap.innerHTML='';
+
+  const section=document.createElement('div');section.className='replies-section';
+  const hdr=document.createElement('div');hdr.className='replies-header';hdr.textContent='Replies';
+
+  // Build compose row
+  const compRow=document.createElement('div');compRow.className='replies-compose';
+  const avSlot=document.createElement('div');avSlot.appendChild(makeAv(currentProfile,30));
+
+  const rTa=document.createElement('textarea');rTa.className='reply-ta';rTa.placeholder='Reply…';rTa.rows=1;
+
+  // Per-reply media state
+  let rFile=null;
+  const rImgPreview=document.createElement('img');rImgPreview.className='reply-img-preview';rImgPreview.style.display='none';
+
+  const rFileIn=document.createElement('input');rFileIn.type='file';rFileIn.accept='image/*';rFileIn.style.display='none';
+  rFileIn.onchange=()=>{
+    const f=rFileIn.files[0];if(!f)return;rFile=f;
+    const reader=new FileReader();reader.onload=e=>{rImgPreview.src=e.target.result;rImgPreview.style.display='block';};
+    reader.readAsDataURL(f);rFileIn.value='';
   };
-  compRow.append(makeAv(currentProfile,30),rTa,rBtn);
-  const hdr=document.createElement('div'); hdr.className='replies-header'; hdr.textContent='Replies';
-  section.append(hdr,compRow,replyList); wrap.appendChild(section);
+
+  const rMediaBtn=document.createElement('button');rMediaBtn.className='media-btn';rMediaBtn.textContent='🖼️';rMediaBtn.title='Add image';
+  rMediaBtn.onclick=()=>rFileIn.click();
+
+  const rSend=document.createElement('button');rSend.className='reply-send';rSend.textContent='Reply';
+  rSend.onclick=async()=>{
+    if(!currentProfile){toast('Session expired.');return;}
+    const body=rTa.value.trim();
+    if(!body&&!rFile)return;
+    rSend.disabled=true;rSend.textContent='…';
+
+    let image_url=null;
+    if(rFile){
+      try{
+        const ext=(rFile.name.split('.').pop()||'jpg').toLowerCase();
+        image_url=await uploadFile(rFile,`posts/${currentProfile.id}/${Date.now()}_r.${ext}`);
+      }catch(e){toast('Upload failed: '+e.message);rSend.disabled=false;rSend.textContent='Reply';return;}
+    }
+
+    try{
+      await sbPost('posts',{user_id:currentProfile.id,username:currentProfile.username,display_name:currentProfile.display_name,color:currentProfile.color,body,image_url,parent_id:postId});
+      rTa.value='';rFile=null;rImgPreview.src='';rImgPreview.style.display='none';
+      // update reply count optimistically in the parent post button
+      const rc=btn.querySelector('.rc');rc.textContent=(parseInt(rc.textContent)||0)+1;
+      loadReplies(postId,replyList);toast('Reply posted!');
+    }catch(e){toast('Error: '+e.message);}
+    rSend.disabled=false;rSend.textContent='Reply';
+  };
+
+  // assemble
+  const rightCol=document.createElement('div');rightCol.style.cssText='flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;';
+  const actRow=document.createElement('div');actRow.style.cssText='display:flex;gap:6px;align-items:flex-end;';
+  actRow.append(rTa,rMediaBtn,rFileIn,rSend);
+  rightCol.append(actRow,rImgPreview);
+  compRow.append(avSlot,rightCol);
+
+  const replyList=document.createElement('div');replyList.id='rlist-'+postId;
+  section.append(hdr,compRow,replyList);wrap.appendChild(section);
   loadReplies(postId,replyList);
 };
+
 async function loadReplies(postId,container){
   container.innerHTML='<div class="loading" style="padding:14px 16px"><div class="spinner"></div></div>';
   const replies=await sbGet('posts',`parent_id=eq.${postId}&order=created_at.asc&select=*`);
   container.innerHTML='';
   if(!replies.length){container.innerHTML='<div style="padding:14px 16px;color:var(--muted2);font-size:13px">No replies yet.</div>';return;}
   replies.forEach(r=>{
-    const row=document.createElement('div'); row.className='reply-post';
-    row.innerHTML=`<div class="rav-slot"></div><div style="flex:1;min-width:0"><div style="display:flex;align-items:baseline;gap:5px;margin-bottom:3px;cursor:pointer" onclick="openUserCard('${r.user_id}')"><span style="font-weight:700;font-size:14px">${esc(r.display_name)}</span><span style="color:var(--muted2);font-size:12px">@${esc(r.username)}</span><span style="color:var(--muted2);font-size:12px">· ${timeAgo(r.created_at)}</span></div><div style="font-size:14px;line-height:1.55;word-break:break-word">${esc(r.body)}</div></div>`;
-    row.querySelector('.rav-slot').appendChild(makeAv(r,30));
+    const row=document.createElement('div');row.className='reply-post';
+    const imgHtml=r.image_url
+      ?`<img class="reply-post-img" src="${esc(r.image_url)}" alt="media" loading="lazy" onclick="viewImg('${esc(r.image_url)}')">`
+      :'';
+    row.innerHTML=`<div class="rrav-slot"></div><div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:3px;cursor:pointer" onclick="openUserCard('${r.user_id}')">
+        <span style="font-weight:700;font-size:14px">${esc(r.display_name)}</span>
+        <span style="color:var(--muted2);font-size:12px">@${esc(r.username)}</span>
+        <span style="color:var(--muted2);font-size:12px">· ${timeAgo(r.created_at)}</span>
+      </div>
+      ${r.body?`<div style="font-size:14px;line-height:1.55;word-break:break-word">${esc(r.body)}</div>`:''}
+      ${imgHtml}
+    </div>`;
+    row.querySelector('.rrav-slot').appendChild(makeAv(r,30));
     container.appendChild(row);
   });
 }
 
-// ── PROFILE ──
+// ── PROFILE VIEW ──
 async function loadProfileView(){
   if(!currentProfile)return;
   await loadProfile(currentProfile.id);
@@ -703,26 +897,71 @@ async function loadProfileView(){
   const container=document.getElementById('profile-posts');
   container.innerHTML='<div class="loading"><div class="spinner"></div></div>';
   const myPosts=await sbGet('posts',`user_id=eq.${p.id}&parent_id=is.null&order=created_at.desc&select=*`);
-  await loadMyLikes(); renderPosts(myPosts,container);
+  await loadMyLikes();renderPosts(myPosts,container);
 }
+
+// ── EDIT PROFILE ──
 window.openEditProfile=function(){
-  const backdrop=document.createElement('div'); backdrop.className='modal-backdrop';
+  const p=currentProfile;
+  const backdrop=document.createElement('div');backdrop.className='modal-backdrop';
   backdrop.onclick=e=>{if(e.target===backdrop)backdrop.remove();};
-  backdrop.innerHTML=`<div class="edit-modal"><button onclick="this.closest('.modal-backdrop').remove()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted2);font-size:20px;cursor:pointer">✕</button><div class="edit-title">Edit Profile</div><div class="form-group"><label class="form-label">Display Name</label><input class="form-input" id="edit-dname" value="${esc(currentProfile.display_name)}"></div><div class="form-group"><label class="form-label">Bio</label><textarea class="form-input" id="edit-bio" rows="3" style="resize:vertical">${esc(currentProfile.bio||'')}</textarea></div><button class="auth-btn" onclick="saveProfile(this)">Save</button></div>`;
+  const avContent=p.avatar_url
+    ?`<img src="${esc(p.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div class="av-overlay">📷</div>`
+    :`<span style="font-size:26px">${(p.display_name||'?')[0].toUpperCase()}</span><div class="av-overlay">📷</div>`;
+  backdrop.innerHTML=`
+    <div class="edit-modal">
+      <button onclick="this.closest('.modal-backdrop').remove()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted2);font-size:20px;cursor:pointer">✕</button>
+      <div class="edit-title">Edit Profile</div>
+      <div class="av-upload-outer">
+        <div class="av-upload-ring" id="edit-av-ring" style="background:${p.color};font-size:26px;color:#fff" onclick="document.getElementById('edit-av-in').click()">
+          ${avContent}
+        </div>
+        <div class="av-hint">Click to change photo</div>
+        <input type="file" id="edit-av-in" accept="image/*" style="display:none" onchange="previewAvatar(this)">
+      </div>
+      <div class="form-group"><label class="form-label">Display Name</label><input class="form-input" id="edit-dname" value="${esc(p.display_name)}"></div>
+      <div class="form-group"><label class="form-label">Bio</label><textarea class="form-input" id="edit-bio" rows="3" style="resize:vertical">${esc(p.bio||'')}</textarea></div>
+      <button class="auth-btn" onclick="saveProfile(this)">Save</button>
+    </div>`;
   document.body.appendChild(backdrop);
 };
+window.previewAvatar=function(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const ring=document.getElementById('edit-av-ring');
+    ring.innerHTML=`<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div class="av-overlay">📷</div>`;
+    ring._pendingFile=file;
+  };
+  reader.readAsDataURL(file);
+};
 window.saveProfile=async function(btn){
-  btn.disabled=true; btn.textContent='Saving…';
+  btn.disabled=true;btn.textContent='Saving…';
   const dname=document.getElementById('edit-dname').value.trim();
   const bio=document.getElementById('edit-bio').value.trim();
-  await sbPatch('profiles',`id=eq.${currentProfile.id}`,{display_name:dname,bio});
-  currentProfile.display_name=dname; currentProfile.bio=bio;
-  renderSidebar(); btn.closest('.modal-backdrop').remove();
-  loadProfileView(); toast('Profile saved!');
+
+  let avatar_url=currentProfile.avatar_url;
+  const ring=document.getElementById('edit-av-ring');
+  if(ring?._pendingFile){
+    try{
+      const f=ring._pendingFile;
+      const ext=(f.name.split('.').pop()||'jpg').toLowerCase();
+      // upsert so old avatar is replaced at the same path
+      avatar_url=await uploadFile(f,`avatars/${currentProfile.id}.${ext}`);
+    }catch(e){toast('Avatar upload failed: '+e.message);btn.disabled=false;btn.textContent='Save';return;}
+  }
+
+  try{
+    await sbPatch('profiles',`id=eq.${currentProfile.id}`,{display_name:dname,bio,avatar_url});
+    currentProfile.display_name=dname;currentProfile.bio=bio;currentProfile.avatar_url=avatar_url;
+    renderSidebar();btn.closest('.modal-backdrop').remove();
+    loadProfileView();toast('Profile saved!');
+  }catch(e){toast('Save failed: '+e.message);btn.disabled=false;btn.textContent='Save';}
 };
 
 // ── USER CARD ──
 window.openUserCard=async function(uid){
+  if(!uid||uid==='undefined')return;
   if(uid===currentProfile?.id){showView('profile');return;}
   const [profiles,following,followers,isFollowArr]=await Promise.all([
     sbGet('profiles',`id=eq.${uid}&select=*`),
@@ -730,27 +969,44 @@ window.openUserCard=async function(uid){
     sbGet('follows',`following_id=eq.${uid}&select=follower_id`),
     sbGet('follows',`follower_id=eq.${currentProfile.id}&following_id=eq.${uid}&select=follower_id`)
   ]);
-  const p=profiles[0]; if(!p)return;
+  const p=profiles[0];if(!p)return;
   const isFollowing=isFollowArr.length>0;
   document.getElementById('user-modal')?.remove();
-  const backdrop=document.createElement('div'); backdrop.id='user-modal'; backdrop.className='modal-backdrop';
+  const backdrop=document.createElement('div');backdrop.id='user-modal';backdrop.className='modal-backdrop';
   backdrop.onclick=e=>{if(e.target===backdrop)backdrop.remove();};
-  backdrop.innerHTML=`<div class="user-card"><button class="card-close" onclick="this.closest('.modal-backdrop').remove()">✕</button><div class="card-banner"></div><div class="card-body"><div class="card-av-row"><div style="width:64px;height:64px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;border:3px solid var(--bg2)">${p.display_name[0]}</div><button onclick="toggleFollow('${uid}',${isFollowing})" style="background:${isFollowing?'transparent':'var(--accent)'};border:1px solid ${isFollowing?'var(--muted2)':'var(--accent)'};color:${isFollowing?'var(--muted2)':'#fff'};border-radius:50px;padding:8px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">${isFollowing?'Following':'Follow'}</button></div><div class="card-name">${esc(p.display_name)}</div><div class="card-handle">@${esc(p.username)}</div>${p.bio?`<div class="card-bio">${esc(p.bio)}</div>`:''}<div class="card-stats"><span><b>${following.length}</b> <span style="color:var(--muted2)">Following</span></span><span><b>${followers.length}</b> <span style="color:var(--muted2)">Followers</span></span></div></div></div>`;
+  const avHtml=p.avatar_url
+    ?`<img src="${esc(p.avatar_url)}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid var(--bg2)">`
+    :`<div style="width:64px;height:64px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;border:3px solid var(--bg2)">${(p.display_name||'?')[0]}</div>`;
+  backdrop.innerHTML=`<div class="user-card">
+    <button class="card-close" onclick="this.closest('.modal-backdrop').remove()">✕</button>
+    <div class="card-banner"></div>
+    <div class="card-body">
+      <div class="card-av-row">${avHtml}
+        <button onclick="toggleFollow('${uid}',${isFollowing})" style="background:${isFollowing?'transparent':'var(--accent)'};border:1px solid ${isFollowing?'var(--muted2)':'var(--accent)'};color:${isFollowing?'var(--muted2)':'#fff'};border-radius:50px;padding:8px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">${isFollowing?'Following':'Follow'}</button>
+      </div>
+      <div class="card-name">${esc(p.display_name)}</div>
+      <div class="card-handle">@${esc(p.username)}</div>
+      ${p.bio?`<div class="card-bio">${esc(p.bio)}</div>`:''}
+      <div class="card-stats">
+        <span><b>${following.length}</b> <span style="color:var(--muted2)">Following</span></span>
+        <span><b>${followers.length}</b> <span style="color:var(--muted2)">Followers</span></span>
+      </div>
+    </div>
+  </div>`;
   document.body.appendChild(backdrop);
 };
 window.toggleFollow=async function(uid,isFollowing){
   if(isFollowing){await sbDelete('follows',`follower_id=eq.${currentProfile.id}&following_id=eq.${uid}`);toast('Unfollowed.');}
   else{await sbPost('follows',{follower_id:currentProfile.id,following_id:uid});toast('Following! 🎉');}
-  document.getElementById('user-modal')?.remove();
-  loadWhoToFollow();
+  document.getElementById('user-modal')?.remove();loadWhoToFollow();
 };
 
 // ── SEARCH ──
 window.schedSearch=function(){clearTimeout(searchTimer);searchTimer=setTimeout(runSearch,350);};
 window.rpSearch=function(){
-  const q=document.getElementById('rp-search').value.trim(); if(!q)return;
-  document.getElementById('explore-q').value=q; showView('explore');
-  clearTimeout(searchTimer); searchTimer=setTimeout(runSearch,0);
+  const q=document.getElementById('rp-search').value.trim();if(!q)return;
+  document.getElementById('explore-q').value=q;showView('explore');
+  clearTimeout(searchTimer);searchTimer=setTimeout(runSearch,0);
 };
 async function runSearch(){
   const q=document.getElementById('explore-q').value.trim();
@@ -758,8 +1014,8 @@ async function runSearch(){
   if(!q){res.innerHTML='<div class="loading">Type to search…</div>';return;}
   res.innerHTML='<div class="loading"><div class="spinner"></div>Searching…</div>';
   const posts=await sbGet('posts',`body=ilike.*${encodeURIComponent(q)}*&parent_id=is.null&order=created_at.desc&limit=50&select=*`);
-  await loadMyLikes(); renderPosts(posts,res);
-  if(!posts.length) res.innerHTML=`<div class="loading">No results for "${esc(q)}"</div>`;
+  await loadMyLikes();renderPosts(posts,res);
+  if(!posts.length)res.innerHTML=`<div class="loading">No results for "${esc(q)}"</div>`;
 }
 
 // ── TRENDING ──
@@ -781,7 +1037,14 @@ async function loadWhoToFollow(){
   const cands=all.filter(p=>!folIds.has(p.id)).slice(0,4);
   const el=document.getElementById('who-list');
   if(!cands.length){el.innerHTML='<div style="color:var(--muted2);font-size:13px">You\'re following everyone!</div>';return;}
-  el.innerHTML=cands.map(p=>`<div class="who-row"><div style="width:34px;height:34px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;cursor:pointer;flex-shrink:0" onclick="openUserCard('${p.id}')">${p.display_name[0]}</div><div class="who-info" style="cursor:pointer" onclick="openUserCard('${p.id}')"><div class="who-name">${esc(p.display_name)}</div><div class="who-handle">@${esc(p.username)}</div></div><button class="follow-btn" onclick="toggleFollow('${p.id}',false);this.textContent='Following';this.style.opacity='.5';this.disabled=true">Follow</button></div>`).join('');
+  el.innerHTML='';
+  cands.forEach(p=>{
+    const row=document.createElement('div');row.className='who-row';
+    row.innerHTML=`<div class="who-av-slot"></div><div class="who-info" style="cursor:pointer" onclick="openUserCard('${p.id}')"><div class="who-name">${esc(p.display_name)}</div><div class="who-handle">@${esc(p.username)}</div></div><button class="follow-btn" onclick="toggleFollow('${p.id}',false);this.textContent='Following';this.style.opacity='.5';this.disabled=true">Follow</button>`;
+    const av=makeAv(p,34);av.onclick=()=>openUserCard(p.id);
+    row.querySelector('.who-av-slot').appendChild(av);
+    el.appendChild(row);
+  });
 }
 
 // ── UTILS ──
