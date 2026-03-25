@@ -483,7 +483,7 @@ create trigger on_profile_update
 </div>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-let SB_URL='', SB_KEY='';
+let SB_URL='https://vnpkknawnwuzkxkedfmh.supabase.co', SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZucGtrbmF3bnd1emt4a2VkZm1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTY3NDksImV4cCI6MjA4OTg3Mjc0OX0._NXiD_YoHPVmqN9nMMygq2_lqaLU6dTWw-7WoiGsJQM';
 let currentUser=null, currentProfile=null;
 let feedTab='all', likedSet=new Set(), searchTimer=null;
 let composeFile=null; // pending upload for next chirp
@@ -506,8 +506,7 @@ function applyConfig(){
   err.style.display='none'; initApp();
 }
 window.addEventListener('DOMContentLoaded',()=>{
-  const url=localStorage.getItem('chirp_url'),key=localStorage.getItem('chirp_key');
-  if(url&&key){SB_URL=url;SB_KEY=key;initApp();}
+  initApp();
 });
 
 // ── HTTP HELPERS ──
