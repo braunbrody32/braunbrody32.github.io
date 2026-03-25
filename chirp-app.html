@@ -13,7 +13,7 @@
   --accent:#5b8fff;--accent2:#82b0ff;--text:#eef0f7;
   --muted:#3f4560;--muted2:#7880a0;--danger:#ff5060;--green:#3dca7a;
 }
-html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
+html,body{height:100vh;width:100vw;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);margin:0;padding:0;overflow:hidden;}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
 /* SETUP */
@@ -52,8 +52,8 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .auth-err{color:var(--danger);font-size:13px;margin-top:10px;text-align:center;display:none}
 
 /* APP */
-#app{display:none;max-width:1100px;margin:0 auto;min-height:100vh}
-.app-inner{display:flex;min-height:100vh}
+#app{display:block;max-width:none;margin:0;width:100vw;height:100vh;overflow:hidden;}
+.app-inner{display:flex;flex-direction:row;flex-wrap:nowrap;height:100vh;overflow:hidden;}
 .sidebar{width:220px;min-width:220px;border-right:1px solid var(--border);padding:20px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow-y:auto}
 .logo{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--accent);padding:6px 10px 18px;letter-spacing:-.5px}
 .nav-btn{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;border:none;background:none;color:var(--muted2);cursor:pointer;font-size:15px;font-weight:500;width:100%;text-align:left;transition:all .15s;font-family:'DM Sans',sans-serif}
@@ -71,7 +71,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .signout-btn{background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted2);cursor:pointer;padding:7px;font-size:13px;font-family:'DM Sans',sans-serif;transition:all .15s;width:100%}
 .signout-btn:hover{border-color:var(--danger);color:var(--danger)}
 
-.feed{flex:1;border-right:1px solid var(--border);overflow-y:auto;max-height:100vh}
+.feed{flex:1;border-right:1px solid var(--border);overflow-y:auto;height:100vh;}
 .feed-header{position:sticky;top:0;background:rgba(7,9,15,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);z-index:10;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
 .feed-title{font-family:'Syne',sans-serif;font-size:19px;font-weight:800}
 .tabs{display:flex}
@@ -117,8 +117,8 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .act-icon{font-size:16px}
 
 /* SIDEBAR RIGHT */
-.right{width:290px;min-width:290px;padding:16px;overflow-y:auto;max-height:100vh}
-.rbox{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}
+.right{order:3;flex-shrink:0;width:290px;min-width:290px;padding:16px;overflow-y:auto;position:sticky;top:0;height:100vh;}
+.rbox{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:10px;margin-bottom:10px}
 .rbox-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:12px}
 .search-in{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border .15s}
 .search-in:focus{border-color:var(--accent)}
@@ -247,6 +247,16 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 @media(max-width:720px){.dm-list{width:100%;min-width:0;display:block}.dm-thread{display:none}.dm-layout.thread-open .dm-list{display:none}.dm-layout.thread-open .dm-thread{display:flex}}
 
 @media(max-width:720px){
+  .sidebar{width:58px;min-width:58px;padding:14px 8px}
+  .nav-btn span:not(.nav-icon){display:none}
+  .new-post-btn{padding:12px;font-size:0}.new-post-btn::before{content:'✏️';font-size:18px}
+  .logo{font-size:18px;padding:6px 2px 14px}
+  .sb-info,.signout-btn{display:none}
+}
+@media(max-width:1100px){.right{display:none;}}
+@media(max-width:720px){
+  .app-inner{flex-direction:column;height:auto;overflow:auto;}
+  .right{order:-1;position:static;width:100%;height:auto;}
   .sidebar{width:58px;min-width:58px;padding:14px 8px}
   .nav-btn span:not(.nav-icon){display:none}
   .new-post-btn{padding:12px;font-size:0}.new-post-btn::before{content:'✏️';font-size:18px}
