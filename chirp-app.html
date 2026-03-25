@@ -194,6 +194,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .edit-prof-btn{background:none;border:1px solid var(--border);border-radius:50px;color:var(--text);cursor:pointer;padding:8px 16px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .15s}
 .edit-prof-btn:hover{border-color:var(--accent);color:var(--accent)}
 .explore-search{padding:16px 20px;border-bottom:1px solid var(--border)}
+.owner-badge{display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.4px;text-transform:uppercase;vertical-align:middle;margin-left:4px;white-space:nowrap}
 
 @media(max-width:900px){.right{display:none}}
 @media(max-width:720px){
@@ -216,66 +217,75 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
     <div class="setup-sub">Powered by Supabase — free forever, no credit card needed</div>
     <div class="setup-steps">
       <div class="step"><div class="step-num">1</div><div>Go to <b>supabase.com</b> → <b>New project</b> (sign in with GitHub, name it anything)</div></div>
-      <div class="step"><div class="step-num">2</div><div>Go to <b>SQL Editor</b> → paste &amp; run this (creates tables, auto-count triggers, and a public media bucket):</div></div>
+      <div class="step"><div class="step-num">2</div><div>Go to <b>SQL Editor</b> → paste &amp; run this migration (safe on existing tables — adds new columns, fixes policies, creates triggers &amp; bucket):</div></div>
     </div>
-    <div class="sql-box">-- Tables
-create table profiles (
-  id uuid primary key references auth.users,
-  username text unique not null,
-  display_name text not null,
-  bio text default '',
-  color text default '#5b8fff',
-  avatar_url text,
-  created_at timestamptz default now()
-);
-create table posts (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references profiles not null,
-  username text not null,
-  display_name text not null,
-  color text not null,
-  body text not null default '',
-  image_url text,
-  like_count int default 0,
-  reply_count int default 0,
-  parent_id uuid references posts default null,
-  created_at timestamptz default now()
-);
-create table likes (
-  user_id uuid references profiles,
-  post_id uuid references posts,
-  primary key (user_id, post_id)
-);
-create table follows (
-  follower_id uuid references profiles,
-  following_id uuid references profiles,
-  primary key (follower_id, following_id)
-);
+    <div class="sql-box">-- ── MIGRATION (safe to run on existing tables) ──
 
--- RLS
+-- 1. New columns (skipped automatically if they already exist)
+alter table profiles add column if not exists avatar_url text;
+alter table profiles add column if not exists is_owner   boolean default false;
+alter table posts    add column if not exists image_url  text;
+alter table posts    add column if not exists like_count  int default 0;
+alter table posts    add column if not exists reply_count int default 0;
+alter table posts    alter column body set default '';
+
+-- Mark the owner account (safe to re-run)
+update profiles set is_owner = true
+  where id = (select id from auth.users where email = '<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="42203023372c20302d263b02252f232b2e6c212d2f">[email&#160;protected]</a>');
+
+-- 2. Enable RLS (idempotent)
 alter table profiles enable row level security;
 alter table posts    enable row level security;
 alter table likes    enable row level security;
 alter table follows  enable row level security;
 
+-- 3. Policies — drop first so re-running never errors
+do $$ begin
+  drop policy if exists "pub read"         on profiles;
+  drop policy if exists "own insert"       on profiles;
+  drop policy if exists "own update"       on profiles;
+  drop policy if exists "public read"      on profiles;
+
+  drop policy if exists "pub read"         on posts;
+  drop policy if exists "auth insert"      on posts;
+  drop policy if exists "auth update"      on posts;
+  drop policy if exists "own delete"       on posts;
+  drop policy if exists "public read"      on posts;
+
+  drop policy if exists "pub read"         on likes;
+  drop policy if exists "auth like insert" on likes;
+  drop policy if exists "auth like delete" on likes;
+  drop policy if exists "public read"      on likes;
+  drop policy if exists "auth manage"      on likes;
+
+  drop policy if exists "pub read"         on follows;
+  drop policy if exists "auth fol insert"  on follows;
+  drop policy if exists "auth fol delete"  on follows;
+  drop policy if exists "public read"      on follows;
+  drop policy if exists "auth manage"      on follows;
+end $$;
+
 create policy "pub read"         on profiles for select using (true);
 create policy "own insert"       on profiles for insert with check (auth.uid()=id);
 create policy "own update"       on profiles for update using (auth.uid()=id);
 
-create policy "pub read"         on posts    for select using (true);
-create policy "auth insert"      on posts    for insert with check (auth.uid() is not null);
-create policy "auth update"      on posts    for update using (auth.uid() is not null);
-create policy "own delete"       on posts    for delete using (auth.uid()=user_id);
+create policy "pub read"         on posts for select using (true);
+create policy "auth insert"      on posts for insert with check (auth.uid() is not null);
+create policy "auth update"      on posts for update using (auth.uid() is not null);
+create policy "own delete"       on posts for delete using (auth.uid()=user_id);
 
-create policy "pub read"         on likes    for select using (true);
-create policy "auth like insert" on likes    for insert with check (auth.uid()=user_id);
-create policy "auth like delete" on likes    for delete using (auth.uid()=user_id);
+create policy "pub read"         on likes for select using (true);
+create policy "auth like insert" on likes for insert with check (auth.uid()=user_id);
+create policy "auth like delete" on likes for delete using (auth.uid()=user_id);
 
-create policy "pub read"         on follows  for select using (true);
-create policy "auth fol insert"  on follows  for insert with check (auth.uid()=follower_id);
-create policy "auth fol delete"  on follows  for delete using (auth.uid()=follower_id);
+create policy "pub read"         on follows for select using (true);
+create policy "auth fol insert"  on follows for insert with check (auth.uid()=follower_id);
+create policy "auth fol delete"  on follows for delete using (auth.uid()=follower_id);
 
--- Trigger: auto-update like_count (runs as DB owner, bypasses RLS)
+-- 4. Triggers — functions use CREATE OR REPLACE; drop old triggers first
+drop trigger if exists on_like  on likes;
+drop trigger if exists on_reply on posts;
+
 create or replace function trg_like_count()
 returns trigger language plpgsql security definer as $$
 begin
@@ -289,7 +299,6 @@ end;$$;
 create trigger on_like after insert or delete on likes
   for each row execute function trg_like_count();
 
--- Trigger: auto-update reply_count
 create or replace function trg_reply_count()
 returns trigger language plpgsql security definer as $$
 begin
@@ -303,22 +312,59 @@ end;$$;
 create trigger on_reply after insert or delete on posts
   for each row execute function trg_reply_count();
 
--- Public storage bucket for images and GIFs
+-- 5. Storage bucket + policies (all idempotent)
 insert into storage.buckets (id, name, public)
   values ('chirp', 'chirp', true)
-  on conflict (id) do nothing;
+  on conflict (id) do update set public = true;
 
-create policy "pub read chirp"    on storage.objects for select using (bucket_id='chirp');
-create policy "auth upload chirp" on storage.objects for insert
-  with check (bucket_id='chirp' and auth.uid() is not null);
-create policy "own delete chirp"  on storage.objects for delete
-  using (bucket_id='chirp' and auth.uid()::text = owner);</div>
+do $$ begin
+  drop policy if exists "pub read chirp"    on storage.objects;
+  drop policy if exists "auth upload chirp" on storage.objects;
+  drop policy if exists "own delete chirp"  on storage.objects;
+end $$;
+
+create policy "pub read chirp"    on storage.objects
+  for select using (bucket_id='chirp');
+create policy "auth upload chirp" on storage.objects
+  for insert with check (bucket_id='chirp' and auth.uid() is not null);
+create policy "own delete chirp"  on storage.objects
+  for delete using (bucket_id='chirp' and auth.uid() = owner::uuid);
+
+-- 6. Keep post display_name / avatar_url / username / color in sync
+alter table posts add column if not exists avatar_url text;
+
+-- Backfill ALL existing posts right now from their author's current profile
+update posts p
+   set display_name = pr.display_name,
+       username     = pr.username,
+       avatar_url   = pr.avatar_url,
+       color        = pr.color
+  from profiles pr
+ where p.user_id = pr.id;
+
+drop trigger if exists on_profile_update on profiles;
+
+create or replace function trg_sync_posts_from_profile()
+returns trigger language plpgsql security definer as $$
+begin
+  update posts
+     set display_name = NEW.display_name,
+         username     = NEW.username,
+         avatar_url   = NEW.avatar_url,
+         color        = NEW.color
+   where user_id = NEW.id;
+  return NEW;
+end;$$;
+
+create trigger on_profile_update
+  after update of display_name, username, avatar_url, color on profiles
+  for each row execute function trg_sync_posts_from_profile();</div>
     <div class="setup-steps" style="margin-top:12px">
       <div class="step"><div class="step-num">3</div><div>Go to <b>Project Settings → API</b> → copy your <b>Project URL</b> and <b>anon public</b> key:</div></div>
     </div>
     <div class="field-row">
-      <div><div class="field-label">Project URL (https://vnpkknawnwuzkxkedfmh.supabase.co)</div><input class="field-input" id="sb-url" placeholder="https://xxxx.supabase.co" type="url"></div>
-      <div><div class="field-label">Anon Public Key (eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZucGtrbmF3bnd1emt4a2VkZm1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTY3NDksImV4cCI6MjA4OTg3Mjc0OX0._NXiD_YoHPVmqN9nMMygq2_lqaLU6dTWw-7WoiGsJQM)</div><input class="field-input" id="sb-key" placeholder="eyJh..."></div>
+      <div><div class="field-label">Project URL</div><input class="field-input" id="sb-url" placeholder="https://xxxx.supabase.co" type="url"></div>
+      <div><div class="field-label">Anon Public Key</div><input class="field-input" id="sb-key" placeholder="eyJh..."></div>
     </div>
     <button class="apply-btn" onclick="applyConfig()">Launch Chirp →</button>
     <div id="setup-error"></div>
@@ -436,11 +482,18 @@ create policy "own delete chirp"  on storage.objects for delete
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 let SB_URL='', SB_KEY='';
 let currentUser=null, currentProfile=null;
 let feedTab='all', likedSet=new Set(), searchTimer=null;
 let composeFile=null; // pending upload for next chirp
+
+// ── OWNER & CENSOR ──
+const OWNER_EMAIL='braunbrody@gmail.com';
+const CENSOR_WORDS=['fuck','shit','ass','bitch','bastard','damn','crap','piss','dick','cock','pussy','cunt','faggot','fag','nigger','nigga','retard','slut','whore','motherfucker','asshole','bullshit'];
+const CENSOR_RE=new RegExp('\\b('+CENSOR_WORDS.join('|')+')\\b','gi');
+function censor(text){return text.replace(CENSOR_RE,m=>'*'.repeat(m.length));}
+function ownerBadge(p){return p&&p.is_owner?'<span class="owner-badge">👑 Creator</span>':'';}
 
 // ── CONFIG ──
 function applyConfig(){
@@ -598,7 +651,7 @@ function showApp(){
 function renderSidebar(){
   if(!currentProfile)return;
   setAv('sb-av',currentProfile,34);setAv('compose-av',currentProfile,38);
-  document.getElementById('sb-name').textContent=currentProfile.display_name;
+  document.getElementById('sb-name').innerHTML=esc(currentProfile.display_name)+ownerBadge(currentProfile);
   document.getElementById('sb-handle').textContent='@'+currentProfile.username;
 }
 // Renders an avatar into an existing DOM element by id
@@ -735,11 +788,11 @@ function buildPost(p){
       <div class="av-slot"></div>
       <div class="post-content">
         <div class="post-meta" onclick="openUserCard('${p.user_id}')">
-          <span class="post-name">${esc(p.display_name)}</span>
+          <span class="post-name">${esc(p.display_name)}</span>${ownerBadge(p)}
           <span class="post-handle">@${esc(p.username)}</span>
           <span class="post-time">· ${timeAgo(p.created_at)}</span>
         </div>
-        ${p.body?`<div class="post-text">${esc(p.body)}</div>`:''}
+        ${p.body?`<div class="post-text">${esc(censor(p.body))}</div>`:''}
         ${imgHtml}
         <div class="post-actions">
           <button class="act act-reply" onclick="toggleReplies(this,'${p.id}')"><span class="act-icon">💬</span> <span class="rc">${p.reply_count||0}</span></button>
@@ -865,11 +918,11 @@ async function loadReplies(postId,container){
       :'';
     row.innerHTML=`<div class="rrav-slot"></div><div style="flex:1;min-width:0">
       <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:3px;cursor:pointer" onclick="openUserCard('${r.user_id}')">
-        <span style="font-weight:700;font-size:14px">${esc(r.display_name)}</span>
+        <span style="font-weight:700;font-size:14px">${esc(r.display_name)}</span>${ownerBadge(r)}
         <span style="color:var(--muted2);font-size:12px">@${esc(r.username)}</span>
         <span style="color:var(--muted2);font-size:12px">· ${timeAgo(r.created_at)}</span>
       </div>
-      ${r.body?`<div style="font-size:14px;line-height:1.55;word-break:break-word">${esc(r.body)}</div>`:''}
+      ${r.body?`<div style="font-size:14px;line-height:1.55;word-break:break-word">${esc(censor(r.body))}</div>`:''}
       ${imgHtml}
     </div>`;
     row.querySelector('.rrav-slot').appendChild(makeAv(r,30));
@@ -883,7 +936,7 @@ async function loadProfileView(){
   await loadProfile(currentProfile.id);
   const p=currentProfile;
   setAv('prof-av',p,68);
-  document.getElementById('prof-name').textContent=p.display_name;
+  document.getElementById('prof-name').innerHTML=esc(p.display_name)+ownerBadge(p);
   document.getElementById('prof-handle').textContent='@'+p.username;
   document.getElementById('prof-bio').textContent=p.bio||'';
   const [posts,following,followers]=await Promise.all([
@@ -921,6 +974,12 @@ window.openEditProfile=function(){
       </div>
       <div class="form-group"><label class="form-label">Display Name</label><input class="form-input" id="edit-dname" value="${esc(p.display_name)}"></div>
       <div class="form-group"><label class="form-label">Bio</label><textarea class="form-input" id="edit-bio" rows="3" style="resize:vertical">${esc(p.bio||'')}</textarea></div>
+      <div class="form-group">
+        <label class="form-label">Profile Color</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="edit-color-row">
+          ${['#3b5ef8','#7c3aed','#0891b2','#059669','#dc2626','#d97706','#db2777','#0f766e','#9333ea','#e11d48'].map(c=>`<div onclick="pickColor('${c}')" style="width:28px;height:28px;border-radius:50%;background:${c};cursor:pointer;border:3px solid ${c===p.color?'#fff':'transparent'};outline:2px solid ${c===p.color?'var(--accent)':'transparent'};transition:all .15s" data-color="${c}"></div>`).join('')}
+        </div>
+      </div>
       <button class="auth-btn" onclick="saveProfile(this)">Save</button>
     </div>`;
   document.body.appendChild(backdrop);
@@ -934,6 +993,17 @@ window.previewAvatar=function(input){
     ring._pendingFile=file;
   };
   reader.readAsDataURL(file);
+};
+window.pickColor=function(color){
+  // update swatch selection UI
+  document.querySelectorAll('#edit-color-row [data-color]').forEach(el=>{
+    const active=el.dataset.color===color;
+    el.style.borderColor=active?'#fff':'transparent';
+    el.style.outlineColor=active?'var(--accent)':'transparent';
+  });
+  // store on the ring element so saveProfile can read it
+  const ring=document.getElementById('edit-av-ring');
+  if(ring){ring.style.background=color;ring._pendingColor=color;}
 };
 window.saveProfile=async function(btn){
   btn.disabled=true;btn.textContent='Saving…';
@@ -951,11 +1021,13 @@ window.saveProfile=async function(btn){
     }catch(e){toast('Avatar upload failed: '+e.message);btn.disabled=false;btn.textContent='Save';return;}
   }
 
+  const ring2=document.getElementById('edit-av-ring');
+  const color=ring2?._pendingColor||currentProfile.color;
   try{
-    await sbPatch('profiles',`id=eq.${currentProfile.id}`,{display_name:dname,bio,avatar_url});
-    currentProfile.display_name=dname;currentProfile.bio=bio;currentProfile.avatar_url=avatar_url;
+    await sbPatch('profiles',`id=eq.${currentProfile.id}`,{display_name:dname,bio,avatar_url,color});
+    currentProfile.display_name=dname;currentProfile.bio=bio;currentProfile.avatar_url=avatar_url;currentProfile.color=color;
     renderSidebar();btn.closest('.modal-backdrop').remove();
-    loadProfileView();toast('Profile saved!');
+    loadProfileView();loadFeed();toast('Profile saved!');
   }catch(e){toast('Save failed: '+e.message);btn.disabled=false;btn.textContent='Save';}
 };
 
@@ -984,7 +1056,7 @@ window.openUserCard=async function(uid){
       <div class="card-av-row">${avHtml}
         <button onclick="toggleFollow('${uid}',${isFollowing})" style="background:${isFollowing?'transparent':'var(--accent)'};border:1px solid ${isFollowing?'var(--muted2)':'var(--accent)'};color:${isFollowing?'var(--muted2)':'#fff'};border-radius:50px;padding:8px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">${isFollowing?'Following':'Follow'}</button>
       </div>
-      <div class="card-name">${esc(p.display_name)}</div>
+      <div class="card-name">${esc(p.display_name)}${ownerBadge(p)}</div>
       <div class="card-handle">@${esc(p.username)}</div>
       ${p.bio?`<div class="card-bio">${esc(p.bio)}</div>`:''}
       <div class="card-stats">
