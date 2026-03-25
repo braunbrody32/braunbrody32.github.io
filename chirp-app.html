@@ -1480,6 +1480,9 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function timeAgo(ts){const d=new Date(ts),now=new Date(),sec=(now-d)/1000;if(sec<60)return Math.floor(sec)+'s';if(sec<3600)return Math.floor(sec/60)+'m';if(sec<86400)return Math.floor(sec/3600)+'h';return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
 function randomColor(){return['#3b5ef8','#7c3aed','#0891b2','#059669','#dc2626','#d97706','#db2777'][Math.floor(Math.random()*7)];}
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);}
+
+alert("Codes of Conduct (Clicking 'close' is agreeing to these): 1. No Cursing 2. No bullying 3. Don't post anything you wouldn't show the principal 4. Follow the rules");
+
 </script>
 </body>
 </html>
