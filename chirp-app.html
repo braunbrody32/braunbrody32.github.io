@@ -194,6 +194,17 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .edit-prof-btn{background:none;border:1px solid var(--border);border-radius:50px;color:var(--text);cursor:pointer;padding:8px 16px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .15s}
 .edit-prof-btn:hover{border-color:var(--accent);color:var(--accent)}
 .explore-search{padding:16px 20px;border-bottom:1px solid var(--border)}
+.explore-trending{padding:14px 20px 4px}
+.explore-trending-label{font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.hashtag-chips{display:flex;flex-wrap:wrap;gap:8px}
+.hashtag-chip{display:inline-flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:6px 13px;font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;transition:all .15s;white-space:nowrap}
+.hashtag-chip:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.hashtag-chip-count{font-size:11px;color:var(--muted2);font-weight:400}
+.hashtag-chip:hover .hashtag-chip-count{color:rgba(255,255,255,.7)}
+/* VIDEO */
+.post-video{width:100%;max-height:480px;border-radius:14px;display:block;margin-bottom:10px;border:1px solid var(--border);background:#000}
+.reply-post-video{max-width:100%;max-height:280px;border-radius:10px;display:block;margin-top:6px;border:1px solid var(--border);background:#000}
+.media-preview-wrap video{max-height:220px;max-width:100%;border-radius:12px;display:block;border:1px solid var(--border)}
 .owner-badge{display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.4px;text-transform:uppercase;vertical-align:middle;margin-left:4px;white-space:nowrap}
 
 /* DM VIEW */
@@ -223,6 +234,13 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .dm-send-btn:disabled{opacity:.4;cursor:default}
 .dm-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:var(--muted2);font-size:14px;gap:8px;padding:24px}
 .dm-nav-badge{background:var(--accent);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-left:auto}
+.rbox-tabbed{padding-bottom:8px}
+.rbox-tabs{display:flex;border-bottom:1px solid var(--border);margin:-16px -16px 14px;padding:0 4px}
+.rbox-tab{flex:1;padding:10px 6px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted2);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.rbox-tab:hover{color:var(--text)}
+.rbox-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+#rpanel-follow{max-height:420px;overflow-y:auto}
+#rpanel-trending{}
 /* ONLINE INDICATOR */
 .online-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:5px}
 .online-count-box{display:flex;align-items:center;gap:6px;font-size:13px}
@@ -256,6 +274,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 alter table profiles add column if not exists avatar_url text;
 alter table profiles add column if not exists is_owner   boolean default false;
 alter table posts    add column if not exists image_url  text;
+alter table posts    add column if not exists video_url  text;
 alter table posts    add column if not exists like_count  int default 0;
 alter table posts    add column if not exists reply_count int default 0;
 alter table posts    alter column body set default '';
@@ -495,13 +514,16 @@ create policy "own upd presence"  on presence for update using (auth.uid()=user_
           <div class="compose-wrap">
             <textarea class="compose-ta" id="compose-ta" placeholder="What's chirping?" oninput="updateChar(this,'compose-char','compose-post')"></textarea>
             <div id="compose-preview-wrap" style="display:none" class="media-preview-wrap">
-              <img id="compose-preview-img" src="" alt="preview">
+              <img id="compose-preview-img" src="" alt="preview" style="display:none">
+              <video id="compose-preview-vid" controls style="display:none;max-height:220px;max-width:100%;border-radius:12px;border:1px solid var(--border)"></video>
               <button class="media-clear-btn" onclick="clearComposeMedia()">✕</button>
             </div>
             <div class="compose-foot">
               <div class="compose-foot-left">
-                <button class="media-btn" title="Add image / GIF" onclick="document.getElementById('compose-file-in').click()">🖼️</button>
-                <input type="file" id="compose-file-in" accept="image/*" style="display:none" onchange="onComposePick(this)">
+                <button class="media-btn" title="Add image" onclick="document.getElementById('compose-file-in').click()">🖼️</button>
+                <button class="media-btn" title="Add video (mp4, max 100MB)" onclick="document.getElementById('compose-vid-in').click()">🎬</button>
+                <input type="file" id="compose-file-in" accept="image/*" style="display:none" onchange="onComposePick(this,'image')">
+                <input type="file" id="compose-vid-in" accept="video/mp4,video/quicktime,video/webm" style="display:none" onchange="onComposePick(this,'video')">
                 <span class="char-count" id="compose-char">280</span>
               </div>
               <button class="post-btn-sm" id="compose-post" onclick="submitPost()" disabled>Chirp</button>
@@ -514,8 +536,12 @@ create policy "own upd presence"  on presence for update using (auth.uid()=user_
       <!-- EXPLORE -->
       <div id="view-explore" style="display:none">
         <div class="feed-header"><div class="feed-title">Explore</div></div>
-        <div class="explore-search"><input class="search-in" style="width:100%" type="text" placeholder="Search chirps…" id="explore-q" oninput="schedSearch()"></div>
-        <div id="explore-results"><div class="loading">Start typing to search…</div></div>
+        <div class="explore-search"><input class="search-in" style="width:100%" type="text" placeholder="Search chirps…" id="explore-q" oninput="onExploreInput()"></div>
+        <div class="explore-trending" id="explore-trending">
+          <div class="explore-trending-label">🔥 Trending Hashtags</div>
+          <div class="hashtag-chips" id="explore-hashtag-chips"><div style="color:var(--muted2);font-size:13px">Loading…</div></div>
+        </div>
+        <div id="explore-results"></div>
       </div>
 
       <!-- PROFILE -->
@@ -560,8 +586,14 @@ create policy "own upd presence"  on presence for update using (auth.uid()=user_
     <aside class="right">
       <div class="rbox"><div class="online-count-box"><span class="online-dot"></span><span id="online-count">1</span> <span style="color:var(--muted2)">online now</span></div></div>
       <div class="rbox"><div class="rbox-title">Search</div><input class="search-in" id="rp-search" type="text" placeholder="Search chirps…" oninput="rpSearch()"></div>
-      <div class="rbox"><div class="rbox-title">Trending</div><div id="trending-list"><div style="color:var(--muted2);font-size:13px">Loading…</div></div></div>
-      <div class="rbox"><div class="rbox-title">Who to follow</div><div id="who-list"><div style="color:var(--muted2);font-size:13px">Loading…</div></div></div>
+      <div class="rbox rbox-tabbed">
+        <div class="rbox-tabs">
+          <button class="rbox-tab active" id="rtab-trending" onclick="switchRTab('trending')">🔥 Trending</button>
+          <button class="rbox-tab" id="rtab-follow" onclick="switchRTab('follow')">👥 Follow</button>
+        </div>
+        <div id="rpanel-trending"><div id="trending-list"><div style="color:var(--muted2);font-size:13px">Loading…</div></div></div>
+        <div id="rpanel-follow" style="display:none"><div id="who-list"><div style="color:var(--muted2);font-size:13px">Loading…</div></div></div>
+      </div>
     </aside>
   </div>
 </div>
@@ -572,6 +604,7 @@ let currentUser=null, currentProfile=null;
 let feedTab='all', likedSet=new Set(), searchTimer=null;
 let composeFile=null; // pending upload for next chirp
 let dmPollTimer=null, dmCurrentPartner=null, dmLastMsgId=null;
+let composeFileType=null;
 
 // ── OWNER & CENSOR ──
 const OWNER_EMAIL='braunbrody@gmail.com';
@@ -772,30 +805,42 @@ window.showView=function(v){
     document.getElementById('nav-'+n)?.classList.toggle('active',n===v);
   });
   if(v==='profile')loadProfileView();
-  if(v==='explore')document.getElementById('explore-q').focus();
+  if(v==='explore'){document.getElementById('explore-q').focus();loadTrending();}
   if(v==='messages'){loadDMConversations();startDMPoll();}
   else{stopDMPoll();}
 };
 window.focusCompose=function(){showView('home');document.getElementById('compose-ta').focus();};
 
 // ── COMPOSE MEDIA ──
-window.onComposePick=function(input){
+window.onComposePick=function(input,type){
   const file=input.files[0];if(!file)return;
-  composeFile=file;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    document.getElementById('compose-preview-img').src=e.target.result;
-    document.getElementById('compose-preview-wrap').style.display='inline-block';
-    document.getElementById('compose-post').disabled=false; // can post with just image
-  };
-  reader.readAsDataURL(file);
-  input.value=''; // reset so same file can be re-picked
+  if(type==='video'){
+    if(file.size>100*1024*1024){toast('Video must be under 100 MB.');input.value='';return;}
+  }
+  composeFile=file;composeFileType=type;
+  const wrap=document.getElementById('compose-preview-wrap');
+  const img=document.getElementById('compose-preview-img');
+  const vid=document.getElementById('compose-preview-vid');
+  if(type==='video'){
+    img.style.display='none';
+    vid.src=URL.createObjectURL(file);vid.style.display='block';
+  }else{
+    vid.style.display='none';
+    const reader=new FileReader();
+    reader.onload=e=>{img.src=e.target.result;img.style.display='block';};
+    reader.readAsDataURL(file);
+  }
+  wrap.style.display='inline-block';
+  document.getElementById('compose-post').disabled=false;
+  input.value='';
 };
 window.clearComposeMedia=function(){
-  composeFile=null;
+  composeFile=null;composeFileType=null;
   document.getElementById('compose-preview-wrap').style.display='none';
-  document.getElementById('compose-preview-img').src='';
-  // re-evaluate button: only enable if there's text
+  const img=document.getElementById('compose-preview-img');
+  const vid=document.getElementById('compose-preview-vid');
+  img.src='';img.style.display='none';
+  vid.src='';vid.style.display='none';
   const ta=document.getElementById('compose-ta');
   updateChar(ta,'compose-char','compose-post');
 };
@@ -819,16 +864,19 @@ window.submitPost=async function(){
   const btn=document.getElementById('compose-post');
   btn.disabled=true;btn.textContent='Posting…';
 
-  let image_url=null;
+  let image_url=null,video_url=null;
   if(composeFile){
     try{
-      const ext=(composeFile.name.split('.').pop()||'jpg').toLowerCase();
-      image_url=await uploadFile(composeFile,`posts/${currentProfile.id}/${Date.now()}.${ext}`);
+      const ext=(composeFile.name.split('.').pop()||'bin').toLowerCase();
+      const path=`posts/${currentProfile.id}/${Date.now()}.${ext}`;
+      const url=await uploadFile(composeFile,path);
+      if(composeFileType==='video')video_url=url;
+      else image_url=url;
     }catch(e){toast('Upload failed: '+e.message);btn.disabled=false;btn.textContent='Chirp';return;}
   }
 
   try{
-    await sbPost('posts',{user_id:currentProfile.id,username:currentProfile.username,display_name:currentProfile.display_name,color:currentProfile.color,avatar_url:currentProfile.avatar_url||null,body,image_url,parent_id:null});
+    await sbPost('posts',{user_id:currentProfile.id,username:currentProfile.username,display_name:currentProfile.display_name,color:currentProfile.color,avatar_url:currentProfile.avatar_url||null,body,image_url,video_url,parent_id:null});
     ta.value='';clearComposeMedia();updateChar(ta,'compose-char','compose-post');
     toast('Chirp posted! 🐦');loadFeed();
   }catch(e){toast('Error: '+e.message);}
@@ -869,9 +917,11 @@ function renderPosts(posts,container){
 function buildPost(p){
   const div=document.createElement('div');div.className='post';
   const liked=likedSet.has(p.id);
-  const imgHtml=p.image_url
-    ?`<img class="post-img" src="${esc(p.image_url)}" alt="media" loading="lazy" onclick="viewImg('${esc(p.image_url)}')">`
-    :'';
+  const mediaHtml=p.video_url
+    ?`<video class="post-video" src="${esc(p.video_url)}" controls preload="metadata" playsinline></video>`
+    :p.image_url
+      ?`<img class="post-img" src="${esc(p.image_url)}" alt="media" loading="lazy" onclick="viewImg('${esc(p.image_url)}')">`
+      :'';
   div.innerHTML=`
     <div class="post-top">
       <div class="av-slot"></div>
@@ -882,7 +932,7 @@ function buildPost(p){
           <span class="post-time">· ${timeAgo(p.created_at)}</span>
         </div>
         ${p.body?`<div class="post-text">${esc(censor(p.body))}</div>`:''}
-        ${imgHtml}
+        ${mediaHtml}
         <div class="post-actions">
           <button class="act act-reply" onclick="toggleReplies(this,'${p.id}')"><span class="act-icon">💬</span> <span class="rc">${p.reply_count||0}</span></button>
           <button class="act act-like ${liked?'liked':''}" onclick="toggleLike(this,'${p.id}')"><span class="act-icon">${liked?'❤️':'🤍'}</span> <span class="lc">${p.like_count||0}</span></button>
@@ -945,18 +995,29 @@ window.toggleReplies=async function(btn,postId){
   const rTa=document.createElement('textarea');rTa.className='reply-ta';rTa.placeholder='Reply…';rTa.rows=1;
 
   // Per-reply media state
-  let rFile=null;
+  let rFile=null,rFileType=null;
   const rImgPreview=document.createElement('img');rImgPreview.className='reply-img-preview';rImgPreview.style.display='none';
+  const rVidPreview=document.createElement('video');rVidPreview.className='reply-img-preview';rVidPreview.controls=true;rVidPreview.style.cssText='display:none;max-height:120px;border-radius:8px;border:1px solid var(--border)';
 
   const rFileIn=document.createElement('input');rFileIn.type='file';rFileIn.accept='image/*';rFileIn.style.display='none';
   rFileIn.onchange=()=>{
-    const f=rFileIn.files[0];if(!f)return;rFile=f;
-    const reader=new FileReader();reader.onload=e=>{rImgPreview.src=e.target.result;rImgPreview.style.display='block';};
+    const f=rFileIn.files[0];if(!f)return;rFile=f;rFileType='image';
+    const reader=new FileReader();reader.onload=e=>{rImgPreview.src=e.target.result;rImgPreview.style.display='block';rVidPreview.style.display='none';};
     reader.readAsDataURL(f);rFileIn.value='';
+  };
+  const rVidIn=document.createElement('input');rVidIn.type='file';rVidIn.accept='video/mp4,video/quicktime,video/webm';rVidIn.style.display='none';
+  rVidIn.onchange=()=>{
+    const f=rVidIn.files[0];if(!f)return;
+    if(f.size>100*1024*1024){toast('Video must be under 100 MB.');rVidIn.value='';return;}
+    rFile=f;rFileType='video';
+    rVidPreview.src=URL.createObjectURL(f);rVidPreview.style.display='block';rImgPreview.style.display='none';
+    rVidIn.value='';
   };
 
   const rMediaBtn=document.createElement('button');rMediaBtn.className='media-btn';rMediaBtn.textContent='🖼️';rMediaBtn.title='Add image';
   rMediaBtn.onclick=()=>rFileIn.click();
+  const rVidBtn=document.createElement('button');rVidBtn.className='media-btn';rVidBtn.textContent='🎬';rVidBtn.title='Add video';
+  rVidBtn.onclick=()=>rVidIn.click();
 
   const rSend=document.createElement('button');rSend.className='reply-send';rSend.textContent='Reply';
   rSend.onclick=async()=>{
@@ -965,17 +1026,20 @@ window.toggleReplies=async function(btn,postId){
     if(!body&&!rFile)return;
     rSend.disabled=true;rSend.textContent='…';
 
-    let image_url=null;
+    let image_url=null,video_url=null;
     if(rFile){
       try{
-        const ext=(rFile.name.split('.').pop()||'jpg').toLowerCase();
-        image_url=await uploadFile(rFile,`posts/${currentProfile.id}/${Date.now()}_r.${ext}`);
+        const ext=(rFile.name.split('.').pop()||'bin').toLowerCase();
+        const url=await uploadFile(rFile,`posts/${currentProfile.id}/${Date.now()}_r.${ext}`);
+        if(rFileType==='video')video_url=url;else image_url=url;
       }catch(e){toast('Upload failed: '+e.message);rSend.disabled=false;rSend.textContent='Reply';return;}
     }
 
     try{
-      await sbPost('posts',{user_id:currentProfile.id,username:currentProfile.username,display_name:currentProfile.display_name,color:currentProfile.color,avatar_url:currentProfile.avatar_url||null,body,image_url,parent_id:postId});
-      rTa.value='';rFile=null;rImgPreview.src='';rImgPreview.style.display='none';
+      await sbPost('posts',{user_id:currentProfile.id,username:currentProfile.username,display_name:currentProfile.display_name,color:currentProfile.color,avatar_url:currentProfile.avatar_url||null,body,image_url,video_url,parent_id:postId});
+      rTa.value='';rFile=null;rFileType=null;
+      rImgPreview.src='';rImgPreview.style.display='none';
+      rVidPreview.src='';rVidPreview.style.display='none';
       // update reply count optimistically in the parent post button
       const rc=btn.querySelector('.rc');rc.textContent=(parseInt(rc.textContent)||0)+1;
       loadReplies(postId,replyList);toast('Reply posted!');
@@ -986,8 +1050,8 @@ window.toggleReplies=async function(btn,postId){
   // assemble
   const rightCol=document.createElement('div');rightCol.style.cssText='flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;';
   const actRow=document.createElement('div');actRow.style.cssText='display:flex;gap:6px;align-items:flex-end;';
-  actRow.append(rTa,rMediaBtn,rFileIn,rSend);
-  rightCol.append(actRow,rImgPreview);
+  actRow.append(rTa,rMediaBtn,rVidBtn,rFileIn,rVidIn,rSend);
+  rightCol.append(actRow,rImgPreview,rVidPreview);
   compRow.append(avSlot,rightCol);
 
   const replyList=document.createElement('div');replyList.id='rlist-'+postId;
@@ -1002,9 +1066,11 @@ async function loadReplies(postId,container){
   if(!replies.length){container.innerHTML='<div style="padding:14px 16px;color:var(--muted2);font-size:13px">No replies yet.</div>';return;}
   replies.forEach(r=>{
     const row=document.createElement('div');row.className='reply-post';
-    const imgHtml=r.image_url
-      ?`<img class="reply-post-img" src="${esc(r.image_url)}" alt="media" loading="lazy" onclick="viewImg('${esc(r.image_url)}')">`
-      :'';
+    const mediaHtml=r.video_url
+      ?`<video class="reply-post-video" src="${esc(r.video_url)}" controls preload="metadata" playsinline></video>`
+      :r.image_url
+        ?`<img class="reply-post-img" src="${esc(r.image_url)}" alt="media" loading="lazy" onclick="viewImg('${esc(r.image_url)}')">`
+        :'';
     row.innerHTML=`<div class="rrav-slot"></div><div style="flex:1;min-width:0">
       <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:3px;cursor:pointer" onclick="openUserCard('${r.user_id}')">
         <span style="font-weight:700;font-size:14px">${esc(r.display_name)}</span>${ownerBadge(r)}
@@ -1012,7 +1078,7 @@ async function loadReplies(postId,container){
         <span style="color:var(--muted2);font-size:12px">· ${timeAgo(r.created_at)}</span>
       </div>
       ${r.body?`<div style="font-size:14px;line-height:1.55;word-break:break-word">${esc(censor(r.body))}</div>`:''}
-      ${imgHtml}
+      ${mediaHtml}
     </div>`;
     row.querySelector('.rrav-slot').appendChild(makeAv(r,30));
     container.appendChild(row);
@@ -1164,16 +1230,24 @@ window.toggleFollow=async function(uid,isFollowing){
 };
 
 // ── SEARCH ──
+window.onExploreInput=function(){
+  const q=document.getElementById('explore-q').value.trim();
+  document.getElementById('explore-trending').style.display=q?'none':'block';
+  clearTimeout(searchTimer);
+  if(q)searchTimer=setTimeout(runSearch,350);
+  else document.getElementById('explore-results').innerHTML='';
+};
 window.schedSearch=function(){clearTimeout(searchTimer);searchTimer=setTimeout(runSearch,350);};
 window.rpSearch=function(){
   const q=document.getElementById('rp-search').value.trim();if(!q)return;
   document.getElementById('explore-q').value=q;showView('explore');
+  document.getElementById('explore-trending').style.display='none';
   clearTimeout(searchTimer);searchTimer=setTimeout(runSearch,0);
 };
 async function runSearch(){
   const q=document.getElementById('explore-q').value.trim();
   const res=document.getElementById('explore-results');
-  if(!q){res.innerHTML='<div class="loading">Type to search…</div>';return;}
+  if(!q){res.innerHTML='';document.getElementById('explore-trending').style.display='block';return;}
   res.innerHTML='<div class="loading"><div class="spinner"></div>Searching…</div>';
   const posts=await sbGet('posts',`body=ilike.*${encodeURIComponent(q)}*&parent_id=is.null&order=created_at.desc&limit=50&select=*`);
   await loadMyLikes();renderPosts(posts,res);
@@ -1181,24 +1255,47 @@ async function runSearch(){
 }
 
 // ── TRENDING ──
+let cachedTrending=[];
 async function loadTrending(){
-  const posts=await sbGet('posts','parent_id=is.null&order=created_at.desc&limit=200&select=body');
+  const posts=await sbGet('posts','parent_id=is.null&order=created_at.desc&limit=400&select=body');
   const counts={};
-  posts.forEach(p=>p.body.split(/\s+/).filter(w=>w.startsWith('#')).forEach(w=>{const k=w.toLowerCase();counts[k]=(counts[k]||0)+1;}));
-  const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  posts.forEach(p=>(p.body||'').split(/\s+/).filter(w=>w.startsWith('#')).forEach(w=>{const k=w.replace(/[^#\w]/g,'').toLowerCase();if(k.length>1){counts[k]=(counts[k]||0)+1;}}));
+  cachedTrending=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  // sidebar (top 5)
   const el=document.getElementById('trending-list');
-  if(!sorted.length){el.innerHTML='<div style="color:var(--muted2);font-size:13px">No hashtags yet!</div>';return;}
-  el.innerHTML=sorted.map(([tag,cnt])=>`<div class="trend-item" onclick="searchTag('${tag}')"><div class="trend-tag">${esc(tag)}</div><div class="trend-count">${cnt} chirp${cnt!==1?'s':''}</div></div>`).join('');
+  if(!cachedTrending.length){el.innerHTML='<div style="color:var(--muted2);font-size:13px">No hashtags yet!</div>';}
+  else{el.innerHTML=cachedTrending.slice(0,5).map(([tag,cnt])=>`<div class="trend-item" onclick="searchTag('${tag}')"><div class="trend-tag">${esc(tag)}</div><div class="trend-count">${cnt} chirp${cnt!==1?'s':''}</div></div>`).join('');}
+  // explore chips (all 10)
+  const chips=document.getElementById('explore-hashtag-chips');
+  if(!chips)return;
+  if(!cachedTrending.length){chips.innerHTML='<div style="color:var(--muted2);font-size:13px">No hashtags yet — be the first!</div>';return;}
+  chips.innerHTML=cachedTrending.map(([tag,cnt],i)=>`<div class="hashtag-chip" onclick="searchTag('${tag}')"><span>${esc(tag)}</span><span class="hashtag-chip-count">${cnt}</span></div>`).join('');
 }
-window.searchTag=function(tag){document.getElementById('explore-q').value=tag;showView('explore');runSearch();};
+window.searchTag=function(tag){
+  document.getElementById('explore-q').value=tag;
+  document.getElementById('explore-trending').style.display='none';
+  showView('explore');runSearch();
+};
+
+// ── RIGHT SIDEBAR TABS ──
+window.switchRTab=function(tab){
+  document.getElementById('rpanel-trending').style.display=tab==='trending'?'block':'none';
+  document.getElementById('rpanel-follow').style.display=tab==='follow'?'block':'none';
+  document.getElementById('rtab-trending').classList.toggle('active',tab==='trending');
+  document.getElementById('rtab-follow').classList.toggle('active',tab==='follow');
+  if(tab==='follow')loadWhoToFollow();
+};
 
 // ── WHO TO FOLLOW ──
 async function loadWhoToFollow(){
-  const [all,myFols]=await Promise.all([sbGet('profiles',`id=neq.${currentProfile.id}&limit=20&select=*`),sbGet('follows',`follower_id=eq.${currentProfile.id}&select=following_id`)]);
+  const [all,myFols]=await Promise.all([
+    sbGet('profiles',`id=neq.${currentProfile.id}&order=display_name.asc&limit=100&select=*`),
+    sbGet('follows',`follower_id=eq.${currentProfile.id}&select=following_id`)
+  ]);
   const folIds=new Set(myFols.map(f=>f.following_id));
-  const cands=all.filter(p=>!folIds.has(p.id)).slice(0,4);
+  const cands=all.filter(p=>!folIds.has(p.id));
   const el=document.getElementById('who-list');
-  if(!cands.length){el.innerHTML='<div style="color:var(--muted2);font-size:13px">You\'re following everyone!</div>';return;}
+  if(!cands.length){el.innerHTML='<div style="color:var(--muted2);font-size:13px;padding:4px 0">You\'re following everyone!</div>';return;}
   el.innerHTML='';
   cands.forEach(p=>{
     const row=document.createElement('div');row.className='who-row';
