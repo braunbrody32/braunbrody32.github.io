@@ -4,6 +4,7 @@ a {color: white}
 
 /* === Tools === */
 #erase      { background-color: red; color: white; padding: 10px; cursor: pointer; }
+#pause      { background-color: rgb(0, 255, 0); color: rgb(0, 0, 0); padding: 10px; cursor: pointer; }
 #save       { background-color: #cc00ff; color: white; padding: 10px; cursor: pointer; }
 #load       { background-color: #cc00ff; color: white; padding: 10px; cursor: pointer; display: inline-block; }
 
