@@ -10,13 +10,14 @@
 </head>
 <body>
     <h1>Element Stuff</h1>
-    <p>Version 1.8.0</p>
+    <p>Version 1.8.3</p>
     <canvas id="canvas1" width="1200" height="600"></canvas>
     <a href="recipes.html" target="_blank">Crafting Recipes</a>
     <a href="https://drive.google.com/drive/folders/1OVt-XPPaJFJaFmoYd5dPkNvx0InF2U0h" target="_blank">Cloud Storage</a>
     <h2>-----------------------------------------Tools-----------------------------------------</h2>
     <button id="erase" onclick="eraseSelected()">Erase</button>
     <button id="mix" onclick="mixSelected()">Mix</button>
+    <button id="pause" onclick="pause()">Pause</button>
     <button id="save" onclick="saveToJSON()">💾 Save</button>
     <label id="load"><input type="file" accept=".json" style="display:none" onchange="loadFromJSON(this)">📂 Load</label>
 
@@ -40,7 +41,6 @@
     <button id="wire" onclick="wireSelected()">Wire</button>
     <button id="battery" onclick="batterySelected()">Battery</button>
     <button id="pump" onclick="pumpSelected()">Pump</button>
-    <button id="base" onclick="baseSelected()">Base</button>
 
     <h2>-----------------------------------------Atomic-----------------------------------------</h2>
     <button id="proton" onclick="protonSelected()">Proton</button>
@@ -76,6 +76,45 @@
     <button id="alcohol" onclick="alcoholSelected()">Alcohol</button>
     <button id="mercury" onclick="mercurySelected()">Mercury</button>
     <button id="honey" onclick="honeySelected()">Honey</button>
+    <button id="tar" onclick="tarSelected()">Tar</button>
+    <button id="slime" onclick="slimeSelected()">Slime</button>
+    <button id="blood" onclick="bloodSelected()">Blood</button>
+    <button id="base" onclick="baseSelected()">Base</button>
+
+    <h2>----------------------------------------Gasses----------------------------------------</h2>
+    <button id="steam" onclick="steamSelected()">Steam</button>
+    <button id="smoke" onclick="smokeSelected()">Smoke</button>
+    <button id="toxicgas" onclick="toxicgasSelected()">Toxic Gas</button>
+    <button id="methane" onclick="methaneSelected()">Methane</button>
+    <button id="antigas" onclick="antigasSelected()">Anti-Gas</button>
+    <button id="hydrogen" onclick="hydrogenSelected()">Hydrogen</button>
+    <button id="oxygen" onclick="oxygenSelected()">Oxygen</button>
+    <button id="nitrogen" onclick="nitrogenSelected()">Nitrogen</button>
+    <button id="propane" onclick="propaneSelected()">Propane</button>
+    <button id="fog" onclick="fogSelected()">Fog</button>
+
+    <h2>----------------------------------------Extras----------------------------------------</h2>
+    <button id="heater" onclick="heaterSelected()">Heater</button>
+    <button id="cooler" onclick="coolerSelected()">Cooler</button>
+    <button id="fire" onclick="fireSelected()">Fire</button>
+    <button id="ember" onclick="emberSelected()">Ember</button>
+    <button id="bomb" onclick="bombSelected()">Bomb</button>
+    <button id="tnt" onclick="tntSelected()">TNT</button>
+    <button id="nitrogel" onclick="nitrogelSelected()">Nitro-Gel</button>
+    <button id="virus" onclick="virusSelected()">Virus</button>
+    <button id="plasma" onclick="plasmaSelected()">Plasma</button>
+    <button id="lightning" onclick="lightningSelected()">Lightning</button>
+    <button id="cloner" onclick="clonerSelected()">Cloner</button>
+    <button id="destroyer" onclick="destroyerSelected()">Destroyer</button>
+    <button id="gel" onclick="gelSelected()">Gel</button>
+    <button id="superacid" onclick="superacidSelected()">Superacid</button>
+    <button id="antimatter" onclick="antimatterSelected()">Antimatter</button>
+    <button id="void" onclick="voidSelected()">Void</button>
+
+    <br><br><a href="../index.html">Go to home page.</a>
+    <script src="script.js"></script>
+</body>
+</html>    <button id="honey" onclick="honeySelected()">Honey</button>
     <button id="tar" onclick="tarSelected()">Tar</button>
     <button id="slime" onclick="slimeSelected()">Slime</button>
     <button id="blood" onclick="bloodSelected()">Blood</button>
