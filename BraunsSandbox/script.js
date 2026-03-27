@@ -4,12 +4,23 @@ const cellSize = 10;
 const gridWidth = Math.floor(canvas.width / cellSize);
 const gridHeight = Math.floor(canvas.height / cellSize);
 
+let paused = false;
 let grid = Array.from({ length: gridWidth }, () => Array(gridHeight).fill(null));
 let particles = [];
 let selected = "none";
 let frameCount = 0;
 
 function getRandomInt(max) { return Math.floor(Math.random() * max); }
+
+function pause() {
+    paused = !paused;
+    const btn = document.getElementById('pause');
+    if (btn) {
+        btn.textContent = paused ? 'Resume' : 'Pause';
+        btn.style.backgroundColor = paused ? '#ff4400' : 'rgb(0, 255, 0)';
+        btn.style.color = paused ? 'white' : 'black';
+    }
+}
 
 // ============================================================
 // CONSTRUCTORS - Original Elements
@@ -416,7 +427,7 @@ AntiLiquid.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fill
 
 Acid.prototype.update = function() {
     if (isNextTo(this,Destroyer)||isNextTo(this,Plasma)) { this.destroy(); return; }
-    const immune=[Destroyer,Acid,Glass,Rubber,Obsidian,Cooler,Superacid,Mercury,Diamond,Crystal,Ceramic,Brick,Heater,Steel];
+    const immune=[Destroyer,Acid,Glass,Rubber,Obsidian,Cooler,Superacid,Mercury,Diamond,Crystal,Ceramic,Brick,Heater,Steel,Cloner];
     for (let [dx,dy] of DIRS) {
         let nx=this.x+dx,ny=this.y+dy;
         if (nx>=0&&nx<gridWidth&&ny>=0&&ny<gridHeight) {
@@ -2052,15 +2063,23 @@ Human.prototype.update = function() {
         } else { this.vx *= -1; }
     } else { this.vx *= -1; }
 
-    // ── THROW SAND ───────────────────────────────────────────
+    // ── THROW STUFF ───────────────────────────────────────────
     this.throwTimer++;
-    if(this.throwTimer > 70 && Math.random() < 0.25){
+    let rizz = getRandomInt(10);
+    if(this.throwTimer > 1 && Math.random() < 0.25){
         this.throwTimer = 0;
         // Arc: 2 cells ahead, 1 cell above head
         const tx = this.x + this.vx * 2;
         const ty = hY - 1;
         if(ib(tx,ty) && !grid[tx][ty]){
-            const s=new Sand(tx,ty); particles.push(s); grid[tx][ty]=s;
+            if (rizz === 0) {const s=new Sand(tx,ty); particles.push(s); grid[tx][ty]=s;}
+            if (rizz === 2) {const s=new Sand(tx,ty); particles.push(s); grid[tx][ty]=s;}
+            if (rizz === 3) {const s=new Sand(tx,ty); particles.push(s); grid[tx][ty]=s;}
+            else if (rizz === 1) {const d=new Dirt(tx,ty); particles.push(d); grid[tx][ty]=d;}
+            else if (rizz === 4) {const d=new Dirt(tx,ty); particles.push(d); grid[tx][ty]=d;}
+            else if (rizz === 5) {const d=new Dirt(tx,ty); particles.push(d); grid[tx][ty]=d;}
+            else if (rizz === 8) {const h=new Human(tx,ty); particles.push(h); grid[tx][ty]=h;}
+            else if (rizz === 9) {const h=new Human(tx,ty); particles.push(h); grid[tx][ty]=h;}
         } else {
             // Fallback: drop at feet
             const fx=this.x, fy=this.y+1;
@@ -2394,16 +2413,18 @@ const SPAWN_MAP = {
 // ============================================================
 function update() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    frameCount++;
+    if (!paused) {
+        frameCount++;
+        propagateElectricity();
+        for (let i=particles.length-1;i>=0;i--) { if (!particles[i].isDead) particles[i].update(); }
+        particles=particles.filter(p=>!p.isDead);
+    }
+    for (let i=0;i<particles.length;i++) { if (!particles[i].isDead) particles[i].draw(); }
     if (isMouseDown) {
         if (selected==="erase") eraseArea(mouseX,mouseY);
         else if (selected==="mix") mixArea(mouseX,mouseY);
         else if (SPAWN_MAP[selected]) SPAWN_MAP[selected](mouseX,mouseY);
     }
-    propagateElectricity();
-    for (let i=particles.length-1;i>=0;i--) { if (!particles[i].isDead) particles[i].update(); }
-    for (let i=0;i<particles.length;i++) { if (!particles[i].isDead) particles[i].draw(); }
-    particles=particles.filter(p=>!p.isDead);
     drawBrushCursor();
     requestAnimationFrame(update);
 }
