@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Freedom!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#040b04;--surface:#0a120a;--border:#152815;
+  --green:#00ff41;--green-dim:#003d10;--green-mid:#00aa33;
+  --allied:#1d4ed8;--allied-glow:#3b82f6;
+  --enemy:#9b1c1c;--enemy-glow:#ef4444;
+  --neutral:#374151;--neutral-glow:#6b7280;
+  --warzone:#92400e;--warzone-glow:#f59e0b;
+  --text:#86efac;--text-dim:#166534;--danger:#ef4444;
+  --head:'Black Ops One',monospace;--mono:'Share Tech Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);overflow:hidden;height:100vh;width:100vw;cursor:crosshair}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px);pointer-events:none;z-index:9999}
+
+/* === WORLD MAP === */
+#worldmap{position:fixed;inset:0;display:flex;flex-direction:column}
+#wm-header{display:flex;align-items:center;justify-content:space-between;padding:9px 18px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;gap:12px}
+#wm-title{font-family:var(--head);font-size:19px;color:var(--green);letter-spacing:4px;text-shadow:0 0 20px var(--green);white-space:nowrap}
+.header-right{display:flex;align-items:center;gap:18px;font-size:11px;color:var(--text-dim)}
+.header-right span{color:var(--green)}
+#player-input{background:transparent;border:none;border-bottom:1px solid var(--green-dim);color:var(--green);font-family:var(--mono);font-size:12px;width:90px;outline:none;padding:1px 0}
+#wm-body{display:flex;flex:1;overflow:hidden;min-height:0}
+#map-wrap{flex:1;overflow:auto;padding:10px;display:flex;align-items:flex-start;justify-content:center;min-width:0}
+#map-svg{width:100%;min-width:700px;height:auto;cursor:crosshair;display:block}
+#sidebar{width:228px;min-width:228px;border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;padding:12px;gap:9px;overflow-y:auto;flex-shrink:0}
+.sb-box{border:1px solid var(--border);padding:9px}
+.sb-label{font-size:9px;letter-spacing:3px;color:var(--text-dim);border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:8px}
+.leg-item{display:flex;align-items:center;gap:8px;font-size:10px;margin-bottom:5px}
+.leg-dot{width:10px;height:10px;border:1px solid;flex-shrink:0}
+.leg-dot.allied{background:var(--allied);border-color:var(--allied-glow)}
+.leg-dot.enemy{background:var(--enemy);border-color:var(--enemy-glow)}
+.leg-dot.neutral{background:var(--neutral);border-color:var(--neutral-glow)}
+.leg-dot.warzone{background:var(--warzone);border-color:var(--warzone-glow);animation:pdot 1.4s infinite}
+@keyframes pdot{0%,100%{opacity:1}50%{opacity:.4}}
+#region-info{font-size:10px;line-height:1.9;color:var(--text-dim)}
+#region-info .rname{font-family:var(--head);font-size:12px;margin-bottom:4px}
+#region-info .rrow{display:flex;justify-content:space-between}
+.pbar{height:4px;background:var(--border);margin:4px 0}
+.pfill{height:100%;background:var(--warzone-glow);transition:width .3s}
+#gstats{font-size:10px;line-height:2.1;color:var(--text-dim)}
+#gstats b{font-style:normal}
+/* Region list */
+#rg-list{display:flex;flex-direction:column;gap:3px;max-height:240px;overflow-y:auto}
+.rg-row{display:flex;align-items:center;gap:6px;padding:3px 4px;cursor:pointer;border:1px solid transparent;transition:border-color .15s}
+.rg-row:hover{border-color:var(--border)}
+.rg-row.wz-row{border-color:#78350f44}
+.rg-dot{width:7px;height:7px;border:1px solid;flex-shrink:0}
+.rg-name{font-size:9px;flex:1;letter-spacing:.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rg-status{font-size:7.5px;opacity:.65;letter-spacing:.5px;flex-shrink:0}
+#deploy-btn{display:none;background:var(--warzone);border:2px solid var(--warzone-glow);color:#fff8;font-family:var(--head);font-size:12px;letter-spacing:3px;padding:9px;cursor:pointer;width:100%;transition:all .2s;margin-top:auto;flex-shrink:0}
+#deploy-btn:hover{background:var(--warzone-glow);color:#fff;box-shadow:0 0 20px var(--warzone-glow)}
+#deploy-btn.on{display:block}
+
+/* === BATTLE === */
+#battle{position:fixed;inset:0;display:none;flex-direction:column}
+#bhud{display:flex;align-items:center;justify-content:space-between;padding:7px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
+.hstat{font-size:9px;letter-spacing:1px;color:var(--text-dim)}
+.hval{font-family:var(--head);font-size:17px;color:var(--green);display:block}
+.hval.red{color:var(--danger)}
+#hpbar{width:110px;height:6px;background:var(--border);margin-top:2px}
+#hpfill{height:100%;background:var(--green);transition:width .15s}
+#hpfill.low{background:var(--danger)}
+#obj-box{text-align:center}
+#obj-label{font-size:8px;letter-spacing:2px;color:var(--text-dim)}
+#obj-text{font-family:var(--head);font-size:12px;color:var(--warzone-glow);letter-spacing:1px}
+#obj-bar{width:190px;height:5px;background:var(--border);margin:3px auto 0}
+#obj-fill{height:100%;background:var(--warzone-glow);transition:width .2s}
+#extract-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:9px;letter-spacing:2px;padding:5px 10px;cursor:pointer;transition:all .2s}
+#extract-btn:hover{border-color:var(--green);color:var(--green)}
+#game-canvas{flex:1;display:block;width:100%}
+
+/* === RESULTS === */
+#results{position:fixed;inset:0;background:rgba(4,11,4,.94);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:100;gap:14px}
+#results.on{display:flex}
+#res-title{font-family:var(--head);font-size:44px;letter-spacing:8px;text-shadow:0 0 40px currentColor}
+#res-title.win{color:var(--green)}
+#res-title.loss{color:var(--danger)}
+#res-score{font-size:22px;color:var(--warzone-glow);font-family:var(--head)}
+#res-info{font-size:11px;color:var(--text-dim);text-align:center;max-width:460px;line-height:1.8}
+#res-btn{background:var(--green);border:none;color:var(--bg);font-family:var(--head);font-size:15px;letter-spacing:3px;padding:13px 38px;cursor:pointer;margin-top:6px;transition:all .2s}
+#res-btn:hover{box-shadow:0 0 30px var(--green)}
+
+/* === MISC === */
+#cfg-warn{position:fixed;top:0;left:0;right:0;background:#7c2d12;border-bottom:1px solid #f97316;color:#fed7aa;font-size:10px;font-family:var(--mono);padding:5px 16px;text-align:center;z-index:10000;display:none}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--green);color:var(--green);font-size:11px;letter-spacing:2px;padding:9px 20px;opacity:0;transition:opacity .3s;z-index:1000;pointer-events:none;white-space:nowrap}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+
+<div id="cfg-warn">⚠ SUPABASE NOT CONFIGURED — Offline mode active.</div>
+
+<!-- WORLD MAP -->
+<div id="worldmap">
+  <div id="wm-header">
+    <div id="wm-title">⟨ FOR LIBERTY ⟩</div>
+    <div class="header-right">
+      OPERATIVE: <input id="player-input" value="GHOST-1" maxlength="12">
+      &nbsp;|&nbsp; SESSION: <span id="sess-pts">0</span> PTS
+      &nbsp;|&nbsp; WARZONES: <span id="h-wz">—</span>
+      &nbsp;|&nbsp; ALLIED: <span id="h-al">—</span>/<span id="h-tot">20</span>
+    </div>
+  </div>
+  <div id="wm-body">
+    <div id="map-wrap">
+      <!-- viewBox 1200×680 — 20 tessellating polygon territories -->
+      <svg id="map-svg" viewBox="0 0 1200 680" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M40 0L0 0 0 40" fill="none" stroke="#080f08" stroke-width="0.8"/>
+          </pattern>
+          <filter id="glow-strong"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <rect width="1200" height="680" fill="#030903"/>
+        <rect width="1200" height="680" fill="url(#grid)"/>
+        <!-- compass rose -->
+        <g opacity="0.12" transform="translate(60,620)">
+          <line x1="0" y1="-22" x2="0" y2="22" stroke="#00ff41" stroke-width="1"/>
+          <line x1="-22" y1="0" x2="22" y2="0" stroke="#00ff41" stroke-width="1"/>
+          <text x="0" y="-27" text-anchor="middle" fill="#00ff41" font-family="'Share Tech Mono'" font-size="9">N</text>
+        </g>
+        <!-- scale bar -->
+        <g opacity="0.18" transform="translate(1100,655)">
+          <line x1="0" y1="0" x2="80" y2="0" stroke="#00ff41" stroke-width="1"/>
+          <line x1="0" y1="-4" x2="0" y2="4" stroke="#00ff41" stroke-width="1"/>
+          <line x1="80" y1="-4" x2="80" y2="4" stroke="#00ff41" stroke-width="1"/>
+          <text x="40" y="-7" text-anchor="middle" fill="#00ff41" font-family="'Share Tech Mono'" font-size="8">100 KM</text>
+        </g>
+        <g id="rg"></g>
+        <g id="lb"></g>
+      </svg>
+    </div>
+    <div id="sidebar">
+      <div class="sb-box">
+        <div class="sb-label">STATUS LEGEND</div>
+        <div class="leg-item"><div class="leg-dot allied"></div>ALLIED TERRITORY</div>
+        <div class="leg-item"><div class="leg-dot enemy"></div>ENEMY TERRITORY</div>
+        <div class="leg-item"><div class="leg-dot neutral"></div>NEUTRAL ZONE</div>
+        <div class="leg-item"><div class="leg-dot warzone"></div>ACTIVE WARZONE</div>
+      </div>
+      <div class="sb-box" style="flex:0 0 auto">
+        <div class="sb-label">REGION INTEL</div>
+        <div id="region-info"><span style="font-size:10px;color:var(--text-dim)">// HOVER A REGION</span></div>
+      </div>
+      <div class="sb-box">
+        <div class="sb-label">THEATER STATUS</div>
+        <div id="gstats">
+          WARZONES: <b id="s-wz" style="color:var(--warzone-glow)">—</b><br>
+          ALLIED:   <b id="s-al" style="color:var(--allied-glow)">—</b><br>
+          ENEMY:    <b id="s-en" style="color:var(--enemy-glow)">—</b><br>
+          NEUTRAL:  <b id="s-ne" style="color:var(--neutral-glow)">—</b>
+        </div>
+      </div>
+      <div class="sb-box" style="flex:1;min-height:0;display:flex;flex-direction:column">
+        <div class="sb-label">ALL REGIONS</div>
+        <div id="rg-list"></div>
+      </div>
+      <button id="deploy-btn" onclick="deployToBattle()">⊕ DEPLOY TO WARZONE</button>
+    </div>
+  </div>
+</div>
+
+<!-- BATTLE -->
+<div id="battle">
+  <div id="bhud">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div class="hstat">HEALTH<span class="hval" id="hval">100</span><div id="hpbar"><div id="hpfill"></div></div></div>
+      <div class="hstat">SCORE<span class="hval" id="score-val">0</span></div>
+    </div>
+    <div id="obj-box">
+      <div id="obj-label">// OBJECTIVE</div>
+      <div id="obj-text">—</div>
+      <div id="obj-bar"><div id="obj-fill" style="width:0%"></div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div class="hstat" style="text-align:right">REGION<span class="hval" id="region-hud" style="font-size:10px;letter-spacing:1px">—</span></div>
+      <button id="extract-btn" onclick="extractBattle()">[ EXTRACT ]</button>
+    </div>
+  </div>
+  <canvas id="game-canvas"></canvas>
+</div>
+
+<!-- RESULTS -->
+<div id="results">
+  <div id="res-title" class="win">MISSION COMPLETE</div>
+  <div id="res-score">+0 POINTS</div>
+  <div id="res-info">—</div>
+  <button id="res-btn" onclick="returnToMap()">RETURN TO COMMAND</button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ╔══════════════════════════════════════════════════════════╗
+// ║  SUPABASE CREDENTIALS                                    ║
+// ╚══════════════════════════════════════════════════════════╝
+const SUPABASE_URL      = 'https://nuiclhbqxeakzhacfqzi.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51aWNsaGJxeGVha3poYWNmcXppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0ODkyMzYsImV4cCI6MjA5MDA2NTIzNn0.XgIFJf8CjptZ0seifdwZDVRONPPAstXu3NC2izXEaSc';
+
+/*
+ ═══════════════════════════════════════════════════════
+  SUPABASE SQL — Run in SQL Editor
+  Safe to run on existing DB: uses CREATE IF NOT EXISTS
+  + ALTER TABLE IF NOT EXISTS + UPSERT (no data loss)
+ ═══════════════════════════════════════════════════════
+
+-- 1. Create table (skips if already exists)
+CREATE TABLE IF NOT EXISTS regions (
+  id        INT  PRIMARY KEY,
+  name      TEXT NOT NULL DEFAULT '',
+  status    TEXT NOT NULL DEFAULT 'neutral'
+              CHECK (status IN ('allied','enemy','neutral','warzone')),
+  points    INT  NOT NULL DEFAULT 0,
+  threshold INT  NOT NULL DEFAULT 400
+);
+
+-- 2. Add any columns that may be missing in older schema versions
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                 WHERE table_name='regions' AND column_name='name') THEN
+    ALTER TABLE regions ADD COLUMN name TEXT NOT NULL DEFAULT '';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                 WHERE table_name='regions' AND column_name='status') THEN
+    ALTER TABLE regions ADD COLUMN status TEXT NOT NULL DEFAULT 'neutral';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                 WHERE table_name='regions' AND column_name='points') THEN
+    ALTER TABLE regions ADD COLUMN points INT NOT NULL DEFAULT 0;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                 WHERE table_name='regions' AND column_name='threshold') THEN
+    ALTER TABLE regions ADD COLUMN threshold INT NOT NULL DEFAULT 400;
+  END IF;
+END $$;
+
+-- 3. Drop old check constraint and re-add (in case old schema had different values)
+DO $$ BEGIN
+  ALTER TABLE regions DROP CONSTRAINT IF EXISTS regions_status_check;
+  ALTER TABLE regions ADD CONSTRAINT regions_status_check
+    CHECK (status IN ('allied','enemy','neutral','warzone'));
+EXCEPTION WHEN others THEN NULL;
+END $$;
+
+-- 4. Upsert all 20 regions (preserves existing points/status, only updates name+threshold)
+INSERT INTO regions (id, name, status, points, threshold) VALUES
+  ( 1, 'NORDFJORD',    'allied',   0,  300),
+  ( 2, 'HIGHPASS',     'allied',   0,  350),
+  ( 3, 'IRONSPIRE',    'neutral',  0,  400),
+  ( 4, 'DRAKENWALL',   'enemy',    0,  500),
+  ( 5, 'VOLGRATH',     'enemy',    0,  450),
+  ( 6, 'ASHVALE',      'warzone',  45, 300),
+  ( 7, 'GREYMARSH',    'neutral',  0,  360),
+  ( 8, 'THE CRUCIBLE', 'warzone',  120,500),
+  ( 9, 'CINDERPASS',   'enemy',    0,  420),
+  (10, 'SCOURGEHOLD',  'enemy',    0,  480),
+  (11, 'DUSTHAVEN',    'neutral',  0,  260),
+  (12, 'IRONFIELD',    'allied',   0,  380),
+  (13, 'RAVENSCAR',    'warzone',  80, 440),
+  (14, 'BLIGHTMOOR',   'enemy',    0,  460),
+  (15, 'DEADWATCH',    'enemy',    0,  400),
+  (16, 'LIBERTYPORT',  'allied',   0,  320),
+  (17, 'STONECROFT',   'neutral',  0,  350),
+  (18, 'SHADOWFEN',    'warzone',  65, 380),
+  (19, 'KISLEV',       'enemy',    0,  450),
+  (20, 'BONESPIRE',    'enemy',    0,  520)
+ON CONFLICT (id) DO UPDATE SET
+  name      = EXCLUDED.name,
+  threshold = EXCLUDED.threshold;
+  -- status and points intentionally preserved from existing data
+
+-- 5. Enable realtime (safe to run multiple times)
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE regions;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+*/
+
+// ════════════════════════════════════════════════════════
+//  20-REGION POLYGON MAP  —  SVG viewBox 1200 × 680
+//
+//  Shared edge grid (all neighbors share exact vertices):
+//   Row seams (y): 0 | ~145 | ~305 | ~460 | 680
+//   Col seams vary per row for organic feel
+// ════════════════════════════════════════════════════════
+const REGION_DEFS = [
+  // ── ROW 1 (y 0 → ~145) ─────────────────────────────
+  { id: 1,  name:'NORDFJORD',   poly:'0,0 242,0 228,145 0,145',                                def:'allied',  thr:300 },
+  { id: 2,  name:'HIGHPASS',    poly:'242,0 484,0 470,140 228,145',                            def:'allied',  thr:350 },
+  { id: 3,  name:'IRONSPIRE',   poly:'484,0 726,0 718,143 470,140',                            def:'neutral', thr:400 },
+  { id: 4,  name:'DRAKENWALL',  poly:'726,0 968,0 958,147 718,143',                            def:'enemy',   thr:500 },
+  { id: 5,  name:'VOLGRATH',    poly:'968,0 1200,0 1200,145 958,147',                          def:'enemy',   thr:450 },
+  // ── ROW 2 (y ~145 → ~305) ──────────────────────────
+  { id: 6,  name:'ASHVALE',     poly:'0,145 228,145 212,305 0,305',                            def:'warzone', thr:300,  pts:45  },
+  { id: 7,  name:'GREYMARSH',   poly:'228,145 470,140 455,300 212,305',                        def:'neutral', thr:360 },
+  { id: 8,  name:'THE CRUCIBLE',poly:'470,140 718,143 710,302 455,300',                        def:'warzone', thr:500,  pts:120 },
+  { id: 9,  name:'CINDERPASS',  poly:'718,143 958,147 948,308 710,302',                        def:'enemy',   thr:420 },
+  { id:10,  name:'SCOURGEHOLD', poly:'958,147 1200,145 1200,305 948,308',                      def:'enemy',   thr:480 },
+  // ── ROW 3 (y ~305 → ~460) ──────────────────────────
+  { id:11,  name:'DUSTHAVEN',   poly:'0,305 212,305 198,462 0,462',                            def:'neutral', thr:260 },
+  { id:12,  name:'IRONFIELD',   poly:'212,305 455,300 440,458 198,462',                        def:'allied',  thr:380 },
+  { id:13,  name:'RAVENSCAR',   poly:'455,300 710,302 702,460 440,458',                        def:'warzone', thr:440,  pts:80  },
+  { id:14,  name:'BLIGHTMOOR',  poly:'710,302 948,308 938,465 702,460',                        def:'enemy',   thr:460 },
+  { id:15,  name:'DEADWATCH',   poly:'948,308 1200,305 1200,462 938,465',                      def:'enemy',   thr:400 },
+  // ── ROW 4 (y ~460 → 680) ───────────────────────────
+  { id:16,  name:'LIBERTYPORT', poly:'0,462 198,462 182,680 0,680',                            def:'allied',  thr:320 },
+  { id:17,  name:'STONECROFT',  poly:'198,462 440,458 425,680 182,680',                        def:'neutral', thr:350 },
+  { id:18,  name:'SHADOWFEN',   poly:'440,458 702,460 688,680 425,680',                        def:'warzone', thr:380,  pts:65  },
+  { id:19,  name:'KISLEV',      poly:'702,460 938,465 922,680 688,680',                        def:'enemy',   thr:450 },
+  { id:20,  name:'BONESPIRE',   poly:'938,465 1200,462 1200,680 922,680',                      def:'enemy',   thr:520 },
+];
+
+const STATUS = {
+  allied:  { fill:'#1e3a8a', stroke:'#3b82f6', label:'ALLIED'  },
+  enemy:   { fill:'#7f1d1d', stroke:'#ef4444', label:'ENEMY'   },
+  neutral: { fill:'#1f2937', stroke:'#4b5563', label:'NEUTRAL' },
+  warzone: { fill:'#78350f', stroke:'#f59e0b', label:'WARZONE' },
+};
+
+// ════════════════════════════════════════════════
+//  BATTLE MAP LAYOUTS  (800×600 game space)
+// ════════════════════════════════════════════════
+const GW = 800, GH = 600;
+
+const MAPS = {
+  urban: {
+    walls:[
+      {x:0,y:0,w:800,h:16},{x:0,y:584,w:800,h:16},{x:0,y:0,w:16,h:600},{x:784,y:0,w:16,h:600},
+      {x:100,y:80,w:85,h:75},{x:255,y:70,w:75,h:85},{x:430,y:80,w:90,h:70},{x:610,y:75,w:80,h:85},
+      {x:80,y:240,w:65,h:60},{x:210,y:225,w:80,h:85},{x:375,y:235,w:75,h:75},{x:530,y:225,w:85,h:80},{x:680,y:240,w:65,h:60},
+      {x:100,y:390,w:85,h:75},{x:255,y:400,w:75,h:80},{x:430,y:390,w:90,h:75},{x:610,y:395,w:80,h:80},
+      {x:355,y:278,w:90,h:55},
+    ],
+    pSpawn:{x:55,y:300}, eSpawns:[{x:730,y:130},{x:730,y:300},{x:730,y:470}], hold:{x:400,y:300,r:48}
+  },
+  corridor: {
+    walls:[
+      {x:0,y:0,w:800,h:16},{x:0,y:584,w:800,h:16},{x:0,y:0,w:16,h:600},{x:784,y:0,w:16,h:600},
+      {x:16,y:190,w:230,h:18},{x:390,y:190,w:390,h:18},
+      {x:16,y:410,w:230,h:18},{x:390,y:410,w:390,h:18},
+    ],
+    pSpawn:{x:55,y:295}, eSpawns:[{x:740,y:80},{x:740,y:295},{x:740,y:510}], hold:{x:400,y:295,r:42}
+  },
+  open: {
+    walls:[
+      {x:0,y:0,w:800,h:16},{x:0,y:584,w:800,h:16},{x:0,y:0,w:16,h:600},{x:784,y:0,w:16,h:600},
+      {x:555,y:180,w:45,h:55},{x:600,y:385,w:55,h:45},{x:540,y:295,w:35,h:35},
+      {x:680,y:125,w:45,h:45},{x:695,y:455,w:45,h:45},{x:685,y:290,w:35,h:35},
+    ],
+    pSpawn:{x:60,y:300}, eSpawns:[{x:720,y:150},{x:720,y:300},{x:720,y:450}], hold:{x:400,y:300,r:52}
+  },
+  fortress: {
+    walls:[
+      {x:0,y:0,w:800,h:16},{x:0,y:584,w:800,h:16},{x:0,y:0,w:16,h:600},{x:784,y:0,w:16,h:600},
+      {x:200,y:100,w:400,h:18},{x:200,y:482,w:400,h:18},
+      {x:200,y:100,w:18,h:168},{x:200,y:340,w:18,h:160},
+      {x:582,y:100,w:18,h:168},{x:582,y:340,w:18,h:160},
+      {x:322,y:205,w:156,h:18},{x:322,y:382,w:156,h:18},
+      {x:322,y:205,w:18,h:85},{x:322,y:322,w:18,h:78},
+      {x:460,y:205,w:18,h:85},{x:460,y:322,w:18,h:78},
+    ],
+    pSpawn:{x:60,y:300}, eSpawns:[{x:740,y:180},{x:740,y:300},{x:740,y:420},{x:400,y:295}], hold:{x:400,y:295,r:38}
+  },
+  trenches: {
+    walls:[
+      {x:0,y:0,w:800,h:16},{x:0,y:584,w:800,h:16},{x:0,y:0,w:16,h:600},{x:784,y:0,w:16,h:600},
+      // horizontal trench lines
+      {x:16,y:145,w:220,h:14},{x:280,y:145,w:205,h:14},{x:530,y:145,w:254,h:14},
+      {x:16,y:295,w:180,h:14},{x:240,y:295,w:260,h:14},{x:560,y:295,w:224,h:14},
+      {x:16,y:445,w:200,h:14},{x:270,y:445,w:245,h:14},{x:570,y:445,w:214,h:14},
+      // vertical connectors
+      {x:85,y:159,w:14,h:136},{x:85,y:309,w:14,h:136},
+      {x:310,y:159,w:14,h:136},{x:310,y:309,w:14,h:136},
+      {x:540,y:159,w:14,h:136},{x:540,y:309,w:14,h:136},
+      {x:680,y:159,w:14,h:136},{x:680,y:309,w:14,h:136},
+    ],
+    pSpawn:{x:55,y:300}, eSpawns:[{x:740,y:100},{x:740,y:300},{x:740,y:500},{x:600,y:220}], hold:{x:400,y:295,r:44}
+  },
+};
+
+const MAP_KEYS = ['urban','corridor','open','fortress','trenches'];
+
+// ════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════
+let sb = null, sbOk = false;
+let regions = [];
+let selRegion = null;
+let sessPoints = 0;
+let playerName = 'GHOST-1';
+let pulseInt = null;
+
+let canvas, ctx;
+let gameRunning = false, battleDone = false, raf = null;
+let player, enemies, bullets, particles, walls, map;
+let objective, objProgress;
+let battleScore, curRegion, lastT;
+let keys = {}, mouse = { x:400, y:300 };
+let gameScale = 1, gameOX = 0, gameOY = 0;
+
+// ════════════════════════════════════════════════
+//  SUPABASE
+// ════════════════════════════════════════════════
+async function initSupabase() {
+  if (SUPABASE_URL === 'YOUR_SUPABASE_URL') {
+    document.getElementById('cfg-warn').style.display = 'block';
+    loadDefaults(); return;
+  }
+  try {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data, error } = await sb.from('regions').select('*').order('id');
+    if (error) throw error;
+    // Merge DB data with any new regions not yet in DB
+    const dbIds = new Set(data.map(r=>r.id));
+    regions = data;
+    // Append any region definitions that don't exist in DB yet (offline fallback)
+    for (const d of REGION_DEFS) {
+      if (!dbIds.has(d.id)) regions.push({id:d.id,name:d.name,status:d.def,points:d.pts||0,threshold:d.thr});
+    }
+    sbOk = true;
+    subscribeRegions();
+    renderMap();
+  } catch(e) {
+    console.error(e);
+    document.getElementById('cfg-warn').style.display = 'block';
+    document.getElementById('cfg-warn').textContent = '⚠ SUPABASE FAILED — Offline mode active.';
+    loadDefaults();
+  }
+}
+
+function loadDefaults() {
+  regions = REGION_DEFS.map(d => ({ id:d.id, name:d.name, status:d.def, points:d.pts||0, threshold:d.thr }));
+  renderMap();
+}
+
+function subscribeRegions() {
+  sb.channel('rg-v2').on('postgres_changes',{ event:'*', schema:'public', table:'regions' }, p => {
+    const u = p.new;
+    const i = regions.findIndex(r=>r.id===u.id);
+    if (i >= 0) {
+      const old = regions[i].status;
+      regions[i] = u;
+      if (old !== u.status) toast(`${u.name} → ${u.status.toUpperCase()}`);
+      renderMap();
+      if (selRegion?.id === u.id) { selRegion = u; showRegionInfo(u); }
+    }
+  }).subscribe();
+}
+
+async function dbSubmitPoints(regionId, pts) {
+  if (!sbOk || pts <= 0) return;
+  try {
+    const { data } = await sb.from('regions').select('points,threshold,status,name').eq('id',regionId).single();
+    if (!data) return;
+    const np = (data.points||0) + pts;
+    const ns = (data.status === 'warzone' && np >= data.threshold) ? 'allied' : data.status;
+    await sb.from('regions').update({ points:np, status:ns }).eq('id', regionId);
+    if (ns === 'allied') toast(`⚡ ${data.name} LIBERATED!`);
+  } catch(e) { console.error('DB write fail:', e); }
+}
+
+// ════════════════════════════════════════════════
+//  WORLD MAP RENDERING
+// ════════════════════════════════════════════════
+function polyCenter(poly) {
+  const pts = poly.split(' ').map(s=>s.split(',').map(Number));
+  return { x: pts.reduce((a,p)=>a+p[0],0)/pts.length, y: pts.reduce((a,p)=>a+p[1],0)/pts.length };
+}
+
+function renderMap() {
+  const rg = document.getElementById('rg');
+  const lb = document.getElementById('lb');
+  rg.innerHTML = ''; lb.innerHTML = '';
+  if (pulseInt) { clearInterval(pulseInt); pulseInt = null; }
+
+  for (const def of REGION_DEFS) {
+    const r = regions.find(x=>x.id===def.id) || { id:def.id, status:def.def, points:def.pts||0, threshold:def.thr };
+    const s = STATUS[r.status];
+    const c = polyCenter(def.poly);
+    const pct = Math.min(r.points/r.threshold, 1);
+    const isWZ = r.status === 'warzone';
+
+    const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    poly.setAttribute('points', def.poly);
+    poly.setAttribute('fill', s.fill);
+    poly.setAttribute('stroke', s.stroke);
+    poly.setAttribute('stroke-width', isWZ ? '2.5' : '1.2');
+    poly.setAttribute('stroke-linejoin', 'round');
+    poly.style.opacity = '0.80';
+    poly.style.cursor = isWZ ? 'pointer' : 'default';
+    poly.dataset.id = def.id;
+    if (isWZ) poly.classList.add('wz');
+
+    poly.addEventListener('mouseenter', ()=>{
+      poly.style.opacity='1'; poly.setAttribute('stroke-width','3'); showRegionInfo(r);
+    });
+    poly.addEventListener('mouseleave', ()=>{
+      poly.style.opacity='0.80'; poly.setAttribute('stroke-width', isWZ?'2.5':'1.2');
+    });
+    poly.addEventListener('click', ()=>{
+      selRegion=r; showRegionInfo(r);
+      document.getElementById('deploy-btn').classList.toggle('on', isWZ);
+    });
+    rg.appendChild(poly);
+
+    // Warzone pulse dot
+    if (isWZ) {
+      const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      dot.setAttribute('cx',c.x); dot.setAttribute('cy',c.y-20); dot.setAttribute('r','5');
+      dot.setAttribute('fill','#f59e0b'); dot.classList.add('wz-dot');
+      rg.appendChild(dot);
+    }
+
+    // Region name
+    const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x',c.x); txt.setAttribute('y',c.y+4);
+    txt.setAttribute('text-anchor','middle');
+    txt.setAttribute('font-family',"'Share Tech Mono',monospace");
+    txt.setAttribute('font-size','9.5');
+    txt.setAttribute('fill',s.stroke);
+    txt.setAttribute('letter-spacing','1.2');
+    txt.setAttribute('pointer-events','none');
+    txt.textContent = def.name; lb.appendChild(txt);
+
+    // Status label
+    const stxt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    stxt.setAttribute('x',c.x); stxt.setAttribute('y',c.y+17);
+    stxt.setAttribute('text-anchor','middle');
+    stxt.setAttribute('font-family',"'Share Tech Mono',monospace");
+    stxt.setAttribute('font-size','7'); stxt.setAttribute('fill',s.stroke); stxt.setAttribute('opacity','0.6');
+    stxt.setAttribute('pointer-events','none');
+    stxt.textContent = `[${s.label}]`; lb.appendChild(stxt);
+
+    // Warzone progress bar
+    if (isWZ) {
+      const bw=52, bx=c.x-bw/2, by=c.y+23;
+      const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      bg.setAttribute('x',bx); bg.setAttribute('y',by); bg.setAttribute('width',bw); bg.setAttribute('height',3);
+      bg.setAttribute('fill','#1a3a1a'); bg.setAttribute('pointer-events','none'); lb.appendChild(bg);
+      const bf=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      bf.setAttribute('x',bx); bf.setAttribute('y',by); bf.setAttribute('width',bw*pct); bf.setAttribute('height',3);
+      bf.setAttribute('fill','#f59e0b'); bf.setAttribute('pointer-events','none'); lb.appendChild(bf);
+    }
+
+    // Region ID badge (small, top-left of each polygon)
+    const badge=document.createElementNS('http://www.w3.org/2000/svg','text');
+    badge.setAttribute('x',c.x-28); badge.setAttribute('y',c.y-6);
+    badge.setAttribute('font-family',"'Share Tech Mono',monospace");
+    badge.setAttribute('font-size','6.5'); badge.setAttribute('fill',s.stroke); badge.setAttribute('opacity','0.4');
+    badge.setAttribute('pointer-events','none');
+    badge.textContent=`R${r.id}`; lb.appendChild(badge);
+  }
+
+  // Update stats
+  const wz=regions.filter(r=>r.status==='warzone').length;
+  const al=regions.filter(r=>r.status==='allied').length;
+  const en=regions.filter(r=>r.status==='enemy').length;
+  const ne=regions.filter(r=>r.status==='neutral').length;
+  document.getElementById('s-wz').textContent=wz;
+  document.getElementById('s-al').textContent=al;
+  document.getElementById('s-en').textContent=en;
+  document.getElementById('s-ne').textContent=ne;
+  document.getElementById('h-wz').textContent=wz;
+  document.getElementById('h-al').textContent=al;
+
+  // Region list in sidebar
+  const list=document.getElementById('rg-list');
+  list.innerHTML='';
+  const sorted=[...regions].sort((a,b)=>{
+    const o={warzone:0,enemy:1,neutral:2,allied:3};
+    return (o[a.status]||4)-(o[b.status]||4);
+  });
+  for (const r of sorted) {
+    const s=STATUS[r.status];
+    const row=document.createElement('div');
+    row.className='rg-row'+(r.status==='warzone'?' wz-row':'');
+    row.innerHTML=`<div class="rg-dot" style="background:${s.fill};border-color:${s.stroke}"></div>
+      <div class="rg-name" style="color:${s.stroke}">${r.name}</div>
+      <div class="rg-status" style="color:${s.stroke}">${s.label}</div>`;
+    row.addEventListener('click',()=>{
+      selRegion=r; showRegionInfo(r);
+      document.getElementById('deploy-btn').classList.toggle('on',r.status==='warzone');
+      // Highlight polygon
+      document.querySelectorAll('#rg polygon').forEach(p=>{
+        if(parseInt(p.dataset.id)===r.id){p.style.opacity='1';p.setAttribute('stroke-width','3');}
+        else{p.style.opacity='0.80';p.setAttribute('stroke-width',regions.find(x=>x.id===parseInt(p.dataset.id))?.status==='warzone'?'2.5':'1.2');}
+      });
+    });
+    list.appendChild(row);
+  }
+
+  // Pulse animation
+  pulseInt = setInterval(()=>{
+    const t = Date.now()/1000;
+    document.querySelectorAll('.wz-dot').forEach(d=>{
+      const v = 0.35+0.5*Math.abs(Math.sin(t*2.2));
+      d.setAttribute('opacity',v); d.setAttribute('r',4+2.5*Math.abs(Math.sin(t*2.2)));
+    });
+    document.querySelectorAll('.wz').forEach(p=>{
+      p.style.opacity = 0.7+0.14*Math.abs(Math.sin(t*3));
+    });
+  },50);
+}
+
+function showRegionInfo(r) {
+  const s = STATUS[r.status];
+  const pct = Math.min(r.points/r.threshold,1);
+  const div = document.getElementById('region-info');
+  div.innerHTML = `
+    <div class="rname" style="color:${s.stroke}">${r.name}</div>
+    <div class="rrow"><span>STATUS</span><span style="color:${s.stroke}">${s.label}</span></div>
+    <div class="rrow"><span>LIBERATION PTS</span><span style="color:#f59e0b">${r.points}/${r.threshold}</span></div>
+    ${r.status==='warzone'?`
+      <div style="font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-top:5px">LIBERATION PROGRESS</div>
+      <div class="pbar"><div class="pfill" style="width:${pct*100}%"></div></div>
+      <div style="font-size:9px;color:var(--text-dim)">${Math.round(pct*100)}% — ${r.threshold-r.points} PTS TO LIBERATE</div>
+      <div style="margin-top:6px;font-size:10px;color:var(--warzone-glow)">⊕ CLICK TO DEPLOY</div>
+    `:`<div style="margin-top:6px;font-size:9px;color:var(--text-dim)">— NOT A DEPLOYABLE ZONE</div>`}
+  `;
+  document.getElementById('deploy-btn').classList.toggle('on', r.status==='warzone');
+  selRegion = r;
+}
+
+// ════════════════════════════════════════════════
+//  BATTLE INIT
+// ════════════════════════════════════════════════
+function deployToBattle() {
+  if (!selRegion || selRegion.status !== 'warzone') return;
+  playerName = document.getElementById('player-input').value || 'GHOST-1';
+  curRegion = selRegion;
+
+  document.getElementById('worldmap').style.display = 'none';
+  document.getElementById('battle').style.display = 'flex';
+  document.getElementById('region-hud').textContent = curRegion.name;
+
+  canvas = document.getElementById('game-canvas');
+  ctx = canvas.getContext('2d');
+  resizeCanvas();
+
+  map = MAPS[MAP_KEYS[(curRegion.id-1) % MAP_KEYS.length]];
+  walls = map.walls;
+
+  if (curRegion.id === 12) {
+  map = MAPS['corridor'];
+}
+
+  player = { x:map.pSpawn.x, y:map.pSpawn.y, angle:0, hp:100, maxHp:100, r:13, spd:185, lastShot:0, cd:0.22, inv:0 };
+  enemies = []; bullets = []; particles = [];
+  battleScore = 0; objProgress = 0; battleDone = false; gameRunning = true;
+
+  const types = ['kill_all','hold_point','survive'];
+  const otype = types[Math.floor(Math.random()*types.length)];
+  const ne = otype==='survive'?10:(otype==='kill_all'?15:10);
+  for (let i=0;i<ne;i++) {
+    const sp = map.eSpawns[i%map.eSpawns.length];
+    enemies.push(mkEnemy(sp.x+(Math.random()-.5)*50, sp.y+(Math.random()-.5)*50));
+  }
+
+  objective = {
+    type:otype, initCount:enemies.length,
+    hold:map.hold, timeReq:otype==='hold_point'?12:0, timeHeld:0,
+    totalTime:otype==='survive'?35:0, survived:0,
+    spawnT:0, spawnInt:7, spawned:enemies.length, maxSpawns:10,
+    done:false, won:false
+  };
+
+  document.getElementById('score-val').textContent='0';
+  updateHUD(); updateObjDisplay();
+  lastT = performance.now();
+  if (raf) cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(loop);
+}
+
+function resizeCanvas() {
+  const hud = document.getElementById('bhud');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight - hud.offsetHeight;
+  gameScale = Math.min(canvas.width/GW, canvas.height/GH);
+  gameOX = (canvas.width - GW*gameScale)/2;
+  gameOY = (canvas.height - GH*gameScale)/2;
+}
+
+function mkEnemy(x,y) {
+  return { x, y, r:12, hp:3, maxHp:3, spd:65+Math.random()*45, angle:Math.random()*Math.PI*2,
+    lastShot:Math.random()*2, cd:+Math.random()*3, state:'patrol',
+    pT:0, wx:(Math.random()-.5)*2, wy:(Math.random()-.5)*2 };
+}
+
+function toGame(cx, cy) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x:((cx-rect.left)*(canvas.width/rect.width)-gameOX)/gameScale,
+    y:((cy-rect.top)*(canvas.height/rect.height)-gameOY)/gameScale
+  };
+}
+
+// ════════════════════════════════════════════════
+//  GAME LOOP
+// ════════════════════════════════════════════════
+function loop(ts) {
+  if (!gameRunning) return;
+  const dt = Math.min((ts-lastT)/1000, 0.05);
+  lastT = ts;
+  update(dt);
+  render();
+  raf = requestAnimationFrame(loop);
+}
+
+function wallHit(x,y,r) {
+  for (const w of walls) {
+    if (x+r>w.x&&x-r<w.x+w.w&&y+r>w.y&&y-r<w.y+w.h) return true;
+  }
+  return false;
+}
+
+function update(dt) {
+  if (!player || objective.done) return;
+
+  let dx=0,dy=0;
+  if (keys['KeyW']||keys['ArrowUp'])   dy-=1;
+  if (keys['KeyS']||keys['ArrowDown']) dy+=1;
+  if (keys['KeyA']||keys['ArrowLeft']) dx-=1;
+  if (keys['KeyD']||keys['ArrowRight'])dx+=1;
+  if (dx&&dy){dx*=.707;dy*=.707;}
+  const nx=player.x+dx*player.spd*dt, ny=player.y+dy*player.spd*dt;
+  if (!wallHit(nx,player.y,player.r)) player.x=nx;
+  if (!wallHit(player.x,ny,player.r)) player.y=ny;
+  player.x=Math.max(player.r+16, Math.min(GW-player.r-16, player.x));
+  player.y=Math.max(player.r+16, Math.min(GH-player.r-16, player.y));
+
+  const gm=toGame(mouse.x,mouse.y);
+  player.angle=Math.atan2(gm.y-player.y, gm.x-player.x);
+  if (player.inv>0) player.inv-=dt;
+
+  // Enemies
+  for (const e of enemies) {
+    const d=Math.hypot(e.x-player.x, e.y-player.y);
+    if (d<400) e.state='chase'; else if (d>400) e.state='patrol';
+    if (e.state==='chase') {
+      const a=Math.atan2(player.y-e.y, player.x-e.x);
+      e.angle=a;
+      const ex=e.x+Math.cos(a)*e.spd*dt, ey=e.y+Math.sin(a)*e.spd*dt;
+      if (!wallHit(ex,e.y,e.r)) e.x=ex;
+      if (!wallHit(e.x,ey,e.r)) e.y=ey;
+      e.lastShot+=dt;
+      if (e.lastShot>=e.cd && d<320) {
+        e.lastShot=0;
+        const spread=(Math.random()-.5)*.35;
+        bullets.push({x:e.x,y:e.y,vx:Math.cos(a+spread)*330,vy:Math.sin(a+spread)*330,fp:false,r:5,life:2.2});
+      }
+    } else {
+      e.pT+=dt;
+      if (e.pT>2){e.pT=0;const len=Math.hypot(e.wx,e.wy)||1;e.wx=(Math.random()-.5)*2/len;e.wy=(Math.random()-.5)*2/len;}
+      const ex=e.x+e.wx*e.spd*.4*dt, ey=e.y+e.wy*e.spd*.4*dt;
+      if (!wallHit(ex,e.y,e.r)){e.x=ex;e.angle=Math.atan2(e.wy,e.wx);}else e.wx*=-1;
+      if (!wallHit(e.x,ey,e.r)) e.y=ey; else e.wy*=-1;
+      e.x=Math.max(40,Math.min(GW-40,e.x)); e.y=Math.max(40,Math.min(GH-40,e.y));
+    }
+  }
+
+  // Bullets
+  bullets=bullets.filter(b=>{
+    b.x+=b.vx*dt; b.y+=b.vy*dt; b.life-=dt;
+    if (b.life<=0||b.x<0||b.x>GW||b.y<0||b.y>GH) return false;
+    if (wallHit(b.x,b.y,b.r)){spark(b.x,b.y,'#4a4a4a',3);return false;}
+    if (!b.fp && player.inv<=0 && Math.hypot(b.x-player.x,b.y-player.y)<player.r+b.r) {
+      player.hp-=15; player.inv=0.28; updateHUD(); spark(b.x,b.y,'#ef4444',5); return false;
+    }
+    if (b.fp) {
+      for (let i=enemies.length-1;i>=0;i--) {
+        const e=enemies[i];
+        if (Math.hypot(b.x-e.x,b.y-e.y)<e.r+b.r) {
+          e.hp--; spark(b.x,b.y,'#f59e0b',5);
+          if (e.hp<=0){spark(e.x,e.y,'#ef4444',14);enemies.splice(i,1);battleScore+=5;document.getElementById('score-val').textContent=battleScore;}
+          return false;
+        }
+      }
+    }
+    return true;
+  });
+
+  particles=particles.filter(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.93;p.vy*=.93;p.life-=dt;return p.life>0;});
+
+  updateObjective(dt);
+  if (player.hp<=0) endBattle(false);
+}
+
+function spark(x,y,col,n){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2, s=60+Math.random()*160;
+    particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,col,life:.3+Math.random()*.4,ml:.3+Math.random()*.4,r:2+Math.random()*3});
+  }
+}
+
+function updateObjective(dt) {
+  const o=objective;
+  if (o.done) return;
+  if (o.type==='kill_all') {
+    objProgress=o.initCount>0?(o.initCount-enemies.length)/o.initCount:0;
+    if (enemies.length===0&&o.initCount>0){o.done=o.won=true;battleScore+=50;updateObjDisplay();setTimeout(()=>endBattle(true),1400);}
+  } else if (o.type==='hold_point') {
+    const dist=Math.hypot(player.x-o.hold.x,player.y-o.hold.y);
+    if (dist<o.hold.r) o.timeHeld=Math.min(o.timeHeld+dt,o.timeReq); else o.timeHeld=Math.max(0,o.timeHeld-dt*.5);
+    objProgress=o.timeHeld/o.timeReq;
+    if (o.timeHeld>=o.timeReq){o.done=o.won=true;battleScore+=50;updateObjDisplay();setTimeout(()=>endBattle(true),1400);}
+  } else if (o.type==='survive') {
+    o.survived+=dt; objProgress=Math.min(o.survived/o.totalTime,1);
+    o.spawnT+=dt;
+    if (o.spawnT>=o.spawnInt&&o.spawned<o.maxSpawns) {
+      o.spawnT=0; o.spawned++; o.spawnInt=Math.max(3,o.spawnInt-.5);
+      const side=Math.floor(Math.random()*4);
+      let ex,ey;
+      if(side===0){ex=Math.random()*GW;ey=40;}
+      else if(side===1){ex=GW-40;ey=Math.random()*GH;}
+      else if(side===2){ex=Math.random()*GW;ey=GH-40;}
+      else{ex=40;ey=Math.random()*GH;}
+      enemies.push(mkEnemy(ex,ey));
+    }
+    if (o.survived>=o.totalTime){o.done=o.won=true;battleScore+=75;updateObjDisplay();setTimeout(()=>endBattle(true),1400);}
+  }
+  updateObjDisplay();
+}
+
+function updateObjDisplay() {
+  const o=objective;
+  const texts={
+    kill_all:`ELIMINATE HOSTILES — ${enemies.length} REMAINING`,
+    hold_point:`HOLD POINT — ${(o.timeHeld||0).toFixed(1)}s / ${o.timeReq}s`,
+    survive:`SURVIVE — ${Math.max(0,o.totalTime-(o.survived||0)).toFixed(0)}s REMAINING`,
+  };
+  document.getElementById('obj-text').textContent=o.done&&o.won?'✓ COMPLETE':(texts[o.type]||'—');
+  document.getElementById('obj-fill').style.width=`${Math.min(objProgress*100,100)}%`;
+}
+
+function updateHUD() {
+  const pct=Math.max(0,player.hp/player.maxHp);
+  document.getElementById('hval').textContent=Math.max(0,Math.round(player.hp));
+  document.getElementById('hval').className=`hval${pct<.3?' red':''}`;
+  document.getElementById('hpfill').style.width=`${pct*100}%`;
+  document.getElementById('hpfill').className=pct<.3?'low':'';
+}
+
+// ════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════
+function render() {
+  const W=canvas.width, H=canvas.height;
+  ctx.fillStyle='#020602'; ctx.fillRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(gameOX,gameOY); ctx.scale(gameScale,gameScale);
+
+  ctx.fillStyle='#060d06'; ctx.fillRect(0,0,GW,GH);
+  ctx.strokeStyle='#0a160a'; ctx.lineWidth=1;
+  for(let x=0;x<GW;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,GH);ctx.stroke();}
+  for(let y=0;y<GH;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(GW,y);ctx.stroke();}
+
+  for (const w of walls) {
+    ctx.fillStyle='#182818'; ctx.fillRect(w.x,w.y,w.w,w.h);
+    ctx.strokeStyle='#274027'; ctx.lineWidth=1.5; ctx.strokeRect(w.x,w.y,w.w,w.h);
+    ctx.fillStyle='#1e361e'; ctx.fillRect(w.x,w.y,w.w,3);
+  }
+
+  if (objective.type==='hold_point') {
+    const hp=objective.hold, t=Date.now()/1000, p=.3+.25*Math.sin(t*3.5);
+    ctx.beginPath(); ctx.arc(hp.x,hp.y,hp.r,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(245,158,11,${p+.4})`; ctx.lineWidth=2;
+    ctx.setLineDash([8,5]); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=`rgba(245,158,11,${p*.4})`; ctx.fill();
+    ctx.beginPath(); ctx.arc(hp.x,hp.y,7,0,Math.PI*2);
+    ctx.fillStyle=`rgba(245,158,11,${p+.5})`; ctx.fill();
+    ctx.fillStyle='#f59e0b'; ctx.font='9px "Share Tech Mono"';
+    ctx.textAlign='center'; ctx.fillText('CAPTURE ZONE',hp.x,hp.y-hp.r-8);
+    if (objective.timeHeld>0) {
+      const arc=objective.timeHeld/objective.timeReq;
+      ctx.beginPath(); ctx.arc(hp.x,hp.y,hp.r+10,-Math.PI/2,-Math.PI/2+arc*Math.PI*2);
+      ctx.strokeStyle='#f59e0b'; ctx.lineWidth=3; ctx.setLineDash([]); ctx.stroke();
+    }
+  }
+
+  for (const p of particles) {
+    ctx.globalAlpha=p.life/p.ml;
+    ctx.fillStyle=p.col; ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r*(p.life/p.ml),0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha=1;
+
+  for (const e of enemies) {
+    ctx.beginPath(); ctx.arc(e.x+2,e.y+2,e.r,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,.45)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(e.x,e.y,e.r,0,Math.PI*2);
+    ctx.fillStyle='#6b1414'; ctx.fill();
+    ctx.strokeStyle='#ef4444'; ctx.lineWidth=2; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(e.x,e.y);
+    ctx.lineTo(e.x+Math.cos(e.angle)*(e.r+9), e.y+Math.sin(e.angle)*(e.r+9));
+    ctx.strokeStyle='#ef4444'; ctx.lineWidth=3; ctx.lineCap='round'; ctx.stroke(); ctx.lineCap='butt';
+    const hw=e.r*2;
+    ctx.fillStyle='#3a0000'; ctx.fillRect(e.x-hw/2,e.y-e.r-8,hw,4);
+    ctx.fillStyle='#ef4444'; ctx.fillRect(e.x-hw/2,e.y-e.r-8,hw*(e.hp/e.maxHp),4);
+  }
+
+  for (const b of bullets) {
+    const col=b.fp?'#00ff41':'#ef4444';
+    const glow=b.fp?'rgba(0,255,65,.15)':'rgba(239,68,68,.15)';
+    ctx.beginPath(); ctx.arc(b.x,b.y,b.r+4,0,Math.PI*2);
+    ctx.fillStyle=glow; ctx.fill();
+    ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+    ctx.fillStyle=col; ctx.fill();
+  }
+
+  if (player && !(player.inv>0 && Math.floor(Date.now()/80)%2===0)) {
+    ctx.beginPath(); ctx.arc(player.x+3,player.y+3,player.r,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,.5)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(player.x,player.y,player.r+5,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,255,65,.08)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(player.x,player.y,player.r,0,Math.PI*2);
+    ctx.fillStyle='#0d280d'; ctx.fill();
+    ctx.strokeStyle='#00ff41'; ctx.lineWidth=2.5; ctx.stroke();
+    const bl=player.r+11;
+    ctx.beginPath(); ctx.moveTo(player.x,player.y);
+    ctx.lineTo(player.x+Math.cos(player.angle)*bl, player.y+Math.sin(player.angle)*bl);
+    ctx.strokeStyle='#00ff41'; ctx.lineWidth=4; ctx.lineCap='round'; ctx.stroke(); ctx.lineCap='butt';
+    ctx.beginPath(); ctx.arc(player.x,player.y,4,0,Math.PI*2);
+    ctx.fillStyle='#00ff41'; ctx.fill();
+  }
+
+  renderMinimap();
+  ctx.restore();
+}
+
+function renderMinimap() {
+  const mmW=130,mmH=98,mx=GW-mmW-14,my=GH-mmH-14;
+  const sx=mmW/GW, sy=mmH/GH;
+  ctx.fillStyle='rgba(4,11,4,.88)'; ctx.fillRect(mx,my,mmW,mmH);
+  ctx.strokeStyle='#1a3a1a'; ctx.lineWidth=1; ctx.strokeRect(mx,my,mmW,mmH);
+  ctx.fillStyle='#152815';
+  for (const w of walls) ctx.fillRect(mx+w.x*sx,my+w.y*sy,w.w*sx,w.h*sy);
+  if (objective.type==='hold_point') {
+    ctx.beginPath(); ctx.arc(mx+objective.hold.x*sx,my+objective.hold.y*sy,objective.hold.r*sx,0,Math.PI*2);
+    ctx.strokeStyle='rgba(245,158,11,.6)'; ctx.lineWidth=1; ctx.stroke();
+  }
+  ctx.fillStyle='#ef4444';
+  for (const e of enemies){ctx.beginPath();ctx.arc(mx+e.x*sx,my+e.y*sy,2.5,0,Math.PI*2);ctx.fill();}
+  ctx.fillStyle='#00ff41';
+  ctx.beginPath(); ctx.arc(mx+player.x*sx,my+player.y*sy,3.5,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#00ff41'; ctx.font='7px "Share Tech Mono"'; ctx.textAlign='left';
+  ctx.fillText('MINIMAP',mx+3,my-3);
+}
+
+// ════════════════════════════════════════════════
+//  END BATTLE
+// ════════════════════════════════════════════════
+function endBattle(victory) {
+  if (battleDone) return; battleDone=true; gameRunning=false;
+  if (raf) cancelAnimationFrame(raf);
+
+  const overlay=document.getElementById('results');
+  const title=document.getElementById('res-title');
+  const scoreEl=document.getElementById('res-score');
+  const info=document.getElementById('res-info');
+
+  if (victory) {
+    title.textContent='MISSION COMPLETE'; title.className='win';
+    sessPoints+=battleScore;
+    document.getElementById('sess-pts').textContent=sessPoints;
+    scoreEl.textContent=`+${battleScore} POINTS EARNED`;
+    const r=curRegion;
+    const np=(r.points||0)+battleScore;
+    if (np>=r.threshold) {
+      info.textContent=`⚡ ${r.name} LIBERATION THRESHOLD REACHED — REGION CONVERTING TO ALLIED`;
+    } else {
+      info.textContent=`${r.name}: ${np}/${r.threshold} PTS — ${r.threshold-np} PTS REMAINING TO LIBERATE`;
+    }
+    const i=regions.findIndex(x=>x.id===r.id);
+    if (i>=0){regions[i].points=np; if(np>=r.threshold) regions[i].status='allied';}
+    dbSubmitPoints(r.id, battleScore);
+  } else {
+    const part=Math.floor(battleScore*.3);
+    title.textContent='OPERATIVE DOWN'; title.className='loss';
+    sessPoints+=part; document.getElementById('sess-pts').textContent=sessPoints;
+    scoreEl.textContent=part>0?`+${part} POINTS (PARTIAL)`:'NO POINTS AWARDED';
+    info.textContent='Mission failed. Some freedom given to the oppressed.';
+    if (part>0) dbSubmitPoints(curRegion.id, part);
+  }
+  overlay.classList.add('on');
+}
+
+function extractBattle() {
+  if (battleDone||!gameRunning) return;
+  const part=Math.floor(battleScore*.5);
+  battleScore=part; battleDone=true; gameRunning=false;
+  if(raf)cancelAnimationFrame(raf);
+  document.getElementById('res-title').textContent='EXTRACTED';
+  document.getElementById('res-title').className='win';
+  document.getElementById('res-score').textContent=part>0?`+${part} POINTS (EXTRACTION)`:'NO POINTS';
+  document.getElementById('res-info').textContent='Tactical extraction complete. Good work soldier!';
+  sessPoints+=part; document.getElementById('sess-pts').textContent=sessPoints;
+  if(part>0) dbSubmitPoints(curRegion.id,part);
+  document.getElementById('results').classList.add('on');
+}
+
+function returnToMap() {
+  gameRunning=false; battleDone=false;
+  if(raf)cancelAnimationFrame(raf);
+  document.getElementById('results').classList.remove('on');
+  document.getElementById('battle').style.display='none';
+  document.getElementById('worldmap').style.display='flex';
+  selRegion=null;
+  document.getElementById('deploy-btn').classList.remove('on');
+  document.getElementById('region-info').innerHTML='<span style="font-size:10px;color:var(--text-dim)">// HOVER A REGION</span>';
+  renderMap();
+}
+
+// ════════════════════════════════════════════════
+//  INPUT
+// ════════════════════════════════════════════════
+document.addEventListener('keydown', e=>{
+  keys[e.code]=true;
+  if(e.code==='Space'&&gameRunning){e.preventDefault();shoot();}
+});
+document.addEventListener('keyup', e=>{ keys[e.code]=false; });
+document.addEventListener('mousemove', e=>{ mouse.x=e.clientX; mouse.y=e.clientY; });
+document.addEventListener('mousedown', e=>{ if(gameRunning&&e.button===0) shoot(); });
+
+function shoot() {
+  if(!gameRunning||!player) return;
+  const now=performance.now()/1000;
+  if(now-player.lastShot<player.cd) return;
+  player.lastShot=now;
+  const gm=toGame(mouse.x,mouse.y);
+  const a=Math.atan2(gm.y-player.y,gm.x-player.x);
+  bullets.push({
+    x:player.x+Math.cos(a)*(player.r+5), y:player.y+Math.sin(a)*(player.r+5),
+    vx:Math.cos(a)*510, vy:Math.sin(a)*510, fp:true, r:5, life:2.2
+  });
+}
+
+window.addEventListener('resize',()=>{
+  if(document.getElementById('battle').style.display!=='none') resizeCanvas();
+});
+
+// ════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════
+let toastTimer=null;
+function toast(msg) {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('on');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('on'),3200);
+}
+
+// ════════════════════════════════════════════════
+//  BOOT
+// ════════════════════════════════════════════════
+initSupabase();
+</script>
+</body>
+</html>
