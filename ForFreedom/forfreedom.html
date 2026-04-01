@@ -1518,17 +1518,17 @@ async function runEnemyAI() {
   const aggression = alliedCount>enemyCount?'high':alliedCount===enemyCount?'medium':'low';
   const roll=Math.random();
 
-  if (aggression==='high'&&roll<0.55&&alliedVulnerable.length>0) {
+  if (aggression==='high'&&roll<0.40&&alliedVulnerable.length>0) {
     const t=alliedVulnerable[Math.floor(Math.random()*alliedVulnerable.length)];
     aiLog(`<span style="color:#ef4444">⚔ COUNTER: ${t.name}</span>`);
-    await aiApplyMove(t.id,'warzone',Math.floor(t.threshold*0.3)); return;
+    await aiApplyMove(t.id,'warzone',Math.floor(t.threshold*0.1)); return;
   }
-  if ((aggression==='high'||aggression==='medium')&&roll<0.4&&alliedNearWZ.length>0) {
+  if ((aggression==='high'||aggression==='medium')&&roll<0.2&&alliedNearWZ.length>0) {
     const t=alliedNearWZ[Math.floor(Math.random()*alliedNearWZ.length)];
     aiLog(`<span style="color:#ef4444">⚡ INCURSION: ${t.name}</span>`);
-    await aiApplyMove(t.id,'warzone',Math.floor(t.threshold*0.2)); return;
+    await aiApplyMove(t.id,'warzone',Math.floor(t.threshold*0.1)); return;
   }
-  if (enemyFrontline.length>0&&roll<0.65) {
+  if (enemyFrontline.length>0&&roll<0.25) {
     const preferred=enemyFrontline.filter(r=>hasNeighborStatus(r.id,'allied'));
     const pool=preferred.length>0?preferred:enemyFrontline;
     const t=pool[Math.floor(Math.random()*pool.length)];
@@ -1557,7 +1557,7 @@ async function runEnemyAI() {
 function scheduleAI() {
   const first=20000+Math.random()*20000;
   aiTickTimer=setTimeout(function tick(){
-    runEnemyAI();
+    //runEnemyAI();
     const next=(aiThreat>70?25000:45000)+Math.random()*30000;
     aiTickTimer=setTimeout(tick,next);
   },first);
