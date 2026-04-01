@@ -302,21 +302,21 @@ const REGION_DEFS = [
   { id: 4,  name:'DRAKENWALL',  poly:'726,0 968,0 958,147 718,143',                            def:'enemy',   thr:500 },
   { id: 5,  name:'VOLGRATH',    poly:'968,0 1200,0 1200,145 958,147',                          def:'enemy',   thr:450 },
   // ── ROW 2 (y ~145 → ~305) ──────────────────────────
-  { id: 6,  name:'ASHVALE',     poly:'0,145 228,145 212,305 0,305',                            def:'warzone', thr:300,  pts:45  },
+  { id: 6,  name:'ASHVALE',     poly:'0,145 228,145 212,305 0,305',                            def:'warzone', thr:300 },
   { id: 7,  name:'GREYMARSH',   poly:'228,145 470,140 455,300 212,305',                        def:'neutral', thr:360 },
-  { id: 8,  name:'THE CRUCIBLE',poly:'470,140 718,143 710,302 455,300',                        def:'warzone', thr:500,  pts:120 },
+  { id: 8,  name:'THE CRUCIBLE',poly:'470,140 718,143 710,302 455,300',                        def:'warzone', thr:500, },
   { id: 9,  name:'CINDERPASS',  poly:'718,143 958,147 948,308 710,302',                        def:'enemy',   thr:420 },
   { id:10,  name:'SCOURGEHOLD', poly:'958,147 1200,145 1200,305 948,308',                      def:'enemy',   thr:480 },
   // ── ROW 3 (y ~305 → ~460) ──────────────────────────
   { id:11,  name:'DUSTHAVEN',   poly:'0,305 212,305 198,462 0,462',                            def:'neutral', thr:260 },
   { id:12,  name:'IRONFIELD',   poly:'212,305 455,300 440,458 198,462',                        def:'allied',  thr:380 },
-  { id:13,  name:'RAVENSCAR',   poly:'455,300 710,302 702,460 440,458',                        def:'warzone', thr:440,  pts:80  },
+  { id:13,  name:'RAVENSCAR',   poly:'455,300 710,302 702,460 440,458',                        def:'warzone', thr:440 },
   { id:14,  name:'BLIGHTMOOR',  poly:'710,302 948,308 938,465 702,460',                        def:'enemy',   thr:460 },
   { id:15,  name:'DEADWATCH',   poly:'948,308 1200,305 1200,462 938,465',                      def:'enemy',   thr:400 },
   // ── ROW 4 (y ~460 → 680) ───────────────────────────
   { id:16,  name:'LIBERTYPORT', poly:'0,462 198,462 182,680 0,680',                            def:'allied',  thr:320 },
   { id:17,  name:'STONECROFT',  poly:'198,462 440,458 425,680 182,680',                        def:'neutral', thr:350 },
-  { id:18,  name:'SHADOWFEN',   poly:'440,458 702,460 688,680 425,680',                        def:'warzone', thr:380,  pts:65  },
+  { id:18,  name:'SHADOWFEN',   poly:'440,458 702,460 688,680 425,680',                        def:'warzone', thr:380 },
   { id:19,  name:'KISLEV',      poly:'702,460 938,465 922,680 688,680',                        def:'enemy',   thr:450 },
   { id:20,  name:'BONESPIRE',   poly:'938,465 1200,462 1200,680 922,680',                      def:'enemy',   thr:520 },
 ];
@@ -468,6 +468,25 @@ async function dbSubmitPoints(regionId, pts) {
     await sb.from('regions').update({ points:np, status:ns }).eq('id', regionId);
     if (ns === 'allied') toast(`⚡ ${data.name} LIBERATED!`);
   } catch(e) { console.error('DB write fail:', e); }
+  // Also record cumulative agent score
+  await dbSubmitAgentPoints(pts);
+}
+
+async function dbSubmitAgentPoints(pts) {
+  if (!sbOk || pts <= 0) return;
+  const name = (document.getElementById('player-input').value.trim() || 'GHOST-1').toUpperCase();
+  try {
+    // Try to find existing agent row by name (case-insensitive match via ilike)
+    const { data: existing } = await sb.from('agents').select('id,points').ilike('name', name).maybeSingle();
+    if (existing) {
+      // Update cumulative points
+      await sb.from('agents').update({ points: existing.points + pts }).eq('id', existing.id);
+    } else {
+      // Insert new agent — use timestamp-based id to avoid collisions
+      const newId = Date.now() % 2147483647; // fits INT range
+      await sb.from('agents').insert({ id: newId, name: name, points: pts });
+    }
+  } catch(e) { console.error('Agent DB write fail:', e); }
 }
 
 // ════════════════════════════════════════════════
@@ -651,7 +670,10 @@ function deployToBattle() {
   map = MAPS[MAP_KEYS[(curRegion.id-1) % MAP_KEYS.length]];
   walls = map.walls;
 
-  if (curRegion.id === 12) {
+if (curRegion.id === 12) {
+  map = MAPS['corridor'];
+}
+if (curRegion.id === 10) {
   map = MAPS['corridor'];
 }
 
