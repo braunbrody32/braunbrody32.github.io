@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>For Freedom!</title>
+<title>For Liberty!</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -117,29 +117,29 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
       OPERATIVE: <input id="player-input" value="GHOST-1" maxlength="12">
       &nbsp;|&nbsp; SESSION: <span id="sess-pts">0</span> PTS
       &nbsp;|&nbsp; WARZONES: <span id="h-wz">—</span>
-      &nbsp;|&nbsp; ALLIED: <span id="h-al">—</span>/<span id="h-tot">20</span>
+      &nbsp;|&nbsp; ALLIED: <span id="h-al">—</span>/<span id="h-tot">30</span>
     </div>
   </div>
   <div id="wm-body">
     <div id="map-wrap">
-      <!-- viewBox 1200×680 — 20 tessellating polygon territories -->
-      <svg id="map-svg" viewBox="0 0 1200 680" xmlns="http://www.w3.org/2000/svg">
+      <!-- viewBox 1800×750 — 30 tessellating polygon territories -->
+      <svg id="map-svg" viewBox="0 0 1800 750" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
             <path d="M40 0L0 0 0 40" fill="none" stroke="#080f08" stroke-width="0.8"/>
           </pattern>
           <filter id="glow-strong"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
-        <rect width="1200" height="680" fill="#030903"/>
-        <rect width="1200" height="680" fill="url(#grid)"/>
+        <rect width="1800" height="750" fill="#030903"/>
+        <rect width="1800" height="750" fill="url(#grid)"/>
         <!-- compass rose -->
-        <g opacity="0.12" transform="translate(60,620)">
+        <g opacity="0.12" transform="translate(60,690)">
           <line x1="0" y1="-22" x2="0" y2="22" stroke="#00ff41" stroke-width="1"/>
           <line x1="-22" y1="0" x2="22" y2="0" stroke="#00ff41" stroke-width="1"/>
           <text x="0" y="-27" text-anchor="middle" fill="#00ff41" font-family="'Share Tech Mono'" font-size="9">N</text>
         </g>
         <!-- scale bar -->
-        <g opacity="0.18" transform="translate(1100,655)">
+        <g opacity="0.18" transform="translate(1680,725)">
           <line x1="0" y1="0" x2="80" y2="0" stroke="#00ff41" stroke-width="1"/>
           <line x1="0" y1="-4" x2="0" y2="4" stroke="#00ff41" stroke-width="1"/>
           <line x1="80" y1="-4" x2="80" y2="4" stroke="#00ff41" stroke-width="1"/>
@@ -267,28 +267,23 @@ DO $$ BEGIN
 EXCEPTION WHEN others THEN NULL;
 END $$;
 
--- 4. Upsert all 20 regions (preserves existing points/status, only updates name+threshold)
+-- 4. Upsert all 30 regions (preserves existing points/status, only updates name+threshold)
 INSERT INTO regions (id, name, status, points, threshold) VALUES
-  ( 1, 'NORDFJORD',    'allied',   0,  300),
-  ( 2, 'HIGHPASS',     'allied',   0,  350),
-  ( 3, 'IRONSPIRE',    'neutral',  0,  400),
-  ( 4, 'DRAKENWALL',   'enemy',    0,  500),
-  ( 5, 'VOLGRATH',     'enemy',    0,  450),
-  ( 6, 'ASHVALE',      'warzone',  45, 300),
-  ( 7, 'GREYMARSH',    'neutral',  0,  360),
-  ( 8, 'THE CRUCIBLE', 'warzone',  120,500),
-  ( 9, 'CINDERPASS',   'enemy',    0,  420),
-  (10, 'SCOURGEHOLD',  'enemy',    0,  480),
-  (11, 'DUSTHAVEN',    'neutral',  0,  260),
-  (12, 'IRONFIELD',    'allied',   0,  380),
-  (13, 'RAVENSCAR',    'warzone',  80, 440),
-  (14, 'BLIGHTMOOR',   'enemy',    0,  460),
-  (15, 'DEADWATCH',    'enemy',    0,  400),
-  (16, 'LIBERTYPORT',  'allied',   0,  320),
-  (17, 'STONECROFT',   'neutral',  0,  350),
-  (18, 'SHADOWFEN',    'warzone',  65, 380),
-  (19, 'KISLEV',       'enemy',    0,  450),
-  (20, 'BONESPIRE',    'enemy',    0,  520)
+  ( 1,'NORDFJORD',  'allied',  0,300),( 2,'HIGHPASS',   'allied',  0,350),
+  ( 3,'IRONSPIRE',  'neutral', 0,400),( 4,'DRAKENWALL',  'enemy',   0,500),
+  ( 5,'VOLGRATH',   'enemy',   0,450),( 6,'BONESPIRE',   'enemy',   0,520),
+  ( 7,'ASHVALE',    'warzone',45,300),( 8,'GREYMARSH',   'neutral', 0,360),
+  ( 9,'THE CRUCIBLE','warzone',120,500),(10,'CINDERPASS', 'enemy',   0,420),
+  (11,'SCOURGEHOLD','enemy',   0,480),(12,'GRIMWATCH',   'enemy',   0,440),
+  (13,'DUSTHAVEN',  'neutral', 0,260),(14,'IRONFIELD',   'allied',  0,380),
+  (15,'RAVENSCAR',  'warzone',80,440),(16,'BLIGHTMOOR',  'enemy',   0,460),
+  (17,'DEADWATCH',  'enemy',   0,400),(18,'WRAITHHOLD',  'enemy',   0,470),
+  (19,'LIBERTYPORT','allied',  0,320),(20,'STONECROFT',  'neutral', 0,350),
+  (21,'SHADOWFEN',  'warzone',65,380),(22,'KISLEV',      'enemy',   0,450),
+  (23,'FROSTMERE',  'neutral', 0,360),(24,'DARKSPIRE',   'enemy',   0,490),
+  (25,'VALEHOME',   'allied',  0,280),(26,'THORNPASS',   'neutral', 0,340),
+  (27,'ASHENREACH', 'warzone',30,420),(28,'COLDWATER',   'enemy',   0,460),
+  (29,'RUINFALL',   'enemy',   0,500),(30,'OBLIVION',    'enemy',   0,550)
 ON CONFLICT (id) DO UPDATE SET
   name      = EXCLUDED.name,
   threshold = EXCLUDED.threshold;
@@ -302,37 +297,49 @@ END $$;
 */
 
 // ════════════════════════════════════════════════════════
-//  20-REGION POLYGON MAP  —  SVG viewBox 1200 × 680
+//  30-REGION POLYGON MAP  —  SVG viewBox 1800 × 750
 //
-//  Shared edge grid (all neighbors share exact vertices):
-//   Row seams (y): 0 | ~145 | ~305 | ~460 | 680
-//   Col seams vary per row for organic feel
+//  6 columns × 5 rows. Col seams stagger slightly per row.
+//  Row seams (y): 0 | 148 | 298 | 450 | 600 | 750
+//  Col seams (x): 0 | 300 | 600 | 900 | 1200 | 1500 | 1800
+//  (+/- 10-18px per row for organic feel)
 // ════════════════════════════════════════════════════════
 const REGION_DEFS = [
-  // ── ROW 1 (y 0 → ~145) ─────────────────────────────
-  { id: 1,  name:'NORDFJORD',   poly:'0,0 242,0 228,145 0,145',                                def:'allied',  thr:300 },
-  { id: 2,  name:'HIGHPASS',    poly:'242,0 484,0 470,140 228,145',                            def:'allied',  thr:350 },
-  { id: 3,  name:'IRONSPIRE',   poly:'484,0 726,0 718,143 470,140',                            def:'neutral', thr:400 },
-  { id: 4,  name:'DRAKENWALL',  poly:'726,0 968,0 958,147 718,143',                            def:'enemy',   thr:500 },
-  { id: 5,  name:'VOLGRATH',    poly:'968,0 1200,0 1200,145 958,147',                          def:'enemy',   thr:450 },
-  // ── ROW 2 (y ~145 → ~305) ──────────────────────────
-  { id: 6,  name:'ASHVALE',     poly:'0,145 228,145 212,305 0,305',                            def:'warzone', thr:300 },
-  { id: 7,  name:'GREYMARSH',   poly:'228,145 470,140 455,300 212,305',                        def:'neutral', thr:360 },
-  { id: 8,  name:'THE CRUCIBLE',poly:'470,140 718,143 710,302 455,300',                        def:'warzone', thr:500, },
-  { id: 9,  name:'CINDERPASS',  poly:'718,143 958,147 948,308 710,302',                        def:'enemy',   thr:420 },
-  { id:10,  name:'SCOURGEHOLD', poly:'958,147 1200,145 1200,305 948,308',                      def:'enemy',   thr:480 },
-  // ── ROW 3 (y ~305 → ~460) ──────────────────────────
-  { id:11,  name:'DUSTHAVEN',   poly:'0,305 212,305 198,462 0,462',                            def:'neutral', thr:260 },
-  { id:12,  name:'IRONFIELD',   poly:'212,305 455,300 440,458 198,462',                        def:'allied',  thr:380 },
-  { id:13,  name:'RAVENSCAR',   poly:'455,300 710,302 702,460 440,458',                        def:'warzone', thr:440 },
-  { id:14,  name:'BLIGHTMOOR',  poly:'710,302 948,308 938,465 702,460',                        def:'enemy',   thr:460 },
-  { id:15,  name:'DEADWATCH',   poly:'948,308 1200,305 1200,462 938,465',                      def:'enemy',   thr:400 },
-  // ── ROW 4 (y ~460 → 680) ───────────────────────────
-  { id:16,  name:'LIBERTYPORT', poly:'0,462 198,462 182,680 0,680',                            def:'allied',  thr:320 },
-  { id:17,  name:'STONECROFT',  poly:'198,462 440,458 425,680 182,680',                        def:'neutral', thr:350 },
-  { id:18,  name:'SHADOWFEN',   poly:'440,458 702,460 688,680 425,680',                        def:'warzone', thr:380 },
-  { id:19,  name:'KISLEV',      poly:'702,460 938,465 922,680 688,680',                        def:'enemy',   thr:450 },
-  { id:20,  name:'BONESPIRE',   poly:'938,465 1200,462 1200,680 922,680',                      def:'enemy',   thr:520 },
+  // ── ROW 1 (y 0 → ~148) ─────────────────────────────────────────
+  { id: 1,  name:'NORDFJORD',   poly:'0,0 300,0 292,148 0,148',                      def:'allied',  thr:300 },
+  { id: 2,  name:'HIGHPASS',    poly:'300,0 600,0 588,145 292,148',                  def:'allied',  thr:350 },
+  { id: 3,  name:'IRONSPIRE',   poly:'600,0 900,0 894,150 588,145',                  def:'neutral', thr:400 },
+  { id: 4,  name:'DRAKENWALL',  poly:'900,0 1200,0 1192,147 894,150',                def:'enemy',   thr:500 },
+  { id: 5,  name:'VOLGRATH',    poly:'1200,0 1500,0 1496,149 1192,147',              def:'enemy',   thr:450 },
+  { id: 6,  name:'BONESPIRE',   poly:'1500,0 1800,0 1800,148 1496,149',              def:'enemy',   thr:520 },
+  // ── ROW 2 (y ~148 → ~298) ──────────────────────────────────────
+  { id: 7,  name:'ASHVALE',     poly:'0,148 292,148 284,298 0,298',                  def:'warzone', thr:300 },
+  { id: 8,  name:'GREYMARSH',   poly:'292,148 588,145 578,294 284,298',              def:'neutral', thr:360 },
+  { id: 9,  name:'THE CRUCIBLE',poly:'588,145 894,150 886,296 578,294',              def:'warzone', thr:500 },
+  { id:10,  name:'CINDERPASS',  poly:'894,150 1192,147 1184,300 886,296',            def:'enemy',   thr:420 },
+  { id:11,  name:'SCOURGEHOLD', poly:'1192,147 1496,149 1490,302 1184,300',          def:'enemy',   thr:480 },
+  { id:12,  name:'GRIMWATCH',   poly:'1496,149 1800,148 1800,300 1490,302',          def:'enemy',   thr:440 },
+  // ── ROW 3 (y ~298 → ~450) ──────────────────────────────────────
+  { id:13,  name:'DUSTHAVEN',   poly:'0,298 284,298 276,450 0,450',                  def:'neutral', thr:260 },
+  { id:14,  name:'IRONFIELD',   poly:'284,298 578,294 568,448 276,450',              def:'allied',  thr:380 },
+  { id:15,  name:'RAVENSCAR',   poly:'578,294 886,296 878,452 568,448',              def:'warzone', thr:440 },
+  { id:16,  name:'BLIGHTMOOR',  poly:'886,296 1184,300 1176,454 878,452',            def:'enemy',   thr:460 },
+  { id:17,  name:'DEADWATCH',   poly:'1184,300 1490,302 1484,456 1176,454',          def:'enemy',   thr:400 },
+  { id:18,  name:'WRAITHHOLD',  poly:'1490,302 1800,300 1800,452 1484,456',          def:'enemy',   thr:470 },
+  // ── ROW 4 (y ~450 → ~600) ──────────────────────────────────────
+  { id:19,  name:'LIBERTYPORT', poly:'0,450 276,450 268,600 0,600',                  def:'allied',  thr:320 },
+  { id:20,  name:'STONECROFT',  poly:'276,450 568,448 558,598 268,600',              def:'neutral', thr:350 },
+  { id:21,  name:'SHADOWFEN',   poly:'568,448 878,452 870,602 558,598',              def:'warzone', thr:380 },
+  { id:22,  name:'KISLEV',      poly:'878,452 1176,454 1168,604 870,602',            def:'enemy',   thr:450 },
+  { id:23,  name:'FROSTMERE',   poly:'1176,454 1484,456 1478,606 1168,604',          def:'neutral', thr:360 },
+  { id:24,  name:'DARKSPIRE',   poly:'1484,456 1800,452 1800,602 1478,606',          def:'enemy',   thr:490 },
+  // ── ROW 5 (y ~600 → 750) ───────────────────────────────────────
+  { id:25,  name:'VALEHOME',    poly:'0,600 268,600 260,750 0,750',                  def:'allied',  thr:280 },
+  { id:26,  name:'THORNPASS',   poly:'268,600 558,598 548,750 260,750',              def:'neutral', thr:340 },
+  { id:27,  name:'ASHENREACH',  poly:'558,598 870,602 860,750 548,750',              def:'warzone', thr:420 },
+  { id:28,  name:'COLDWATER',   poly:'870,602 1168,604 1158,750 860,750',            def:'enemy',   thr:460 },
+  { id:29,  name:'RUINFALL',    poly:'1168,604 1478,606 1468,750 1158,750',          def:'enemy',   thr:500 },
+  { id:30,  name:'OBLIVION',    poly:'1478,606 1800,602 1800,750 1468,750',          def:'enemy',   thr:550 },
 ];
 
 const STATUS = {
@@ -389,6 +396,10 @@ const MAPS = {
   trenches: {
     walls:[
       {x:0,y:0,w:800,h:16},{x:0,y:584,w:800,h:16},{x:0,y:0,w:16,h:600},{x:784,y:0,w:16,h:600},
+      // horizontal trench lines
+      {x:16,y:145,w:220,h:14},{x:280,y:145,w:205,h:14},{x:530,y:145,w:254,h:14},
+      {x:16,y:295,w:180,h:14},{x:240,y:295,w:260,h:14},{x:560,y:295,w:224,h:14},
+      {x:16,y:445,w:200,h:14},{x:270,y:445,w:245,h:14},{x:570,y:445,w:214,h:14},
       // vertical connectors
       {x:85,y:159,w:14,h:136},{x:85,y:309,w:14,h:136},
       {x:310,y:159,w:14,h:136},{x:310,y:309,w:14,h:136},
@@ -691,13 +702,7 @@ function deployToBattle() {
 
   map = MAPS[MAP_KEYS[(curRegion.id-1) % MAP_KEYS.length]];
   walls = map.walls;
-
-if (curRegion.id === 12) {
-  map = MAPS['trenches'];
-}
-if (curRegion.id === 10) {
-  map = MAPS['trenches'];
-}
+  buildPFGrid();
 
   player = { x:map.pSpawn.x, y:map.pSpawn.y, angle:0, hp:100, maxHp:100, r:13, spd:185, lastShot:0, cd:0.22, inv:0 };
   enemies = []; bullets = []; particles = [];
@@ -735,10 +740,107 @@ function resizeCanvas() {
   gameOY = (canvas.height - GH*gameScale)/2;
 }
 
+// ════════════════════════════════════════════════
+//  A* PATHFINDING
+// ════════════════════════════════════════════════
+const PF_CELL = 20; // grid cell size in game pixels
+const PF_COLS = Math.ceil(800/PF_CELL);
+const PF_ROWS = Math.ceil(600/PF_CELL);
+
+let pfGrid = null; // recomputed when walls change
+
+function buildPFGrid() {
+  pfGrid = new Uint8Array(PF_COLS * PF_ROWS); // 0=open, 1=blocked
+  for (let r=0; r<PF_ROWS; r++) {
+    for (let c=0; c<PF_COLS; c++) {
+      const wx=c*PF_CELL, wy=r*PF_CELL;
+      // mark blocked if any corner of cell overlaps a wall (+padding for enemy radius)
+      const pad=14;
+      let blocked=false;
+      outer: for (const w of walls) {
+        if (wx+PF_CELL>w.x-pad && wx<w.x+w.w+pad && wy+PF_CELL>w.y-pad && wy<w.y+w.h+pad) {
+          blocked=true; break outer;
+        }
+      }
+      pfGrid[r*PF_COLS+c] = blocked ? 1 : 0;
+    }
+  }
+}
+
+function pfWorldToCell(x,y) {
+  return { c: Math.floor(x/PF_CELL), r: Math.floor(y/PF_CELL) };
+}
+function pfCellToWorld(c,r) {
+  return { x: c*PF_CELL+PF_CELL/2, y: r*PF_CELL+PF_CELL/2 };
+}
+function pfIdx(c,r) { return r*PF_COLS+c; }
+function pfValid(c,r) { return c>=0&&c<PF_COLS&&r>=0&&r<PF_ROWS&&pfGrid[pfIdx(c,r)]===0; }
+
+function astar(sx,sy,tx,ty) {
+  if (!pfGrid) return null;
+  const sc=pfWorldToCell(sx,sy), tc=pfWorldToCell(tx,ty);
+  if (!pfValid(sc.c,sc.r)) return null;
+  if (!pfValid(tc.c,tc.r)) {
+    // find nearest open cell to target
+    let best=null, bd=Infinity;
+    for (let dr=-2;dr<=2;dr++) for (let dc=-2;dc<=2;dc++) {
+      const nc=tc.c+dc, nr=tc.r+dr;
+      if (pfValid(nc,nr)) { const d=Math.hypot(dc,dr); if(d<bd){bd=d;best={c:nc,r:nr};} }
+    }
+    if (!best) return null;
+    tc.c=best.c; tc.r=best.r;
+  }
+  if (sc.c===tc.c&&sc.r===tc.r) return [];
+
+  const h=(c,r)=>Math.hypot(c-tc.c,r-tc.r);
+  const gScore=new Float32Array(PF_COLS*PF_ROWS).fill(Infinity);
+  const fScore=new Float32Array(PF_COLS*PF_ROWS).fill(Infinity);
+  const cameFrom=new Int32Array(PF_COLS*PF_ROWS).fill(-1);
+  const inOpen=new Uint8Array(PF_COLS*PF_ROWS);
+
+  const si=pfIdx(sc.c,sc.r);
+  gScore[si]=0; fScore[si]=h(sc.c,sc.r);
+  // simple priority queue via sorted array (works fine for 800x600/20px = 40x30=1200 nodes)
+  const open=[si]; inOpen[si]=1;
+
+  const DIRS=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+
+  while (open.length>0) {
+    // pop node with lowest fScore
+    let bi=0;
+    for (let i=1;i<open.length;i++) if (fScore[open[i]]<fScore[open[bi]]) bi=i;
+    const cur=open.splice(bi,1)[0];
+    inOpen[cur]=0;
+
+    const cr=Math.floor(cur/PF_COLS), cc=cur%PF_COLS;
+    if (cc===tc.c&&cr===tc.r) {
+      // reconstruct
+      const path=[];
+      let n=cur;
+      while (n!==si) { const nr2=Math.floor(n/PF_COLS),nc2=n%PF_COLS; path.unshift(pfCellToWorld(nc2,nr2)); n=cameFrom[n]; }
+      return path;
+    }
+
+    for (const [dc,dr] of DIRS) {
+      const nc=cc+dc, nr=cr+dr;
+      if (!pfValid(nc,nr)) continue;
+      const ni=pfIdx(nc,nr);
+      const cost=Math.hypot(dc,dr);
+      const ng=gScore[cur]+cost;
+      if (ng<gScore[ni]) {
+        cameFrom[ni]=cur; gScore[ni]=ng; fScore[ni]=ng+h(nc,nr);
+        if (!inOpen[ni]) { open.push(ni); inOpen[ni]=1; }
+      }
+    }
+  }
+  return null;
+}
+
 function mkEnemy(x,y) {
   return { x, y, r:12, hp:3, maxHp:3, spd:65+Math.random()*45, angle:Math.random()*Math.PI*2,
-    lastShot:Math.random()*2, cd:+Math.random()*3, state:'patrol',
-    pT:0, wx:(Math.random()-.5)*2, wy:(Math.random()-.5)*2 };
+    lastShot:Math.random()*2, cd:1.4+Math.random()*1.2, state:'patrol',
+    pT:0, wx:(Math.random()-.5)*2, wy:(Math.random()-.5)*2,
+    path:null, pathT:0, pathTarget:{x:-1,y:-1} };
 }
 
 function toGame(cx, cy) {
@@ -787,29 +889,59 @@ function update(dt) {
   player.angle=Math.atan2(gm.y-player.y, gm.x-player.x);
   if (player.inv>0) player.inv-=dt;
 
-  // Enemies
+  // Enemies — A* pathfinding
   for (const e of enemies) {
     const d=Math.hypot(e.x-player.x, e.y-player.y);
-    if (d<400) e.state='chase'; else if (d>400) e.state='patrol';
+    const canSee = d < 380;
+    if (canSee) e.state='chase'; else if (d>420) e.state='patrol';
+
     if (e.state==='chase') {
-      const a=Math.atan2(player.y-e.y, player.x-e.x);
-      e.angle=a;
-      const ex=e.x+Math.cos(a)*e.spd*dt, ey=e.y+Math.sin(a)*e.spd*dt;
-      if (!wallHit(ex,e.y,e.r)) e.x=ex;
-      if (!wallHit(e.x,ey,e.r)) e.y=ey;
+      // Re-path every 0.6s or if player moved significantly
+      e.pathT=(e.pathT||0)+dt;
+      const pdx=Math.abs(e.pathTarget.x-player.x), pdy=Math.abs(e.pathTarget.y-player.y);
+      if (e.pathT>0.6 || pdx>40 || pdy>40 || !e.path) {
+        e.pathT=0;
+        e.pathTarget={x:player.x,y:player.y};
+        e.path=astar(e.x,e.y,player.x,player.y);
+      }
+
+      // Follow path
+      let moveX=0, moveY=0;
+      if (e.path && e.path.length>0) {
+        const wp=e.path[0];
+        const dx2=wp.x-e.x, dy2=wp.y-e.y;
+        const dist2=Math.hypot(dx2,dy2);
+        if (dist2<PF_CELL*0.7) { e.path.shift(); }
+        else { moveX=dx2/dist2; moveY=dy2/dist2; }
+      } else if (d>1) {
+        // direct if no path (open line of sight)
+        moveX=(player.x-e.x)/d; moveY=(player.y-e.y)/d;
+      }
+
+      if (moveX!==0||moveY!==0) {
+        e.angle=Math.atan2(moveY,moveX);
+        const ex=e.x+moveX*e.spd*dt, ey=e.y+moveY*e.spd*dt;
+        if (!wallHit(ex,e.y,e.r)) e.x=ex;
+        if (!wallHit(e.x,ey,e.r)) e.y=ey;
+      }
+
+      // Shoot
       e.lastShot+=dt;
       if (e.lastShot>=e.cd && d<320) {
         e.lastShot=0;
-        const spread=(Math.random()-.5)*.35;
-        bullets.push({x:e.x,y:e.y,vx:Math.cos(a+spread)*330,vy:Math.sin(a+spread)*330,fp:false,r:5,life:2.2});
+        const sa=Math.atan2(player.y-e.y, player.x-e.x);
+        const spread=(Math.random()-.5)*.3;
+        bullets.push({x:e.x,y:e.y,vx:Math.cos(sa+spread)*330,vy:Math.sin(sa+spread)*330,fp:false,r:5,life:2.2});
       }
     } else {
+      // Patrol: random walk
       e.pT+=dt;
       if (e.pT>2){e.pT=0;const len=Math.hypot(e.wx,e.wy)||1;e.wx=(Math.random()-.5)*2/len;e.wy=(Math.random()-.5)*2/len;}
       const ex=e.x+e.wx*e.spd*.4*dt, ey=e.y+e.wy*e.spd*.4*dt;
       if (!wallHit(ex,e.y,e.r)){e.x=ex;e.angle=Math.atan2(e.wy,e.wx);}else e.wx*=-1;
       if (!wallHit(e.x,ey,e.r)) e.y=ey; else e.wy*=-1;
       e.x=Math.max(40,Math.min(GW-40,e.x)); e.y=Math.max(40,Math.min(GH-40,e.y));
+      e.path=null; // clear stale path
     }
   }
 
