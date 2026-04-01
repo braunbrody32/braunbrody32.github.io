@@ -61,6 +61,14 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 #deploy-btn{display:none;background:var(--warzone);border:2px solid var(--warzone-glow);color:#fff8;font-family:var(--head);font-size:12px;letter-spacing:3px;padding:9px;cursor:pointer;width:100%;transition:all .2s;margin-top:auto;flex-shrink:0}
 #deploy-btn:hover{background:var(--warzone-glow);color:#fff;box-shadow:0 0 20px var(--warzone-glow)}
 #deploy-btn.on{display:block}
+.lb-row{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--border)}
+.lb-row:last-child{border-bottom:none}
+.lb-rank{font-family:var(--head);font-size:9px;color:var(--text-dim);width:14px;flex-shrink:0;text-align:center}
+.lb-rank.gold{color:#f59e0b}
+.lb-rank.silver{color:#94a3b8}
+.lb-rank.bronze{color:#a16207}
+.lb-name{flex:1;font-size:10px;letter-spacing:.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-pts{font-family:var(--head);font-size:10px;color:var(--warzone-glow);flex-shrink:0}
 
 /* === BATTLE === */
 #battle{position:fixed;inset:0;display:none;flex-direction:column}
@@ -165,6 +173,12 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
       <div class="sb-box" style="flex:1;min-height:0;display:flex;flex-direction:column">
         <div class="sb-label">ALL REGIONS</div>
         <div id="rg-list"></div>
+      </div>
+      <div class="sb-box" style="flex-shrink:0">
+        <div class="sb-label">TOP OPERATIVES</div>
+        <div id="leaderboard" style="font-size:10px;line-height:1;color:var(--text-dim)">
+          <span style="opacity:.5">LOADING...</span>
+        </div>
       </div>
       <button id="deploy-btn" onclick="deployToBattle()">⊕ DEPLOY TO WARZONE</button>
     </div>
@@ -431,6 +445,7 @@ async function initSupabase() {
     sbOk = true;
     subscribeRegions();
     renderMap();
+    renderLeaderboard();
   } catch(e) {
     console.error(e);
     document.getElementById('cfg-warn').style.display = 'block';
@@ -476,17 +491,28 @@ async function dbSubmitAgentPoints(pts) {
   if (!sbOk || pts <= 0) return;
   const name = (document.getElementById('player-input').value.trim() || 'GHOST-1').toUpperCase();
   try {
-    // Try to find existing agent row by name (case-insensitive match via ilike)
     const { data: existing } = await sb.from('agents').select('id,points').ilike('name', name).maybeSingle();
     if (existing) {
-      // Update cumulative points
       await sb.from('agents').update({ points: existing.points + pts }).eq('id', existing.id);
     } else {
-      // Insert new agent — use timestamp-based id to avoid collisions
-      const newId = Date.now() % 2147483647; // fits INT range
+      const newId = Date.now() % 2147483647;
       await sb.from('agents').insert({ id: newId, name: name, points: pts });
     }
   } catch(e) { console.error('Agent DB write fail:', e); }
+  await renderLeaderboard();
+}
+
+async function renderLeaderboard() {
+  const el = document.getElementById('leaderboard');
+  if (!sbOk) { el.innerHTML='<span style="opacity:.4">OFFLINE</span>'; return; }
+  try {
+    const { data, error } = await sb.from('agents').select('name,points').order('points',{ascending:false}).limit(5);
+    if (error) throw error;
+    if (!data || data.length === 0) { el.innerHTML='<span style="opacity:.4">NO DATA YET</span>'; return; }
+    const rankClass = ['gold','silver','bronze','',''];
+    const rankSym   = ['1','2','3','4','5'];
+    el.innerHTML = data.map((a,i) => `<div class="lb-row"><span class="lb-rank ${rankClass[i]}">${rankSym[i]}</span><span class="lb-name">${a.name}</span><span class="lb-pts">${a.points}</span></div>`).join('');
+  } catch(e) { el.innerHTML='<span style="opacity:.4">ERROR</span>'; }
 }
 
 // ════════════════════════════════════════════════
