@@ -389,10 +389,6 @@ const MAPS = {
   trenches: {
     walls:[
       {x:0,y:0,w:800,h:16},{x:0,y:584,w:800,h:16},{x:0,y:0,w:16,h:600},{x:784,y:0,w:16,h:600},
-      // horizontal trench lines
-      {x:16,y:145,w:220,h:14},{x:280,y:145,w:205,h:14},{x:530,y:145,w:254,h:14},
-      {x:16,y:295,w:180,h:14},{x:240,y:295,w:260,h:14},{x:560,y:295,w:224,h:14},
-      {x:16,y:445,w:200,h:14},{x:270,y:445,w:245,h:14},{x:570,y:445,w:214,h:14},
       // vertical connectors
       {x:85,y:159,w:14,h:136},{x:85,y:309,w:14,h:136},
       {x:310,y:159,w:14,h:136},{x:310,y:309,w:14,h:136},
@@ -697,10 +693,10 @@ function deployToBattle() {
   walls = map.walls;
 
 if (curRegion.id === 12) {
-  map = MAPS['corridor'];
+  map = MAPS['trenches'];
 }
 if (curRegion.id === 10) {
-  map = MAPS['corridor'];
+  map = MAPS['trenches'];
 }
 
   player = { x:map.pSpawn.x, y:map.pSpawn.y, angle:0, hp:100, maxHp:100, r:13, spd:185, lastShot:0, cd:0.22, inv:0 };
