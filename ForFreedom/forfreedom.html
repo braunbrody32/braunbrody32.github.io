@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>For Liberty!</title>
+<title>For Freedom!</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -125,7 +125,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 <!-- WORLD MAP -->
 <div id="worldmap">
   <div id="wm-header">
-    <div id="wm-title">⟨ FOR LIBERTY ⟩</div>
+    <div id="wm-title">⟨ FOR FREEDOM ⟩</div>
     <div class="header-right">
       OPERATIVE: <input id="player-input" value="GHOST-1" maxlength="12">
       &nbsp;|&nbsp; SESSION: <span id="sess-pts">0</span> PTS
@@ -809,7 +809,7 @@ function deployToBattle() {
 
   const types = ['kill_all','hold_point','survive'];
   const otype = types[Math.floor(Math.random()*types.length)];
-  const ne = otype==='survive'?10:(otype==='kill_all'?15:10);
+  const ne = otype==='survive'?30:(otype==='kill_all'?25:15);
   for (let i=0;i<ne;i++) {
     const sp = map.eSpawns[i%map.eSpawns.length];
     enemies.push(mkEnemy(sp.x+(Math.random()-.5)*50, sp.y+(Math.random()-.5)*50));
@@ -1143,7 +1143,7 @@ function update(dt) {
           e.hp--; spark(b.x,b.y,'#f59e0b',5);
           if (e.hp<=0){spark(e.x,e.y,'#ef4444',14);enemies.splice(i,1);
             if (!b.ally){battleScore+=5;document.getElementById('score-val').textContent=battleScore;}
-            else{battleScore+=2;document.getElementById('score-val').textContent=battleScore;}}
+            else{battleScore+=1;document.getElementById('score-val').textContent=battleScore;}}
           return false;
         }
       }
@@ -1169,7 +1169,7 @@ function updateObjective(dt) {
   if (o.done) return;
   if (o.type==='kill_all') {
     objProgress=o.initCount>0?(o.initCount-enemies.length)/o.initCount:0;
-    if (enemies.length===0&&o.initCount>0){o.done=o.won=true;battleScore+=50;updateObjDisplay();setTimeout(()=>endBattle(true),1400);}
+    if (enemies.length===0&&o.initCount>0){o.done=o.won=true;battleScore+=75;updateObjDisplay();setTimeout(()=>endBattle(true),1400);}
   } else if (o.type==='hold_point') {
     const dist=Math.hypot(player.x-o.hold.x,player.y-o.hold.y);
     if (dist<o.hold.r) o.timeHeld=Math.min(o.timeHeld+dt,o.timeReq); else o.timeHeld=Math.max(0,o.timeHeld-dt*.5);
@@ -1188,7 +1188,7 @@ function updateObjective(dt) {
       else{ex=40;ey=Math.random()*GH;}
       enemies.push(mkEnemy(ex,ey));
     }
-    if (o.survived>=o.totalTime){o.done=o.won=true;battleScore+=75;updateObjDisplay();setTimeout(()=>endBattle(true),1400);}
+    if (o.survived>=o.totalTime){o.done=o.won=true;battleScore+=50;updateObjDisplay();setTimeout(()=>endBattle(true),1400);}
   }
   updateObjDisplay();
 }
@@ -1502,65 +1502,150 @@ async function aiApplyMove(regionId, newStatus, newPoints) {
 async function runEnemyAI() {
   if (!regions||regions.length===0) return;
 
-  const enemyFrontline = regions.filter(r=>r.status==='enemy'&&
-    (hasNeighborStatus(r.id,'warzone')||hasNeighborStatus(r.id,'allied')||hasNeighborStatus(r.id,'neutral')));
-  const alliedVulnerable = regions.filter(r=>r.status==='allied'&&hasNeighborStatus(r.id,'enemy'));
-  const alliedNearWZ = regions.filter(r=>r.status==='allied'&&hasNeighborStatus(r.id,'warzone'));
-  const neutralTargets = regions.filter(r=>r.status==='neutral'&&hasNeighborStatus(r.id,'enemy')&&!hasNeighborStatus(r.id,'allied'));
-  const warzonesByEnemy = regions.filter(r=>r.status==='warzone'&&hasNeighborStatus(r.id,'enemy'));
+  // ── Counts ──────────────────────────────────────────────────────────
+  const enemyCount   = regions.filter(r=>r.status==='enemy').length;
+  const alliedCount  = regions.filter(r=>r.status==='allied').length;
+  const warzoneCount = regions.filter(r=>r.status==='warzone').length;
 
-  const enemyCount=regions.filter(r=>r.status==='enemy').length;
-  const alliedCount=regions.filter(r=>r.status==='allied').length;
-  const warzoneCount=regions.filter(r=>r.status==='warzone').length;
-  const newThreat=Math.min(100,Math.max(10,50+(alliedCount-enemyCount)*3+warzoneCount*2));
+  // Threat: rises the more allied is winning
+  const newThreat = Math.min(100,Math.max(5,
+    40 + (alliedCount - enemyCount) * 4 + warzoneCount
+  ));
   aiSetThreat(newThreat);
 
-  const aggression = alliedCount>enemyCount?'high':alliedCount===enemyCount?'medium':'low';
-  const roll=Math.random();
-
-  if (aggression==='high'&&roll<0.40&&alliedVulnerable.length>0) {
-    const t=alliedVulnerable[Math.floor(Math.random()*alliedVulnerable.length)];
-    aiLog(`<span style="color:#ef4444">⚔ COUNTER: ${t.name}</span>`);
-    await aiApplyMove(t.id,'warzone',Math.floor(t.threshold*0.1)); return;
-  }
-  if ((aggression==='high'||aggression==='medium')&&roll<0.2&&alliedNearWZ.length>0) {
-    const t=alliedNearWZ[Math.floor(Math.random()*alliedNearWZ.length)];
-    aiLog(`<span style="color:#ef4444">⚡ INCURSION: ${t.name}</span>`);
-    await aiApplyMove(t.id,'warzone',Math.floor(t.threshold*0.1)); return;
-  }
-  if (enemyFrontline.length>0&&roll<0.25) {
-    const preferred=enemyFrontline.filter(r=>hasNeighborStatus(r.id,'allied'));
-    const pool=preferred.length>0?preferred:enemyFrontline;
-    const t=pool[Math.floor(Math.random()*pool.length)];
-    aiLog(`<span style="color:#f59e0b">⚡ MOBILISE: ${t.name}</span>`);
-    await aiApplyMove(t.id,'warzone',0); return;
-  }
-  if (neutralTargets.length>0&&roll<0.5) {
-    const t=neutralTargets[Math.floor(Math.random()*neutralTargets.length)];
-    aiLog(`<span style="color:#ef4444">▶ ANNEX: ${t.name}</span>`);
-    await aiApplyMove(t.id,'enemy',0); return;
-  }
-  if (warzonesByEnemy.length>0) {
-    const t=warzonesByEnemy[Math.floor(Math.random()*warzonesByEnemy.length)];
-    const erosion=Math.floor(t.threshold*(0.05+Math.random()*0.1));
-    const np=Math.max(0,(t.points||0)-erosion);
-    aiLog(`<span style="color:#f59e0b">⬇ SUPPRESS: ${t.name} -${erosion}pts</span>`);
-    const i=regions.findIndex(x=>x.id===t.id);
-    if (i>=0) regions[i].points=np;
-    renderMap();
-    if (sbOk){try{await sb.from('regions').update({points:np}).eq('id',t.id);}catch(e){}}
+  // Hard cap: never let there be more than 4 warzones at once
+  // (prevents the whole map going orange)
+  if (warzoneCount >= 4) {
+    // Only suppress — erode points on a contested warzone we border
+    const suppress = regions.filter(r=>r.status==='warzone'&&hasNeighborStatus(r.id,'enemy'));
+    if (suppress.length>0) {
+      const t = suppress[Math.floor(Math.random()*suppress.length)];
+      const erosion = Math.floor(t.threshold*(0.06+Math.random()*0.08));
+      const np = Math.max(0,(t.points||0)-erosion);
+      aiLog(`<span style="color:#f59e0b">⬇ SUPPRESS: ${t.name} −${erosion}pts</span>`);
+      const i=regions.findIndex(x=>x.id===t.id);
+      if(i>=0) regions[i].points=np;
+      renderMap();
+      if(sbOk){try{await sb.from('regions').update({points:np}).eq('id',t.id);}catch(e){}}
+    } else {
+      aiLog(`<span style="opacity:.35">— AT CAPACITY</span>`);
+    }
     return;
   }
-  aiLog(`<span style="opacity:.35">— HOLDING POSITION</span>`);
+
+  // ── Frontline pools (strict adjacency rules) ─────────────────────────
+
+  // TRUE frontline: enemy regions that directly border allied OR warzone
+  // (NOT neutral — that was causing deep-interior escalation)
+  const trueFrontlineEnemy = regions.filter(r =>
+    r.status==='enemy' &&
+    (hasNeighborStatus(r.id,'allied') || hasNeighborStatus(r.id,'warzone'))
+  );
+
+  // Counter-attack targets: allied regions that directly border enemy territory
+  // (only valid if AI is losing — high aggression)
+  const counterTargets = regions.filter(r =>
+    r.status==='allied' &&
+    hasNeighborStatus(r.id,'enemy')
+  );
+
+  // Neutral absorption: neutral regions that border enemy but NOT allied
+  // (prevents the AI from leaping over the front)
+  const annexTargets = regions.filter(r =>
+    r.status==='neutral' &&
+    hasNeighborStatus(r.id,'enemy') &&
+    !hasNeighborStatus(r.id,'allied') &&
+    !hasNeighborStatus(r.id,'warzone')
+  );
+
+  // Suppression: warzones the enemy borders (chip away player progress)
+  const suppressTargets = regions.filter(r =>
+    r.status==='warzone' &&
+    hasNeighborStatus(r.id,'enemy')
+  );
+
+  // ── Aggression level ──────────────────────────────────────────────────
+  // low  = enemy is winning (allied < enemy)
+  // med  = roughly even
+  // high = enemy is losing (allied > enemy)
+  const aggression = alliedCount > enemyCount + 2 ? 'high'
+                   : alliedCount > enemyCount - 2 ? 'med'
+                   : 'low';
+
+  // ── Single weighted random action (mutually exclusive buckets) ────────
+  // Build weighted action list based on current state + aggression
+  const actions = [];
+
+  // Frontline mobilisation — always available if there's a true frontline enemy
+  // but only 1 move per tick, prefer the one bordering allied (most threatening)
+  if (trueFrontlineEnemy.length > 0) {
+    const preferBorderingAllied = trueFrontlineEnemy.filter(r=>hasNeighborStatus(r.id,'allied'));
+    const pool = preferBorderingAllied.length > 0 ? preferBorderingAllied : trueFrontlineEnemy;
+    const w = aggression==='high' ? 20 : aggression==='med' ? 30 : 35;
+    actions.push({ weight: w, fn: async ()=>{
+      const t = pool[Math.floor(Math.random()*pool.length)];
+      aiLog(`<span style="color:#f59e0b">⚡ MOBILISE: ${t.name}</span>`);
+      await aiApplyMove(t.id,'warzone',0);
+    }});
+  }
+
+  // Suppress warzone progress — always a valid defensive move
+  if (suppressTargets.length > 0) {
+    const w = aggression==='low' ? 50 : aggression==='med' ? 35 : 20;
+    actions.push({ weight: w, fn: async ()=>{
+      const t = suppressTargets[Math.floor(Math.random()*suppressTargets.length)];
+      const erosion = Math.floor(t.threshold*(0.05+Math.random()*0.09));
+      const np = Math.max(0,(t.points||0)-erosion);
+      aiLog(`<span style="color:#f59e0b">⬇ SUPPRESS: ${t.name} −${erosion}pts</span>`);
+      const i=regions.findIndex(x=>x.id===t.id);
+      if(i>=0) regions[i].points=np;
+      renderMap();
+      if(sbOk){try{await sb.from('regions').update({points:np}).eq('id',t.id);}catch(e){}}
+    }});
+  }
+
+  // Counter-attack into allied land — only when losing, and only on true border
+  if (aggression==='high' && counterTargets.length > 0) {
+    actions.push({ weight: 30, fn: async ()=>{
+      const t = counterTargets[Math.floor(Math.random()*counterTargets.length)];
+      aiLog(`<span style="color:#ef4444">⚔ COUNTER-ATTACK: ${t.name}</span>`);
+      await aiApplyMove(t.id,'warzone',Math.floor(t.threshold*0.08));
+    }});
+  }
+
+  // Annex neutral — opportunistic, low priority, only when NOT losing badly
+  if (aggression!=='high' && annexTargets.length > 0) {
+    const w = aggression==='low' ? 25 : 10;
+    actions.push({ weight: w, fn: async ()=>{
+      const t = annexTargets[Math.floor(Math.random()*annexTargets.length)];
+      aiLog(`<span style="color:#6b7280">▶ ANNEX: ${t.name}</span>`);
+      await aiApplyMove(t.id,'enemy',0);
+    }});
+  }
+
+  if (actions.length === 0) {
+    aiLog(`<span style="opacity:.35">— HOLDING</span>`);
+    return;
+  }
+
+  // Weighted random pick
+  const totalW = actions.reduce((s,a)=>s+a.weight,0);
+  let pick = Math.random()*totalW;
+  for (const a of actions) {
+    pick -= a.weight;
+    if (pick <= 0) { await a.fn(); return; }
+  }
+  await actions[actions.length-1].fn();
 }
 
 function scheduleAI() {
-  const first=20000+Math.random()*20000;
-  aiTickTimer=setTimeout(function tick(){
-    //runEnemyAI();
-    const next=(aiThreat>70?25000:45000)+Math.random()*30000;
-    aiTickTimer=setTimeout(tick,next);
-  },first);
+  const first = 25000 + Math.random()*15000;
+  aiTickTimer = setTimeout(function tick(){
+    runEnemyAI();
+    // Slower when map is stable, faster when AI is under pressure
+    const next = (aiThreat>70 ? 30000 : 55000) + Math.random()*25000;
+    aiTickTimer = setTimeout(tick, next);
+  }, first);
 }
 
 // ════════════════════════════════════════════════
