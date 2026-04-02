@@ -71,6 +71,7 @@ function Plasma(gx, gy) { this.x=gx; this.y=gy; this.finalColor=Math.random()<.5
 // CONSTRUCTORS - v1.7 Elements (30 new)
 // ============================================================
 function Charcoal(gx,gy){this.x=gx;this.y=gy;this.burning=false;this.burnTimer=0;this.finalColor=Math.random()<.5?"#1a1a1a":"#222222";}
+function Poop(gx,gy){this.x=gx;this.y=gy;this.burning=false;this.burnTimer=0;this.finalColor=Math.random()<.5?"#472917":"#53311c";}
 function Sulfur(gx,gy){this.x=gx;this.y=gy;this.finalColor=Math.random()<.5?"#c8b400":"#d4bc00";}
 function Coal(gx,gy){this.x=gx;this.y=gy;this.burning=false;this.burnTimer=0;this.finalColor=Math.random()<.5?"#111111":"#191919";}
 function Chalk(gx,gy){this.x=gx;this.y=gy;this.finalColor=Math.random()<.5?"#f0f0f0":"#e8e8e8";}
@@ -153,7 +154,7 @@ const ALL_TYPES = [
     Alcohol,Mercury,Honey,Tar,Slime,
     Hydrogen,Oxygen,Nitrogen,Propane,Fog,
     Lightning,Antimatter,Ember,Gel,Void,Crystal,Rust,Blood,NitroGel,Superacid,
-    Wire,Battery,Pump,Base,Proton,Electron,Human
+    Wire,Battery,Pump,Base,Proton,Electron,Human,Poop
 ];
 ALL_TYPES.forEach(T => { T.prototype.destroy = function() { removeParticle(this); }; });
 
@@ -2144,6 +2145,15 @@ Human.prototype.draw = function() {
         ctx.globalAlpha = 1;
     }
 };
+Poop.prototype.update = function() {
+    if (isNextTo(this,Destroyer)||isNextTo(this,Acid)||isNextTo(this,Plasma)||isNextTo(this,Superacid)||isNextTo(this,Void)) { this.destroy(); return; }
+    if (isNextTo(this,Fire)||isNextTo(this,Lava)||isNextTo(this,Ember)||isNextTo(this,Lightning)||isNextTo(this,Human)||isNextTo(this,Lava)) {
+        let bx=this.x,by=this.y; this.destroy(); explode(bx,by,40);
+        return;
+    }
+    powderFall(this);
+};
+Poop.prototype.draw = function() { ctx.fillStyle=this.finalColor; ctx.fillRect(this.x*cellSize,this.y*cellSize,cellSize,cellSize); };
 
 // ============================================================
 // SAVE / LOAD
@@ -2285,6 +2295,7 @@ function spawnPump(x,y){spawnArea(x,y,Pump);}
 function spawnBase(x,y){spawnArea(x,y,Base);}
 function spawnProton(x,y){spawnArea(x,y,Proton);}
 function spawnElectron(x,y){spawnArea(x,y,Electron);}
+function spawnPoop(x,y){spawnArea(x,y,Poop);}
 function spawnHuman(x,y){
     const cx=Math.floor(x/cellSize), cy=Math.floor(y/cellSize);
     for(let dx=-brushSize+1;dx<brushSize;dx++){
@@ -2368,6 +2379,7 @@ function rustSelected(){setSelected("rust");}
 function bloodSelected(){setSelected("blood");}
 function nitrogelSelected(){setSelected("nitrogel");}
 function superacidSelected(){setSelected("superacid");}
+function poopSelected(){setSelected("poop");}
 
 // v1.8
 function wireSelected(){setSelected("wire");}
@@ -2405,7 +2417,7 @@ const SPAWN_MAP = {
     lightning:spawnLightning, antimatter:spawnAntimatter, ember:spawnEmber, gel:spawnGel, void:spawnVoid,
     crystal:spawnCrystal, rust:spawnRust, blood:spawnBlood, nitrogel:spawnNitroGel, superacid:spawnSuperacid,
     wire:spawnWire, battery:spawnBattery, pump:spawnPump, base:spawnBase,
-    proton:spawnProton, electron:spawnElectron, human:spawnHuman
+    proton:spawnProton, electron:spawnElectron, human:spawnHuman, poop:spawnPoop
 };
 
 // ============================================================
