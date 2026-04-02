@@ -23,6 +23,7 @@ a {color: white}
 #chalk      { background-color: #f0f0f0; color: #333; padding: 10px; cursor: pointer; }
 #gravel     { background-color: #787878; color: white; padding: 10px; cursor: pointer; }
 #rust       { background-color: #8B4010; color: white; padding: 10px; cursor: pointer; }
+#poop       { background-color: #472917; color: white; padding: 10px; cursor: pointer; }
 
 /* === Solids === */
 #stone      { background-color: rgb(99, 99, 99); color: white; padding: 10px; cursor: pointer; }
