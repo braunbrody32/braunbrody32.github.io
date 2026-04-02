@@ -427,7 +427,7 @@ const MAPS = {
       {x:100,y:390,w:85,h:75},{x:255,y:400,w:75,h:80},{x:430,y:390,w:90,h:75},{x:610,y:395,w:80,h:80},
       {x:355,y:278,w:90,h:55},
     ],
-    pSpawn:{x:55,y:300}, eSpawns:[{x:730,y:130},{x:730,y:300},{x:730,y:470}], hold:{x:400,y:300,r:48}
+    pSpawn:{x:55,y:300}, eSpawns:[{x:730,y:130},{x:730,y:300},{x:730,y:470}], hold:{x:300,y:300,r:48}
   },
   corridor: {
     walls:[
@@ -559,6 +559,8 @@ async function dbSubmitPoints(regionId, pts) {
 async function dbSubmitAgentPoints(pts) {
   if (!sbOk || pts <= 0) return;
   const name = (document.getElementById('player-input').value.trim() || 'GHOST-1').toUpperCase();
+  localStorage.setItem('name', name);
+  localStorage.setItem('name', name);
   try {
     const { data: existing } = await sb.from('agents').select('id,points').ilike('name', name).maybeSingle();
     if (existing) {
