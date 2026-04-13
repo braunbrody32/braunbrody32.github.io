@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html> 
+<head>
+    <style>
+        body {background-color: black;}
+        p {color: white;}
+    </style>
+    <link rel="icon" type="image/x-icon" href="../appimages/dotwar.png">
+    <title>Soldier War</title>
+    <link rel="icon" type="image/x-icon" href="../appimages/angy.png">
+</head>
+<body>
+<canvas id="map" width="1200" height="600"></canvas>
+<p id="kills">Red kills: 0 Blue kills: 0 Green kills: 0 Purple kills: 0</p> <p id="tiles">Red tiles: 0 Blue tiles: 0 Green tiles: 0 Purple tiles: 0</p>
+<br><br><a href="../index.html">Go to home page.</a>
+<script>
+//go to line 431 to edit Infantry count
+const gameMap = document.getElementById("map");
+const ctx = gameMap.getContext("2d");
+const size = 10;
+const rows = gameMap.height / size;
+const cols = gameMap.width / size;
+const killElement = document.getElementById("kills")
+const landsElement = document.getElementById("tiles")
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max); 
+}
+
+let redDeaths = 0;
+let blueDeaths = 0;
+let greenDeaths = 0;
+let purpleDeaths = 0;
+
+let redTiles = 0;
+let blueTiles = 0;
+let greenTiles = 0;
+let purpleTiles = 0;
+
+let redSpawnX = 0;
+let blueSpawnX = 0;
+let greenSpawnX = 1200;
+let purpleSpawnX = 1200;
+let redSpawnY = 0;
+let blueSpawnY = 600;
+let greenSpawnY = 600;
+let purpleSpawnY = 0;
+
+let selectedUnit = null;
+
+function Land(gridX, gridY) {
+    this.x = gridX;
+    this.y = gridY;
+    this.owner = 0; 
+}
+
+function Infantry(x, y, team) {
+    this.x = x;
+    this.y = y;
+    this.team = team;
+    this.targetX = x; 
+    this.targetY = y;
+    this.hp = 100;
+    this.captureProgress = 0;
+    this.captureGoal = 20;
+    this.shootCooldown = 0;
+    this.type = "infantry";
+}
+
+function eliteInfantry(x, y, team) {
+    this.x = x;
+    this.y = y;
+    this.team = team;
+    this.targetX = x; 
+    this.targetY = y;
+    this.hp = 200;
+    this.captureProgress = 0;
+    this.captureGoal = 20;
+    this.shootCooldown = 0;
+    this.type = "eliteInfantry";
+}
+
+function Sniper(x, y, team) {
+    this.x = x;
+    this.y = y;
+    this.team = team;
+    this.targetX = x; 
+    this.targetY = y;
+    this.hp = 50;
+    this.captureProgress = 0;
+    this.captureGoal = 20;
+    this.shootCooldown = 0;
+    this.type = "sniper";
+}
+
+Land.prototype.update = function() {
+    if (this.x <= 600) {
+        this.owner = 1;
+    }
+    if (this.x >= 600) {
+        this.owner = 2;
+    }
+}
+
+Infantry.prototype.update = function() {
+    if (this.hp <= 0) return;
+
+    let enemy = units.find(u => u.team !== this.team && u.hp > 0 && Math.sqrt((u.x-this.x)**2 + (u.y-this.y)**2) < 100);
+
+    if (enemy) {
+        if (this.shootCooldown <= 0) {
+            enemy.hp -= 10;
+            this.shootCooldown = 10;
+            this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+        }
+    } else {
+        const dx = this.targetX - this.x;
+        const dy = this.targetY - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > 2) {
+            this.x += dx * 0.02;
+            this.y += dy * 0.02;
+        }
+        if (this.hp <= 100) {
+            this.hp++;
+        }
+    }
+
+    if (this.shootCooldown > 0) this.shootCooldown--;
+
+    let gridX = Math.floor(this.x / size);
+    let gridY = Math.floor(this.y / size);
+    if (gridY >= 0 && gridY < rows && gridX >= 0 && gridX < cols) {
+        let land = grid[gridY][gridX];
+        if (land.owner !== this.team) {
+            this.captureProgress++;
+            if (this.captureProgress >= this.captureGoal) {
+                land.owner = this.team;
+                this.captureProgress = 0;
+            }
+        } else {
+            this.captureProgress = 0;
+        }
+    }
+};
+
+Sniper.prototype.update = function() {
+    if (this.hp <= 0) return;
+
+    let enemy = units.find(u => u.team !== this.team && u.hp > 0 && Math.sqrt((u.x-this.x)**2 + (u.y-this.y)**2) < 300);
+
+    if (enemy) {
+        if (this.shootCooldown <= 0) {
+            enemy.hp -= 1000;
+            this.shootCooldown = 100;
+            this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+        }
+    } else {
+        const dx = this.targetX - this.x;
+        const dy = this.targetY - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > 2) {
+            this.x += dx * 0.02;
+            this.y += dy * 0.02;
+        }
+        if (this.hp <= 100) {
+            this.hp++;
+        }
+    }
+
+    if (this.shootCooldown > 0) this.shootCooldown--;
+
+    let gridX = Math.floor(this.x / size);
+    let gridY = Math.floor(this.y / size);
+    if (gridY >= 0 && gridY < rows && gridX >= 0 && gridX < cols) {
+        let land = grid[gridY][gridX];
+        if (land.owner !== this.team) {
+            this.captureProgress++;
+            if (this.captureProgress >= this.captureGoal) {
+                land.owner = this.team;
+                this.captureProgress = 0;
+            }
+        } else {
+            this.captureProgress = 0;
+        }
+    }
+};
+
+eliteInfantry.prototype.update = function() {
+    if (this.hp <= 0) return;
+
+    let enemy = units.find(u => u.team !== this.team && u.hp > 0 && Math.sqrt((u.x-this.x)**2 + (u.y-this.y)**2) < 200);
+
+    if (enemy) {
+        if (this.shootCooldown <= 0) {
+            enemy.hp -= 50;
+            this.shootCooldown = 10;
+            this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+        }
+    } else {
+        const dx = this.targetX - this.x;
+        const dy = this.targetY - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > 2) {
+            this.x += dx * 0.02;
+            this.y += dy * 0.02;
+        }
+        if (this.hp <= 200) {
+            this.hp++;
+        }
+    }
+
+    if (this.shootCooldown > 0) this.shootCooldown--;
+
+    let gridX = Math.floor(this.x / size);
+    let gridY = Math.floor(this.y / size);
+    if (gridY >= 0 && gridY < rows && gridX >= 0 && gridX < cols) {
+        let land = grid[gridY][gridX];
+        if (land.owner !== this.team) {
+            this.captureProgress++;
+            if (this.captureProgress >= this.captureGoal) {
+                land.owner = this.team;
+                this.captureProgress = 0;
+            }
+        } else {
+            this.captureProgress = 0;
+        }
+    }
+};
+
+let units = [];
+
+for (let i = 0; i < 100; i++) {
+    units.push(new Infantry(redSpawnX, redSpawnY, 1));
+}
+for (let i = 0; i < 100; i++) {
+    units.push(new Infantry(blueSpawnX, blueSpawnY, 2));
+}
+for (let i = 0; i < 100; i++) {
+    units.push(new Infantry(greenSpawnX, greenSpawnY, 3));
+}
+for (let i = 0; i < 100; i++) {
+    units.push(new Infantry(purpleSpawnX, purpleSpawnY, 4));
+}
+
+for (let i = 0; i < 0; i++) {
+    units.push(new eliteInfantry(redSpawnX, redSpawnY, 1));
+}
+for (let i = 0; i < 0; i++) {
+    units.push(new eliteInfantry(blueSpawnX, blueSpawnY, 2));
+}
+for (let i = 0; i < 0; i++) {
+    units.push(new eliteInfantry(greenSpawnX, greenSpawnY, 3));
+}
+for (let i = 0; i < 0; i++) {
+    units.push(new eliteInfantry(purpleSpawnX, purpleSpawnY, 4));
+}
+
+for (let i = 0; i < 0; i++) {
+    units.push(new Sniper(redSpawnX, redSpawnY, 1));
+}
+for (let i = 0; i < 0; i++) {
+    units.push(new Sniper(blueSpawnX, blueSpawnY, 2));
+}
+for (let i = 0; i < 0; i++) {
+    units.push(new Sniper(greenSpawnX, greenSpawnY, 3));
+}
+for (let i = 0; i < 0; i++) {
+    units.push(new Sniper(purpleSpawnX, purpleSpawnY, 4));
+}
+
+let grid = Array.from({ length: rows }, (v, r) => 
+    Array.from({ length: cols }, (v, c) => {
+        let land = new Land(c, r);
+
+        return land;
+    })
+);
+
+function updateTeamAI() {
+    for (let i = units.length - 1; i >= 0; i--) {
+        const u = units[i];
+
+        if (u.hp <= 0) {
+            if (u.team === 1) {
+                /*if (u instanceof Infantry) units.push(new Infantry(getRandomInt(600),redSpawnY,1));
+                if (u instanceof eliteInfantry) units.push(new eliteInfantry(getRandomInt(600),redSpawnY,1));
+                if (u instanceof Sniper) units.push(new Sniper(getRandomInt(600),redSpawnY,1));*/
+                redDeaths++; 
+            } else if (u.team === 2) {
+                /*if (u instanceof Infantry) units.push(new Infantry(getRandomInt(600),blueSpawnY,2));
+                if (u instanceof eliteInfantry) units.push(new eliteInfantry(getRandomInt(600),blueSpawnY,2));
+                if (u instanceof Sniper) units.push(new Sniper(getRandomInt(600),blueSpawnY,2));*/
+                blueDeaths++;
+            } else if (u.team === 3) {
+                /*if (u instanceof Infantry) units.push(new Infantry(1200,getRandomInt(gameMap.height),3));
+                if (u instanceof eliteInfantry) units.push(new eliteInfantry(1200,getRandomInt(gameMap.height),3));
+                if (u instanceof Sniper) units.push(new Sniper(1200,getRandomInt(gameMap.height),3));*/
+                greenDeaths++;
+            } else if (u.team === 4) {
+                /*if (u instanceof Infantry) units.push(new Infantry(0,getRandomInt(gameMap.height),4));
+                if (u instanceof eliteInfantry) units.push(new eliteInfantry(0,getRandomInt(gameMap.height),4));
+                if (u instanceof Sniper) units.push(new Sniper(0,getRandomInt(gameMap.height),4));*/
+                purpleDeaths++;
+            }
+            units.splice(i, 1);
+        }
+
+        const distToTarget = Math.sqrt((u.x - u.targetX)**2 + (u.y - u.targetY)**2);
+        
+        if (u.captureProgress === 0 && distToTarget < 5) {
+            let potentialTargets = [];
+
+            for(let r = 0; r < rows; r++) {
+                for(let c = 0; c < cols; c++) {
+                    if(grid[r][c].owner !== u.team) {
+                        potentialTargets.push({
+                            x: c * size + size / 2,
+                            y: r * size + size / 2
+                        });
+                    }
+                }
+            }
+
+            if (potentialTargets.length > 0) {
+                const randomIndex = Math.floor(Math.random() * potentialTargets.length);
+                const target = potentialTargets[randomIndex];
+                u.targetX = target.x;
+                u.targetY = target.y;
+            }
+        }
+    };
+}
+
+gameMap.addEventListener("mousedown", (e) => {
+    const rect = gameMap.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const clickedUnit = units.find(u => u.hp > 0 && Math.sqrt((u.x - mouseX)**2 + (u.y - mouseY)**2) < 15);
+
+    if (clickedUnit) {
+        selectedUnit = clickedUnit;
+    } else if (selectedUnit) {
+        selectedUnit.targetX = mouseX;
+        selectedUnit.targetY = mouseY;
+        selectedUnit = null;
+    }
+});
+
+function draw() {
+    ctx.clearRect(0, 0, gameMap.width, gameMap.height);
+    
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            const land = grid[r][c];
+            ctx.fillStyle = land.owner === 1 ? "#FF0000" : land.owner === 2 ? "#0000FF" : land.owner === 3 ? "#00FF00" : land.owner === 4 ? "#E100FF" : "#111";
+            ctx.fillRect(c * size, r * size, size, size);
+        }
+    }
+
+    units.forEach(u => {
+        if (u.hp <= 0) return;
+
+        if (u.lastShotTarget && u.lastShotTarget.timer > 0) {
+            ctx.beginPath();
+            ctx.moveTo(u.x, u.y);
+            ctx.lineTo(u.lastShotTarget.x, u.lastShotTarget.y);
+            ctx.strokeStyle = "yellow";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            u.lastShotTarget.timer--;
+        }
+
+        ctx.fillStyle = u.team === 1 ? "red" : u.team === 2 ? "blue" : u.team === 3 ? "green" : "purple";
+        
+        if (u.type === "eliteInfantry") {
+            ctx.fillRect(u.x - 5, u.y - 5, 10, 10);
+            
+            ctx.strokeStyle = (selectedUnit === u) ? "lime" : "white";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(u.x - 5, u.y - 5,10, 10);
+        } else if (u.type === "sniper") {
+            ctx.beginPath();
+            ctx.moveTo(u.x, u.y);
+            ctx.lineTo(u.x+5, u.y+10);
+            ctx.lineTo(u.x-5, u.y+10);
+            ctx.closePath();
+
+            ctx.fill();
+            ctx.stroke();
+        } else {
+            ctx.beginPath();
+            ctx.arc(u.x, u.y, 5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.strokeStyle = (selectedUnit === u) ? "lime" : "white";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        ctx.fillStyle = "black";
+        ctx.fillRect(u.x - 10, u.y + 10, 20, 4);
+        ctx.fillStyle = "lightblue";
+        ctx.fillRect(u.x - 10, u.y + 10, (u.hp / 100) * 20, 4);
+
+        if (u.captureProgress > 0) {
+            ctx.beginPath();
+            ctx.arc(u.x, u.y, 10, 0, (u.captureProgress / u.captureGoal) * Math.PI * 2);
+            ctx.strokeStyle = "lightblue";
+            ctx.stroke();
+        }
+    });
+}
+
+function gameLoop() {
+    redTiles = 0;
+    blueTiles = 0;
+    greenTiles = 0;
+    purpleTiles = 0;
+
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            if (grid[r][c].owner === 1) redTiles++;
+            else if (grid[r][c].owner === 2) blueTiles++;
+            else if (grid[r][c].owner === 3) greenTiles++;
+            else if (grid[r][c].owner === 4) purpleTiles++;
+        }
+    }
+
+    if (units.length <= 2000) {
+        for (let i = 0; i < Math.floor(redTiles/100); i++) {
+            units.push(new Infantry(redSpawnX,redSpawnY,1));
+        }
+        for (let i = 0; i < Math.floor(blueTiles/100); i++) {
+            units.push(new Infantry(blueSpawnX,blueSpawnY,2));
+        }
+        for (let i = 0; i < Math.floor(greenTiles/100); i++) {
+            units.push(new Infantry(greenSpawnX,greenSpawnY,3));
+        }
+        for (let i = 0; i < Math.floor(purpleTiles/100); i++) {
+            units.push(new Infantry(purpleSpawnX,purpleSpawnY,4));
+        }
+    }
+    for (let i = 0; i < 0; i++) {
+        units.push(new eliteInfantry(redSpawnX,redSpawnY,1));
+        units.push(new eliteInfantry(blueSpawnX,blueSpawnY,2));
+        units.push(new eliteInfantry(greenSpawnX,greenSpawnY,3));
+        units.push(new eliteInfantry(purpleSpawnX,purpleSpawnY,4));
+    }
+    for (let i = 0; i < 0; i++) {
+        units.push(new Sniper(redSpawnX,redSpawnY,1));
+        units.push(new Sniper(blueSpawnX,blueSpawnY,2));
+        units.push(new Sniper(greenSpawnX,greenSpawnY,3));
+        units.push(new Sniper(purpleSpawnX,purpleSpawnY,4));
+    }
+
+    killElement.textContent = `Red deaths: ${redDeaths} Blue deaths: ${blueDeaths} Green deaths: ${greenDeaths} Purple deaths: ${purpleDeaths} `;
+    landsElement.textContent = `Red tiles: ${redTiles} Blue tiles: ${blueTiles} Green tiles: ${greenTiles} Purple tiles: ${purpleTiles}`;
+
+    updateTeamAI();
+    units.forEach(u => u.update());
+    
+    draw();
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+</body>
+</html>
