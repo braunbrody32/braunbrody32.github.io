@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <title>Braun's Search Engine</title>
@@ -14,6 +14,18 @@
             font-size: 16px;
             transition: border-color 0.3s;
             padding: 5px; width: 250px;
+            border-color: rgb(128, 0, 255);
+            background: #111;
+            color: white;
+        }
+        select { 
+            padding: 1px 5px; cursor: pointer; 
+            border: 1px solid rgb(128, 0, 255);
+            border-radius: 5px;
+            padding: 2px 5px;
+            outline: none;
+            transition: border-color 0.3s;
+            padding: 5px; width: 100px;
             border-color: rgb(128, 0, 255);
             background: #111;
             color: white;
@@ -164,15 +176,18 @@
         }
         #ai-overlay.open { display: block; }
     </style>
+    <div class="gtranslate_wrapper"></div>
+    <script>window.gtranslateSettings = {"default_language":"en","native_language_names":true,"languages":["en","fr","it","es","de","ru","pl","pt","ar","sv"],"wrapper_selector":".gtranslate_wrapper","horizontal_position":"right","vertical_position":"top"}</script>
+    <script src="https://cdn.gtranslate.net/widgets/latest/dropdown.js" defer></script>
 </head>
-<body>
+<body id="body">
     <h1 id="ptitle">Braun's Search Engine</h1>
     <input type="text" name="q" placeholder="Search whatever..." id="sstring" list="suggestions">
     <datalist id="suggestions"></datalist>
     <button type="button" id="search">Search</button>
     <button type="button" id="braunai">Braun AI</button>
 
-    <div id="content-display" style="margin-top: 20px;">Type something...</div>
+    <div id="content-display" style="margin-top: 20px;"></div>
 
     <!-- AI Chat Modal -->
     <div id="ai-overlay"></div>
@@ -211,6 +226,19 @@
             }
             ptitle.style.color = `rgb(${red}, ${green}, 255)`;
         }, 20);
+
+        let crn = 0;
+        let crt = ""
+        let searched = false;
+        setInterval(() => {
+            crn++;
+            if (crn===4) {crn=0}
+            if (crn===0) {crt=""}
+            if (crn===1) {crt="."}
+            if (crn===2) {crt=".."}
+            if (crn===3) {crt="..."}
+            if (searched===false) { display.textContent = "Loading"+crt; }
+        }, 500);
 
         // Suggestions
         async function fetchSuggestions(term) {
@@ -271,9 +299,18 @@
         }
 
         queryInput.addEventListener("input", (e) => fetchSuggestions(e.target.value));
-        queryInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleSearch(); });
-        document.getElementById("search").addEventListener("click", handleSearch);
+        queryInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                handleSearch(); 
+                searched = true;
+            }
+        });
+        const searchBtn = document.getElementById("search");
 
+        searchBtn.addEventListener("click", () => { 
+            handleSearch();
+            searched = true;
+        });
         // ─── Braun AI Modal ───────────────────────────────────────────
         const modal = document.getElementById("ai-modal");
         const overlay = document.getElementById("ai-overlay");
