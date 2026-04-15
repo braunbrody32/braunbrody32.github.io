@@ -102,16 +102,145 @@ Land.prototype.update = function() {
     }
 }
 
+const allyInput = prompt("What are the allies? (A. None B. Everyone targets one team C. Diagonal D. Horizontal E. Vertical)");
+let targett = getRandomInt(4);
+targett++;
+
 Infantry.prototype.update = function() {
     if (this.hp <= 0) return;
 
     let enemy = units.find(u => u.team !== this.team && u.hp > 0 && Math.sqrt((u.x-this.x)**2 + (u.y-this.y)**2) < 100);
 
     if (enemy) {
-        if (this.shootCooldown <= 0) {
-            enemy.hp -= 10;
-            this.shootCooldown = 10;
-            this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+        if (allyInput==="A") {
+            if (this.shootCooldown <= 0) {
+                enemy.hp -= 10;
+                this.shootCooldown = 10;
+                this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+            }
+        }
+        if (allyInput==="B") {
+            if (enemy.team===targett) {
+                if (this.shootCooldown <= 0) {
+                    enemy.hp -= 10;
+                    this.shootCooldown = 10;
+                    this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+                }
+            }
+        }
+        if (allyInput==="C") {
+            if (this.team===1) {
+                if (enemy.team!==3) {
+                    if (this.shootCooldown <= 0) {
+                        enemy.hp -= 10;
+                        this.shootCooldown = 10;
+                        this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+                    }
+                }
+            }
+            if (this.team===2) {
+                if (enemy.team!==4) {
+                    if (this.shootCooldown <= 0) {
+                        enemy.hp -= 10;
+                        this.shootCooldown = 10;
+                        this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+                    }
+                }
+            }
+            if (this.team===3) {
+                if (enemy.team!==1) {
+                    if (this.shootCooldown <= 0) {
+                        enemy.hp -= 10;
+                        this.shootCooldown = 10;
+                        this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+                    }
+                }
+            }
+            if (this.team===4) {
+                if (enemy.team!==2) {
+                    if (this.shootCooldown <= 0) {
+                        enemy.hp -= 10;
+                        this.shootCooldown = 10;
+                        this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+                    }
+                }
+            }
+        }
+        if (allyInput==="D") {
+            if (this.team===1) {
+                if (enemy.team!==2) {
+                    if (this.shootCooldown <= 0) {
+                        enemy.hp -= 10;
+                        this.shootCooldown = 10;
+                        this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+                    }
+                }
+            }
+            if (this.team===2) {
+                if (enemy.team!==1) {
+                    if (this.shootCooldown <= 0) {
+                        enemy.hp -= 10;
+                        this.shootCooldown = 10;
+                        this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+                    }
+                }
+            }
+            if (this.team===3) {
+                if (enemy.team!==4) {
+                    if (this.shootCooldown <= 0) {
+                        enemy.hp -= 10;
+                        this.shootCooldown = 10;
+                        this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+                    }
+                }
+            }
+            if (this.team===4) {
+                if (enemy.team!==3) {
+                    if (this.shootCooldown <= 0) {
+                        enemy.hp -= 10;
+                        this.shootCooldown = 10;
+                        this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+                    }
+                }
+            }
+        }
+        if (allyInput==="E") {
+            if (this.team===1) {
+                if (enemy.team!==4) {
+                    if (this.shootCooldown <= 0) {
+                        enemy.hp -= 10;
+                        this.shootCooldown = 10;
+                        this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+                    }
+                }
+            }
+            if (this.team===4) {
+                if (enemy.team!==1) {
+                    if (this.shootCooldown <= 0) {
+                        enemy.hp -= 10;
+                        this.shootCooldown = 10;
+                        this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+                    }
+                }
+            }
+            if (this.team===3) {
+                if (enemy.team!==2) {
+                    if (this.shootCooldown <= 0) {
+                        enemy.hp -= 10;
+                        this.shootCooldown = 10;
+                        this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+                    }
+                }
+            }
+            if (this.team===2) {
+                if (enemy.team!==3) {
+                    if (this.shootCooldown <= 0) {
+                        enemy.hp -= 10;
+                        this.shootCooldown = 10;
+                        this.lastShotTarget = {x: enemy.x, y: enemy.y, timer: 5};
+                    }
+                }
+            }
         }
     } else {
         const dx = this.targetX - this.x;
