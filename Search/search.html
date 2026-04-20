@@ -204,8 +204,9 @@
     </div>
 
     <script>
-        const GROQ_API_KEY = "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";
+        const GROQ_API_KEY = "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";
         const GROQ_MODEL = "llama-3.1-8b-instant";
+        let msg = 0;
 
         const queryInput = document.getElementById("sstring");
         const suggestionList = document.getElementById("suggestions");
@@ -360,8 +361,11 @@
 
             aiInput.value = "";
             aiSend.disabled = true;
-            addMessage("user", text);
-            chatHistory.push({ role: "user", content: text });
+            if (msg <= 5) {
+                addMessage("user", text);
+                chatHistory.push({ role: "user", content: text });
+                msg++;
+            }
 
             const thinking = addMessage("thinking", "Braun AI is thinking...");
 
