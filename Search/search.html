@@ -275,6 +275,13 @@
             iframe.allow = "autoplay; fullscreen";
             display.appendChild(iframe);
         }
+        function loadGladdiGame() {
+            display.innerHTML = "";
+            const iframe = document.createElement("iframe");
+            iframe.id = "game-frame"; iframe.src = "indexg.html";
+            iframe.allow = "autoplay; fullscreen";
+            display.appendChild(iframe);
+        }
 
         async function getWikiPage(pageTitle) {
             const endpoint = "https://en.wikipedia.org/w/api.php";
@@ -296,6 +303,7 @@
             const query = queryInput.value.trim();
             if (query.toLowerCase() === "big e") loadBigEGame();
             else if (query.toLowerCase() === "dot war") loadDotWarGame();
+            else if (query.toLowerCase() === "roma est") loadGladdiGame();
             else getWikiPage(query);
         }
 
