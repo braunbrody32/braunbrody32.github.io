@@ -2,54 +2,162 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Main Page</title>
+    <title>Main Page - LeBraun's Stuff</title>
     <link rel="icon" type="image/x-icon" href="appimages/lebron.jpeg">
     <style>
-        a {text-align: center;}
-        h1 {color: white;text-align: center;}
-        h3 {color: white;text-align: center; margin: 20px;}
-        p {color: white;text-align: center;}
         body {
             font-family: sans-serif;
             background-color: #000000;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
             margin: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* The background canvas */
+        #myCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1; /* Pushes it behind everything */
+        }
+
+        /* Content styling */
+        .content {
+            position: relative;
+            z-index: 1; /* Ensures links stay clickable and on top */
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        h1, h3, p {
+            color: white;
+            text-shadow: 0px 0px 10px rgba(0,0,0,0.8); /* Helps readability */
+        }
+
+        .icon-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 800px;
+            margin-top: 40px;
+        }
+
+        img {
+            width: 100px;
+            height: 100px;
+            transition: transform 0.2s;
+            border-radius: 10px;
+        }
+
+        img:hover {
+            transform: scale(1.3);
         }
     </style>
 </head>
 <body>
-    <div id="sfc3nhl48s8qmcm7dtct45atsfb86ae7uty"></div><script type="text/javascript" src="https://counter1.optistats.ovh/private/counter.js?c=3nhl48s8qmcm7dtct45atsfb86ae7uty&down=async" async></script><br><a href="https://www.freecounterstat.com"></a><noscript><a href="https://www.freecounterstat.com" title="web counter"><img src="https://counter1.optistats.ovh/private/freecounterstat.php?c=3nhl48s8qmcm7dtct45atsfb86ae7uty" border="0" title="web counter" alt="web counter"></a></noscript>
-    <h1>Home Page</h1>
-    <h3>of LeBraun's Stuff</h3>
-    <br><br><br>
-    <a href="BraunsSandbox/index.html">
-        <img src="appimages/auracat.png" alt="Link to Sandbox" style="width:100px;height:100px;">
-    </a>
-    <a href="BraunsColorWar/index.html">
-        <img src="appimages/conquer.png" alt="Link to Conquer Game" style="width:100px;height:100px;">
-    </a>
-    <a href="BraunsTileGame/index.html">
-        <img src="appimages/dotty.webp" alt="Link to Dot War Game" style="width:100px;height:100px;">
-    </a>
-    <a href="BraunsPathDots/index.html">
-        <img src="appimages/dots.webp" alt="Link to Music Game" style="width:100px;height:100px;">
-    </a>
-    <a href="BraunsCiv/main.html">
-        <img src="appimages/frank.webp" alt="Link to Civ 67" style="width:100px;height:100px;">
-    </a>
-    <a href="ForFreedom/forfreedom.html">
-        <img src="appimages/liberty.png" alt="Link to For Freedom" style="width:100px;height:100px;">
-    </a>
-    <a href="Search/search.html">
-        <img src="appimages/sherlock.jpg" alt="Link to Search" style="width:100px;height:100px;">
-    </a>
-    <a href="BraunsCode/BraunCode.html">
-        <img src="appimages/bvc.png" alt="Link to Civ 67" style="width:100px;height:100px;">
-    </a>
-    <a href="BraunsCode/BraunCodeEditor.html">
-        <img src="appimages/bc.png" alt="Link to Civ 67" style="width:100px;height:100px;">
-    </a>
+
+    <!-- Background Canvas -->
+    <canvas id="myCanvas"></canvas>
+
+    <!-- UI Content -->
+    <div class="content">
+        <div id="sfc3nhl48s8qmcm7dtct45atsfb86ae7uty"></div>
+        <script type="text/javascript" src="https://counter1.optistats.ovh/private/counter.js?c=3nhl48s8qmcm7dtct45atsfb86ae7uty&down=async" async></script>
+        
+        <h1>Home Page</h1>
+        <h3>of LeBraun's Stuff t</h3>
+
+        <div class="icon-container">
+            <a href="BraunsSandbox/index.html"><img src="appimages/auracat.png" alt="Sandbox"></a>
+            <a href="BraunsColorWar/index.html"><img src="appimages/conquer.png" alt="Conquer Game"></a>
+            <a href="BraunsTileGame/index.html"><img src="appimages/dotty.webp" alt="Dot War Game"></a>
+            <a href="BraunsPathDots/index.html"><img src="appimages/dots.webp" alt="Music Game"></a>
+            <a href="BraunsCiv/main.html"><img src="appimages/frank.webp" alt="Civ 67"></a>
+            <a href="ForFreedom/forfreedom.html"><img src="appimages/liberty.png" alt="For Freedom"></a>
+            <a href="Search/search.html"><img src="appimages/sherlock.jpg" alt="Search"></a>
+            <a href="BraunsCode/BraunCode.html"><img src="appimages/bvc.png" alt="Code"></a>
+            <a href="BraunsCode/BraunCodeEditor.html"><img src="appimages/bc.png" alt="Editor"></a>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Match canvas size to window size
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        let z = 0;
+        let mouseX = -1000;
+        let mouseY = -1000;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        const p = new Uint8Array(512);
+        const permutation = new Uint8Array(256).map(() => Math.floor(Math.random() * 256));
+        for (let i = 0; i < 512; i++) p[i] = permutation[i & 255];
+
+        function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+        function lerp(t, a, b) { return a + t * (b - a); }
+        function grad(hash, x, y, z) {
+            const h = hash & 15;
+            const u = h < 8 ? x : y, v = h < 4 ? y : h === 12 || h === 14 ? x : z;
+            return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+        }
+
+        function noise(x, y, z) {
+            const X = Math.floor(x) & 255, Y = Math.floor(y) & 255, Z = Math.floor(z) & 255;
+            x -= Math.floor(x); y -= Math.floor(y); z -= Math.floor(z);
+            const u = fade(x), v = fade(y), w = fade(z);
+            const A = p[X] + Y, AA = p[A] + Z, AB = p[A + 1] + Z, B = p[X + 1] + Y, BA = p[B] + Z, BB = p[B + 1] + Z;
+            return lerp(w, lerp(v, lerp(u, grad(p[AA], x, y, z), grad(p[BA], x - 1, y, z)), lerp(u, grad(p[AB], x, y - 1, z), grad(p[BB], x - 1, y - 1, z))), lerp(v, lerp(u, grad(p[AA + 1], x, y, z - 1), grad(p[BA + 1], x - 1, y, z - 1)), lerp(u, grad(p[AB + 1], x, y - 1, z - 1), grad(p[BB + 1], x - 1, y - 1, z - 1))));
+        }
+
+        function draw() {
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const scale = 0.01;
+            const step = 10; // Slightly larger steps for performance
+            const radius = 250;
+
+            for (let x = 0; x < canvas.width; x += step) {
+                for (let y = 0; y < canvas.height; y += step) {
+                    const dx = x - mouseX;
+                    const dy = y - mouseY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < radius) {
+                        let val = noise(x * scale, y * scale, z);
+                        let strength = Math.max(0, 1 - (distance / radius));
+                        strength = Math.pow(strength, 2) * 2;
+                        
+                        let r = (Math.sin(val * 3 + z) * 127 + 128) * strength;
+                        let g = (Math.sin(val * 3 + z + 2) * 127 + 128) * strength;
+                        let b = (Math.sin(val * 3 + z + 4) * 127 + 128) * strength;
+                        
+                        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                        ctx.fillRect(x, y, step, step);
+                    }
+                }
+            }
+            z += 0.1;
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
 </body>
 </html>
