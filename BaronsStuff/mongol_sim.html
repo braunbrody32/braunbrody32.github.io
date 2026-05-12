@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DUCHY OF KRAKÓW — The Mongol Winter</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@400;700&display=swap');
+:root{
+  --vellum:#f5e6c8;--vellum2:#ede0b4;--ink:#1a0e00;--blood:#6b0a0a;
+  --iron:#3a3530;--rust:#8b3a1a;--gold:#a07820;--gold2:#c8a030;
+  --moss:#2a4018;--moss2:#3d5c22;--border:#7a5820;--border2:#a07840;
+  --panel:#0d0a06;--dim:#7a6040;--warn:#b05010;--ok:#2a6010;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--ink);color:var(--ink);font-family:'IM Fell English',Georgia,serif;min-height:100vh;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 3px);}
+#shell{display:grid;grid-template-columns:1fr 285px;min-height:100vh;}
+#main{padding:20px 28px 80px;max-width:860px;overflow-y:auto;}
+#sidebar{background:#0a0806;border-left:2px solid #2a1e0a;padding:14px 12px;overflow-y:auto;position:sticky;top:0;height:100vh;}
+header{text-align:center;padding:18px 0 16px;border-bottom:2px solid var(--border);margin-bottom:16px;}
+header::before{content:'⚔ ✝ ⚔';display:block;font-family:'IM Fell English',serif;font-size:11px;letter-spacing:1em;color:var(--border);margin-bottom:8px;}
+.seal{width:54px;height:54px;border-radius:50%;border:2px solid var(--gold);background:var(--ink);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:24px;animation:seal-pulse 4s ease-in-out infinite;}
+@keyframes seal-pulse{0%,100%{box-shadow:0 0 0 0 rgba(160,120,32,.4)}50%{box-shadow:0 0 0 14px rgba(160,120,32,0)}}
+h1{font-family:'Cinzel Decorative',serif;font-size:clamp(14px,3vw,22px);font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--vellum);text-shadow:0 0 20px rgba(160,120,32,.5);}
+.tagline{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.4em;color:var(--gold);margin-top:4px;text-transform:uppercase;}
+#stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;}
+.sc{background:var(--vellum);border:1.5px solid var(--border);border-radius:2px;padding:6px 10px;position:relative;overflow:hidden;transition:border-color .3s;}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.sc.ap::before{background:#c04010;}.sc.ec::before{background:var(--moss2);}.sc.mi::before{background:var(--iron);}
+.sc.st::before{background:var(--gold);}.sc.pc::before{background:#6040a0;}.sc.al::before{background:#205080;}
+.sc-lbl{font-family:'Cinzel',serif;font-size:7px;letter-spacing:.18em;text-transform:uppercase;color:#7a6040;margin-bottom:2px;}
+.sc-val{font-family:'Cinzel Decorative',serif;font-size:18px;font-weight:700;line-height:1;}
+.sc.ap .sc-val{color:#b03010;}.sc.ec .sc-val{color:var(--moss2);}.sc.mi .sc-val{color:var(--iron);}
+.sc.st .sc-val{color:var(--gold);}.sc.pc .sc-val{color:#6040a0;}.sc.al .sc-val{color:#205080;}
+.sc-bar{height:3px;background:rgba(0,0,0,.1);border-radius:2px;margin-top:4px;overflow:hidden;}
+.sc-fill{height:100%;border-radius:2px;transition:width .5s;}
+.sc.ap .sc-fill{background:#b03010;}.sc.ec .sc-fill{background:var(--moss2);}.sc.mi .sc-fill{background:var(--iron);}
+.sc.st .sc-fill{background:var(--gold);}.sc.pc .sc-fill{background:#6040a0;}.sc.al .sc-fill{background:#205080;}
+.sc.warning{border-color:var(--warn);animation:wpulse .9s ease-in-out infinite;}
+.sc.critical{border-color:var(--blood);animation:wpulse .5s ease-in-out infinite;}
+@keyframes wpulse{0%,100%{box-shadow:0 0 0 0 rgba(139,10,10,.4)}50%{box-shadow:0 0 0 5px rgba(139,10,10,0)}}
+#meters{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+.meter{background:var(--vellum);border:1.5px solid var(--border);border-radius:2px;padding:7px 10px;}
+.m-lbl{font-family:'Cinzel',serif;font-size:7px;letter-spacing:.15em;text-transform:uppercase;color:#7a6040;display:flex;justify-content:space-between;margin-bottom:4px;}
+.m-val{font-weight:700;}
+.m-track{height:4px;background:rgba(0,0,0,.1);border-radius:2px;overflow:hidden;}
+.m-fill{height:100%;border-radius:2px;transition:width .5s;}
+#crisis-progress{margin-bottom:12px;background:var(--vellum2);border:1.5px solid var(--border);border-radius:2px;padding:9px 12px;}
+.cp-header{font-family:'Cinzel',serif;font-size:7px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:flex;justify-content:space-between;}
+.cp-track{display:flex;gap:3px;}
+.cp-step{flex:1;height:5px;border-radius:2px;background:#2a1e0a;position:relative;transition:all .4s;}
+.cp-step.done{background:var(--moss2);}
+.cp-step.done::after{content:'✓';position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:8px;color:var(--moss2);}
+.cp-step.active{background:var(--gold);box-shadow:0 0 6px var(--gold);}
+.cp-step.active::after{content:'▶';position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:8px;color:var(--gold);}
+.cp-names{display:flex;gap:3px;margin-top:5px;}
+.cp-name{flex:1;font-family:'Cinzel',serif;font-size:6px;color:#6a5030;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;letter-spacing:.04em;}
+.cp-name.done{color:var(--moss2);}.cp-name.active{color:var(--gold);}
+.meta-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.15em;color:var(--dim);}
+.badge{padding:2px 8px;border-radius:2px;font-family:'Cinzel',serif;font-size:7px;letter-spacing:.2em;text-transform:uppercase;}
+.b-new{background:#3a1a00;color:var(--gold);border:1px solid var(--gold);}
+.b-esc{background:#3a0808;color:#ff8888;border:1px solid #8a2828;}
+.b-desc{background:#0a2010;color:#88cc88;border:1px solid #2a6020;}
+.cp-stage-ind{font-family:'Cinzel',serif;font-size:7px;letter-spacing:.25em;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
+#crisis-panel{display:none;margin-bottom:14px;}
+.cp-card{background:var(--vellum);border:2px solid var(--border);border-radius:3px;padding:16px 20px;animation:pin .45s ease both;background-image:radial-gradient(ellipse at 90% 10%,rgba(160,120,32,.05) 0%,transparent 50%);}
+@keyframes pin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.cp-tag{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.3em;text-transform:uppercase;padding:2px 10px;border-radius:2px;display:inline-block;margin-bottom:8px;}
+.tag-mil{background:#3a0808;color:#ff9090;}.tag-dip{background:#0a1a30;color:#90b8e0;}
+.tag-intel{background:#1a1040;color:#b090e0;}.tag-econ{background:#1a1000;color:#d0a030;}
+.tag-siege{background:#2a0808;color:#ff7060;}.tag-horde{background:#200808;color:#ff6050;}
+.tag-faith{background:#0a1a08;color:#80c060;}.tag-winter{background:#102030;color:#80c0d0;}
+.cp-title{font-family:'Cinzel',serif;font-size:15px;font-weight:700;color:var(--ink);line-height:1.35;margin-bottom:10px;}
+.cp-body{font-size:13px;line-height:1.75;color:#3a2a10;font-weight:400;margin-bottom:12px;font-style:italic;}
+.cp-consequences{margin-top:10px;padding:8px 10px;background:rgba(139,10,10,.07);border-radius:2px;border-left:3px solid var(--blood);}
+.cp-consequences .con-title{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--blood);margin-bottom:4px;}
+.cp-consequences .con-item{font-size:11.5px;color:#5a2010;margin-bottom:2px;padding-left:8px;}
+.cp-consequences .con-item::before{content:'⚠ ';}
+.cp-divider{border:none;border-top:1px solid var(--border2);margin:12px 0;}
+.advisor-panel{background:var(--vellum2);border:1.5px solid var(--border);border-radius:2px;padding:12px 14px;margin-bottom:12px;}
+.adv-title{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.adv-row{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;}
+.adv-row:last-child{margin-bottom:0;}
+.adv-avatar{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:var(--vellum);}
+.adv-name{font-family:'Cinzel',serif;font-size:10px;font-weight:700;color:var(--ink);}
+.adv-role{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-bottom:2px;}
+.adv-quote{font-size:11.5px;color:#3a2a10;font-style:italic;line-height:1.5;}
+.adv-stance{font-family:'Cinzel',serif;font-size:7px;letter-spacing:.15em;padding:1px 6px;border-radius:2px;display:inline-block;margin-top:3px;}
+.stance-hawk{background:#2d0008;color:#ff9090;}.stance-dove{background:#002d08;color:#90e090;}
+.stance-econ{background:#0d0d2d;color:#9090ff;}.stance-intel{background:#1d1400;color:#ffe090;}
+.stance-faith{background:#001d0d;color:#80e0c0;}
+.dec-odds{font-family:'Cinzel',serif;font-size:7.5px;margin-top:5px;display:flex;align-items:center;gap:6px;}
+.odds-bar{flex:1;height:4px;border-radius:2px;background:rgba(0,0,0,.12);overflow:hidden;}
+.odds-fill{height:100%;border-radius:2px;}
+.odds-high .odds-fill{background:var(--moss2);}.odds-med .odds-fill{background:#b07010;}.odds-low .odds-fill{background:var(--blood);}
+.odds-label{font-size:7px;letter-spacing:.06em;white-space:nowrap;}
+.odds-high .odds-label{color:var(--moss2);}.odds-med .odds-label{color:#b07010;}.odds-low .odds-label{color:var(--blood);}
+.roll-result{font-family:'Cinzel',serif;font-size:9px;padding:4px 10px;border-radius:2px;margin-bottom:6px;letter-spacing:.1em;}
+.roll-success{background:#d4edda;color:#144d1e;}.roll-fail{background:#f8d7da;color:#6e1c1c;}
+#decisions{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.dec-btn{background:var(--vellum);border:1.5px solid var(--border);border-radius:3px;padding:11px 15px;cursor:pointer;text-align:left;transition:all .16s;animation:fade .35s ease both;position:relative;}
+.dec-btn:nth-child(1){animation-delay:.04s}.dec-btn:nth-child(2){animation-delay:.09s}.dec-btn:nth-child(3){animation-delay:.14s}.dec-btn:nth-child(4){animation-delay:.19s}.dec-btn:nth-child(5){animation-delay:.24s}
+@keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.dec-btn:hover{border-color:var(--iron);transform:translateX(4px);box-shadow:-3px 0 0 var(--iron);background:#ede0b4;}
+.dec-btn.d-hawk:hover{border-color:var(--blood);box-shadow:-3px 0 0 var(--blood);}
+.dec-btn.d-costly:hover{border-color:#6040a0;box-shadow:-3px 0 0 #6040a0;}
+.dec-btn:disabled{opacity:.38;cursor:not-allowed;transform:none;box-shadow:none;}
+.dec-letter{font-family:'Cinzel',serif;font-size:7.5px;font-weight:700;letter-spacing:.15em;margin-bottom:3px;display:flex;align-items:center;gap:6px;}
+.dec-letter .dl-main{color:var(--iron);}.dec-btn.d-hawk .dec-letter .dl-main{color:var(--blood);}
+.dec-cost{font-family:'Cinzel',serif;font-size:6.5px;padding:1px 5px;border-radius:2px;background:#1a0a30;color:#b090e0;}
+.dec-text{font-size:13px;line-height:1.55;color:var(--ink);}.dec-hint{font-size:10.5px;color:#7a5030;font-style:italic;margin-top:3px;}
+#outcome-panel{display:none;background:var(--vellum);border:2px solid var(--border);border-radius:3px;padding:16px 20px;margin-bottom:14px;animation:pin .4s ease both;}
+#outcome-panel.show{display:block;}
+.out-head{font-family:'Cinzel',serif;font-size:15px;font-weight:700;margin-bottom:7px;color:var(--ink);}
+.out-body{font-size:13px;line-height:1.75;color:#3a2a10;font-style:italic;font-weight:400;margin-bottom:11px;}
+.out-deltas{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.delta{font-family:'Cinzel',serif;font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:2px;}
+.dp{background:#d4edda;color:#144d1e;}.dn{background:#f8d7da;color:#6e1c1c;}
+.dt-up{background:#200000;color:#ff9090;}.dt-dn{background:#002000;color:#90d090;}
+.out-ripples{margin-bottom:10px;padding:8px 10px;background:rgba(160,120,0,.08);border-left:3px solid var(--gold);border-radius:0 3px 3px 0;}
+.ripple-title{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+.ripple-item{font-size:11.5px;color:#5a3a10;margin-bottom:2px;}
+.out-next{font-size:11.5px;font-style:italic;color:var(--gold);margin-bottom:10px;border-left:3px solid var(--gold);padding-left:8px;}
+.btn-continue{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.2em;text-transform:uppercase;background:var(--ink);color:var(--vellum);border:none;padding:9px 22px;border-radius:2px;cursor:pointer;transition:background .16s;}
+.btn-continue:hover{background:var(--iron);}
+#loading{display:none;text-align:center;padding:30px;}
+#loading.show{display:block;}
+.ld-txt{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.3em;color:var(--gold);animation:blink 1.1s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+.ld-bar{height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);background-size:200%;animation:shim 1.5s ease-in-out infinite;margin:10px auto;width:200px;}
+@keyframes shim{0%{background-position:200%}100%{background-position:-200%}}
+#gameover{display:none;background:var(--vellum);border:2px solid var(--border);border-radius:3px;padding:22px 24px;text-align:center;}
+#gameover.show{display:block;}
+#go-title{font-family:'Cinzel Decorative',serif;font-size:18px;font-weight:700;color:var(--blood);margin-bottom:12px;}
+#go-body{font-size:13px;line-height:1.75;color:#3a2a10;font-style:italic;margin-bottom:16px;}
+.final-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px;}
+.final-stat{background:var(--vellum2);border:1px solid var(--border);border-radius:2px;padding:7px;text-align:center;}
+.fs-lbl{font-family:'Cinzel',serif;font-size:7px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:3px;}
+.fs-val{font-family:'Cinzel Decorative',serif;font-size:16px;font-weight:700;color:var(--ink);}
+.sb-section{margin-bottom:16px;}
+.sb-head{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #2a1e0a;}
+.intel-item{padding:5px 8px;background:#100c06;border:1px solid #2a1e0a;border-radius:2px;margin-bottom:4px;}
+.i-tag{font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);}
+.i-txt{font-size:10.5px;color:#c8b090;line-height:1.45;margin-top:2px;}
+.i-age{font-family:'Cinzel',serif;font-size:7px;color:#5a4030;margin-top:2px;}
+.intel-new{border-color:var(--gold)!important;}
+.event-ticker{font-family:'Cinzel',serif;}
+.et-item{font-size:9px;padding:3px 0;border-bottom:1px solid #1a1408;display:flex;gap:5px;}
+.et-time{color:#4a3820;font-size:7.5px;white-space:nowrap;flex-shrink:0;}
+.et-neg{color:#c07050;}.et-neu{color:#a09070;}.et-pos{color:#80a060;}
+.h-entry{font-family:'IM Fell English',serif;font-size:10px;color:#a09070;padding:4px 0;border-bottom:1px solid #1a1408;line-height:1.4;}
+.h-turn{font-family:'Cinzel',serif;font-size:7px;color:#5a4030;letter-spacing:.1em;}
+.vote-panel{font-family:'Cinzel',serif;}
+.vote-title{font-size:9px;letter-spacing:.1em;color:#a09070;margin-bottom:6px;}
+.vote-bar-wrap{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-bottom:4px;}
+.vote-seg{transition:flex .5s;}
+.vs-for{background:var(--moss2);}.vs-abs{background:#3a3020;}.vs-ag{background:var(--blood);}
+.vote-labels{display:flex;justify-content:space-between;font-size:7px;color:#5a4030;}
+.special-event{position:fixed;bottom:20px;right:20px;background:var(--vellum);border:2px solid var(--gold);border-radius:3px;padding:12px 14px;max-width:300px;z-index:1000;animation:fade .3s ease;font-family:'Cinzel',serif;box-shadow:0 4px 20px rgba(0,0,0,.5);}
+.se-dismiss{position:absolute;top:4px;right:6px;background:none;border:none;cursor:pointer;color:var(--dim);font-size:11px;}
+.se-type{font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+.se-txt{font-size:11px;color:var(--ink);line-height:1.5;font-style:italic;}
+#rout-screen{display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0);align-items:center;justify-content:center;}
+#rout-screen.show{display:flex;}
+#rout-flash{position:absolute;inset:0;background:#6b0a0a;opacity:0;pointer-events:none;}
+.rout-card{background:#1a0808;border:3px solid var(--blood);border-radius:4px;padding:30px 36px;max-width:560px;text-align:center;z-index:1;box-shadow:0 0 80px rgba(107,10,10,.8);}
+.rout-header{font-family:'UnifrakturMaguntia',serif;font-size:28px;color:var(--blood);margin-bottom:6px;}
+.rout-sub{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.25em;color:#a04040;margin-bottom:14px;}
+.rout-desc{font-family:'IM Fell English',serif;font-size:12px;color:#c09080;line-height:1.7;margin-bottom:18px;font-style:italic;}
+.rout-cdown{font-family:'Cinzel Decorative',serif;font-size:48px;color:var(--blood);animation:blink .8s infinite;}
+.rout-restart{margin-top:16px;font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:.2em;background:var(--blood);color:var(--vellum);border:none;padding:10px 24px;border-radius:2px;cursor:pointer;}
+@media(max-width:700px){#shell{grid-template-columns:1fr;}#sidebar{display:none;}}
+</style>
+</head>
+<body>
+<div id="shell">
+<div id="main">
+  <header>
+    <div class="seal">⚜</div>
+    <h1>Duchy of Kraków</h1>
+    <div class="tagline">The Mongol Winter · Anno Domini 1241</div>
+  </header>
+  <div id="stats">
+    <div class="sc ap"><div class="sc-lbl">People</div><div class="sc-val" id="v-ap">52</div><div class="sc-bar"><div class="sc-fill" id="b-ap" style="width:52%"></div></div></div>
+    <div class="sc ec"><div class="sc-lbl">Treasury</div><div class="sc-val" id="v-ec">68</div><div class="sc-bar"><div class="sc-fill" id="b-ec" style="width:68%"></div></div></div>
+    <div class="sc mi"><div class="sc-lbl">Swords</div><div class="sc-val" id="v-mi">75</div><div class="sc-bar"><div class="sc-fill" id="b-mi" style="width:75%"></div></div></div>
+    <div class="sc st"><div class="sc-lbl">Order</div><div class="sc-val" id="v-st">70</div><div class="sc-bar"><div class="sc-fill" id="b-st" style="width:70%"></div></div></div>
+    <div class="sc pc"><div class="sc-lbl">Favour</div><div class="sc-val" id="v-pc">80</div><div class="sc-bar"><div class="sc-fill" id="b-pc" style="width:80%"></div></div></div>
+    <div class="sc al"><div class="sc-lbl">Alliances</div><div class="sc-val" id="v-al">65</div><div class="sc-bar"><div class="sc-fill" id="b-al" style="width:65%"></div></div></div>
+  </div>
+  <div id="meters">
+    <div class="meter"><div class="m-lbl"><span>🔥 Horde Advance</span><span class="m-val" id="t-val">20</span></div><div class="m-track"><div class="m-fill" id="t-fill" style="width:20%"></div></div></div>
+    <div class="meter"><div class="m-lbl"><span>🦅 Scout Reports</span><span class="m-val" id="iq-val">55</span></div><div class="m-track"><div class="m-fill" id="iq-fill" style="width:55%;background:#605020"></div></div></div>
+  </div>
+  <div id="crisis-progress">
+    <div class="cp-header"><span>Nine Trials — The Road to Survival, AD 1241-1259</span><span id="cp-count">0 / 9 SURVIVED</span></div>
+    <div class="cp-track" id="cp-track"></div>
+    <div class="cp-names" id="cp-names"></div>
+  </div>
+  <div class="meta-row"><span id="meta-left">WINTER · AD 1241 · DAY 1</span><span><span class="badge b-new" id="esc-badge">DISPATCH</span></span></div>
+  <div id="crisis-panel">
+    <div class="cp-card" id="cp-card">
+      <div class="cp-stage-ind" id="stage-ind">STAGE 1</div>
+      <div class="cp-tag" id="c-tag">DISPATCH</div>
+      <div class="cp-title" id="c-title"></div>
+      <div class="cp-body" id="c-body"></div>
+      <div class="cp-consequences" id="c-consequences" style="display:none"><div class="con-title">Active Calamities</div><div id="c-con-list"></div></div>
+      <hr class="cp-divider">
+    </div>
+  </div>
+  <div class="advisor-panel" id="advisor-panel" style="display:none">
+    <div class="adv-title">Council Chamber</div>
+    <div id="advisor-rows"></div>
+  </div>
+  <div id="loading"><div class="ld-txt" id="ld-txt">DISPATCHES ARRIVING…</div><div class="ld-bar"></div></div>
+  <div id="decisions"></div>
+  <div id="outcome-panel">
+    <div class="out-head" id="o-head"></div>
+    <div class="out-body" id="o-body"></div>
+    <div class="out-deltas" id="o-deltas"></div>
+    <div class="out-ripples" id="o-ripples" style="display:none"><div class="ripple-title">Tidings From the Realm</div><div id="o-ripple-list"></div></div>
+    <div class="out-next" id="o-next"></div>
+    <button class="btn-continue" id="cont-btn">CONTINUE →</button>
+  </div>
+  <div id="gameover"><h2 id="go-title"></h2><p id="go-body"></p><div class="final-grid" id="final-grid"></div><button class="btn-continue" onclick="location.reload()">BEGIN ANEW</button></div>
+</div>
+<div id="sidebar">
+  <div class="sb-section"><div class="sb-head">Scouts and Spies</div><div id="intel-feed"></div></div>
+  <div class="sb-section"><div class="sb-head">Noble Support</div><div id="congress-panel"></div></div>
+  <div class="sb-section"><div class="sb-head">Chronicle of Events</div><div id="event-ticker"></div></div>
+  <div class="sb-section"><div class="sb-head">Your Councils</div><div id="h-log"></div></div>
+</div>
+</div>
+<div id="rout-screen">
+  <div id="rout-flash"></div>
+  <div class="rout-card">
+    <div class="rout-header">KRAKÓW FALLS</div>
+    <div class="rout-sub" id="rout-sub">THE HORDE HAS BROKEN THROUGH</div>
+    <div id="rout-desc" class="rout-desc"></div>
+    <div class="rout-cdown" id="rout-cdown">—</div>
+    <button class="rout-restart" onclick="location.reload()">⚔ RIDE AGAIN</button>
+  </div>
+</div>
+
+<script>
+const S={ap:52,ec:68,mi:75,st:70,pc:80,al:65,tension:20,iq:55,day:1,year:1241,crisisCount:0,totalDecisions:0,gameOver:false,nuked:false,history:[],log:[],intel:[],allies:{},consequences:[],currentNode:null,currentTree:null,stage:1,treesDone:[],treesQueue:[],legacyFlags:{},globalConsequences:[]};
+const FACTIONS={Church:{name:'Holy Church',emoji:'✝',trust:72},Silesia:{name:'Silesia',emoji:'🦅',trust:65},Hungary:{name:'Hungary',emoji:'⚔',trust:58},Teutonic:{name:'Teutonic Kn.',emoji:'🏰',trust:55},Bohemia:{name:'Bohemia',emoji:'🌹',trust:50},HRE:{name:'Holy R. Emp.',emoji:'👑',trust:40},Mongols:{name:'Mongol Horde',emoji:'🏹',trust:5},Cumans:{name:'Cuman Allies',emoji:'🐴',trust:35}};
+for(const k in FACTIONS)S.allies[k]=Object.assign({},FACTIONS[k]);
+const COUNCIL={voivode:{name:'Voivode Mikołaj',role:'Marshal of the Realm',emoji:'⚔️',stance:'hawk'},bishop:{name:'Bishop Prandota',role:'Bishop of Kraków',emoji:'✝️',stance:'faith'},treasurer:{name:'Castellan Dobiesław',role:'Lord Treasurer',emoji:'💰',stance:'econ'},spy:{name:'Henryk the Scout',role:'Master of Scouts',emoji:'🦅',stance:'intel'},herald:{name:'Lord Sędziwój',role:'Royal Herald',emoji:'🕊️',stance:'dove'}};
+function clamp(v,lo=0,hi=100){return Math.max(lo,Math.min(hi,v));}
+function rnd(lo,hi){return Math.floor(Math.random()*(hi-lo+1))+lo;}
+function setLoad(show,msg){const el=document.getElementById('loading');el.className=show?'show':'';if(msg)document.getElementById('ld-txt').textContent=msg;}
+function addLog(txt,type='neu'){const s=S.day<90?'WINTER':S.day<180?'SPRING':S.day<270?'SUMMER':'AUTUMN';S.log.unshift({time:s+' '+S.year+' D'+S.day,txt,type});if(S.log.length>20)S.log.pop();renderLog();}
+function addIntel(tag,txt){S.intel.unshift({tag,txt,age:0,isNew:true});if(S.intel.length>8)S.intel.pop();renderIntel();showSE(tag,txt);}
+function showSE(tag,txt){const e=document.querySelector('.special-event');if(e)e.remove();const d=document.createElement('div');d.className='special-event';d.innerHTML='<button class="se-dismiss" onclick="this.parentElement.remove()">✕</button><div class="se-type">'+tag+'</div><div class="se-txt">'+txt+'</div>';document.body.appendChild(d);setTimeout(()=>{if(d.parentElement)d.remove();},5500);}
+function applyDeltas(d){
+  if(d.ap!==undefined)S.ap=clamp(S.ap+d.ap);if(d.ec!==undefined)S.ec=clamp(S.ec+d.ec);
+  if(d.mi!==undefined)S.mi=clamp(S.mi+d.mi);if(d.st!==undefined)S.st=clamp(S.st+d.st);
+  if(d.pc!==undefined)S.pc=clamp(S.pc+d.pc);if(d.al!==undefined)S.al=clamp(S.al+d.al);
+  if(d.tension!==undefined)S.tension=clamp(S.tension+d.tension,0,100);
+  if(d.iq!==undefined)S.iq=clamp(S.iq+d.iq);
+  if(d.allies)for(const k in d.allies)if(S.allies[k])S.allies[k].trust=clamp(S.allies[k].trust+d.allies[k],0,100);
+  updateStats();
+}
+function updateStats(){
+  ['ap','ec','mi','st','pc','al'].forEach(k=>{document.getElementById('v-'+k).textContent=S[k];document.getElementById('b-'+k).style.width=S[k]+'%';const c=document.getElementById('b-'+k).closest('.sc');c.classList.remove('warning','critical');if(S[k]<25)c.classList.add('warning');if(S[k]<12)c.classList.add('critical');});
+  const t=S.tension,tf=document.getElementById('t-fill'),tv=document.getElementById('t-val');
+  tf.style.width=t+'%';tf.style.background=t<30?'#2d7a2d':t<55?'#a07010':t<75?'#b84010':'#8b0000';
+  tv.textContent=t;tv.style.color=t>=75?'#ff4040':t>=55?'#c05010':t>=30?'#a07010':'#2d7a2d';
+  document.getElementById('iq-fill').style.width=S.iq+'%';document.getElementById('iq-val').textContent=S.iq;
+  const s=S.day<90?'WINTER':S.day<180?'SPRING':S.day<270?'SUMMER':'AUTUMN';
+  document.getElementById('meta-left').textContent=s+' · AD '+S.year+' · DAY '+S.day;
+  renderNobles();
+}
+function renderLog(){document.getElementById('event-ticker').innerHTML='<div class="event-ticker">'+S.log.slice(0,12).map(l=>'<div class="et-item"><span class="et-time">'+l.time+'</span><span class="et-'+l.type+'"> '+l.txt+'</span></div>').join('')+'</div>';}
+function renderIntel(){document.getElementById('intel-feed').innerHTML=S.intel.map(it=>'<div class="intel-item'+(it.isNew?' intel-new':'')+'"><div class="i-tag">'+it.tag+'</div><div class="i-txt">'+it.txt+'</div><div class="i-age">'+(it.age===0?'JUST RECEIVED':it.age+' councils ago')+'</div></div>').join('');}
+function renderNobles(){const p=Math.max(10,Math.min(85,S.ap-5+rnd(-3,3))),a=Math.max(5,100-p-10),b=100-p-a;document.getElementById('congress-panel').innerHTML='<div class="vote-panel"><div class="vote-title">Lords Supporting Duke: '+p+'%</div><div class="vote-bar-wrap"><div class="vote-seg vs-for" style="flex:'+p+'"></div><div class="vote-seg vs-abs" style="flex:'+b+'"></div><div class="vote-seg vs-ag" style="flex:'+a+'"></div></div><div class="vote-labels"><span>With Duke '+p+'%</span><span>Wavering '+b+'%</span><span>Against '+a+'%</span></div></div>';}
+function renderHistory(){document.getElementById('h-log').innerHTML=S.history.slice().reverse().map(h=>'<div class="h-entry"><div class="h-turn">Day '+h.day+' · '+h.label+'</div>'+h.crisis.substring(0,32)+'…<br><em>→ '+h.result+'</em></div>').join('');}
+const CRISIS_ORDER=[
+  {id:'SCOUTS',    label:'THE SCOUTS',     short:'Scouts',  date:'Jan 1241'},
+  {id:'SANDOMIERZ',label:'SANDOMIERZ',     short:'Sandom.', date:'Jan 1241'},
+  {id:'SUPPLY',    label:'WINTER MARCH',   short:'March',   date:'Feb 1241'},
+  {id:'CHMIEL',    label:'CHMIELNIK',      short:'Chmiel.', date:'Mar 18'},
+  {id:'KRAKOW',    label:'KRAKÓW BESIEGED',short:'Kraków',  date:'Mar 1241'},
+  {id:'SIERADZ',   label:'SIERADZ',        short:'Sieradz', date:'Apr 1241'},
+  {id:'LEGNICA',   label:'LEGNICA',         short:'Legnica', date:'Apr 9'},
+  {id:'AFTERMATH', label:'AFTERMATH',       short:'Aftermath',date:'Apr-May'},
+  {id:'MOHI',      label:'THE LONG RETURN', short:'Return',  date:'1241-59'},
+];
+function renderProgress(){const tr=document.getElementById('cp-track'),nm=document.getElementById('cp-names'),co=document.getElementById('cp-count');if(!tr)return;const d=S.treesDone.length;co.textContent=d+' / 9 SURVIVED';tr.innerHTML='';nm.innerHTML='';CRISIS_ORDER.forEach((c,i)=>{const iD=d>i,iA=!iD&&S.currentTree&&S.currentTree.id===c.id;const s=document.createElement('div');s.className='cp-step '+(iD?'done':iA?'active':'locked');s.title=c.label;tr.appendChild(s);const n=document.createElement('div');n.className='cp-name '+(iD?'done':iA?'active':'');n.textContent=c.short;nm.appendChild(n);});}
+const ROUTS=[{sub:'THE HORDE ENTERS KRAKÓW — FIRE AND SWORD',desc:'The great market of Kraków burned for three days. The cathedral of Wawel was looted. The screams carried to Wrocław. Batu Khan\'s generals reported to the Great Khan: Poland is grass. Bolesław fled into Hungary. He was never spoken of as duke again.'},{sub:'THE ARMY OF POLAND DESTROYED AT THE FIELD',desc:'The knights charged as knights always charge — in heavy mail, lances levelled, glory in their hearts. The Mongols parted, encircled, and shot them down like deer. Three thousand Christian knights lay dead before vespers. The battle lasted four hours. Poland would take a generation to rebuild what was lost in an afternoon.'},{sub:'KRAKÓW ABANDONED — THE DUCHY IS NO MORE',desc:'The people fled before the vanguard arrived. The city was empty — and the Mongols burned it anyway. Empty cities burn just as well as full ones. Bolesław sat on a hill south of the Vistula and watched the smoke. He had failed every test the winter had given him.'}];
+</script>
+
+<script>
+const TREES=[
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 1: THE SCOUTS — First Warning, January 1241
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 1: THE SCOUTS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{id:'SCOUTS',name:'The First Warning',nodes:{
+  start:{tag:'DISPATCH',tagCls:'tag-intel',title:'A Rider from the East — The Mongols Have Crossed the San',
+   body:'A horseman, half-dead and coated in frozen mud, collapses in your courtyard at dawn. He survived the Mongol vanguard\'s advance across the San River. His message: three tumens — perhaps 30,000 riders — move west at a pace no army has matched. They carry no supply wagons. They eat their horses. Sandomierz has already fallen. Kraków has perhaps two weeks.',
+   advisors:[{who:'voivode',say:'Call every knight in Małopolska to Kraków within five days or we cannot field an army.',stance:'hawk'},{who:'bishop',say:'The Pope must know. Send riders to Rome. This is not Poland\'s war alone — it is Christendom\'s.',stance:'faith'},{who:'spy',say:'The scout\'s information is three days old. Send fresh riders east before committing.',stance:'intel'},{who:'herald',say:'The people must be told something. Rumour is worse than truth.',stance:'dove'}],
+   consequences:[],
+   choices:[
+    {text:'Sound the war-horn. Call every knight and man-at-arms to Kraków immediately.',hint:'Gathers your army — also reveals your position to Mongol scouts',type:'hawk',cost:{pc:8},
+     outcome:{head:'The War-Horn Echoes Across Małopolska',body:'Church bells rang from a hundred towers. Within three days, four thousand knights and twelve thousand foot assembled outside Kraków\'s walls. The largest Polish army in living memory. Also clearly visible to Mongol scouts watching from the eastern hills.',deltas:{ap:+8,mi:+18,st:+5,tension:+10,al:+8,pc:+8},ripples:['4,000 knights assembled — visible to Mongol vanguard','Mongol scouts: Counting Polish strength from hilltops','Sandomierz survivors: Reporting Mongol tactics to assembled captains'],addIntel:'SCOUT: Mongol vanguard observed Polish assembly. Tumen redirecting toward Kraków.',addLog:'War-horn sounded. Army assembling.',next:'sc_deploy'}},
+    {text:'Send urgent embassies to Silesia, Hungary, and the Holy Roman Emperor.',hint:'Allies take time to arrive — but you cannot hold alone',type:'dove',cost:{pc:10},
+     outcome:{head:'Riders Dispatched to Christendom',body:'Twelve riders left Kraków before dawn — to Wrocław, to Esztergom, to Prague, to Rome. Hungary\'s King Béla replied within a week. He was already mobilizing.',deltas:{ap:+5,ec:-3,al:+20,tension:+5,pc:+6,allies:{Hungary:+18,Silesia:+10,HRE:+8,Church:+8}},ripples:['Hungary: King Béla mobilizing — 60,000 men','Silesia: Duke Henryk pledged his knights','Pope Gregory IX: Issued crusade bull'],addIntel:'DIPLOMATIC: Hungarian army mobilizing. Silesian knights riding. Emperor still silent.',addLog:'Embassies sent. Hungary responding.',next:'sc_deploy'}},
+    {text:'Send scouts east immediately — gather precise intelligence before committing.',hint:'Knowledge is a weapon — but the Mongols are already moving',type:'intel',cost:{pc:5},
+     roll:{odds:0.70,failHead:'Scouts Do Not Return',failBody:'Three of four scout parties sent east did not return. One rider came back with an arrow through his thigh and a message scratched in the dirt: thousands. Just: thousands.',failDeltas:{ap:-12,mi:-8,st:-14,tension:+22,iq:-20},failRipples:['3 of 4 scout parties: Did not return','Panic spreading — people leaving Kraków','Duke\'s credibility: Questioned by nervous nobles'],failNext:'sc_crisis'},
+     outcome:{head:'Scouts Return With Detailed Intelligence',body:'Precise counts: two full tumens from the northeast, one sweeping south. Nine days to Kraków, not fourteen. The intelligence was invaluable.',deltas:{ap:+3,st:+5,iq:+25,tension:+8,pc:+8},ripples:['Precise tumen positions confirmed — 9 days, not 14','Mongol flanking movement identified before it could surprise','Nine days: Enough time to prepare properly'],addIntel:'CONFIRMED: Two tumens NE, one south. Nine days to Kraków.',addLog:'Scouts returned. Nine days confirmed.',next:'sc_deploy'}},
+    {text:'Begin evacuating civilians south and west — empty the city before the Mongols arrive.',hint:'Saves lives — abandoning Kraków destroys morale',type:'dove',cost:{pc:6},
+     outcome:{head:'Evacuation Ordered — The City Empties',body:'Columns of people stretched south on the river road. Old women carrying icons. Merchants with carts. Priests with relics. Three hundred knights chose to leave with their families rather than stay.',deltas:{ap:-6,ec:-5,st:-8,al:+4,tension:+5,pc:+4,allies:{Church:+5}},ripples:['Kraków: 60% of population evacuating south','300 knights departed — army weakened','Bishop Prandota: Blessed those who fled and those who stayed'],addIntel:'POPULATION: 60% of Kraków evacuating. Army diminished.',addLog:'Evacuation ordered. City emptying.',next:'sc_crisis'}},
+    {text:'Fortify Kraków — reinforce the walls, flood the moat, prepare for siege.',hint:'Cities can be held — Mongols rarely besiege, they go around',type:'hawk',cost:{pc:7},
+     outcome:{head:'Kraków Prepared for Siege',body:'The city\'s walls were reinforced with timber and earth. The moat was deepened. Stores of food and arrows gathered. When the Mongol vanguard arrived to scout, they reported to Subutai: the city would cost ten thousand men to take directly.',deltas:{ap:+4,mi:+10,st:+8,ec:-8,tension:-5,pc:+6},ripples:['Kraków walls: Significantly strengthened','Mongol vanguard deterred from direct assault','Subutai: Will bypass and starve if needed','Stores: Six months of food inside the walls'],addIntel:'MILITARY: Kraków fortified. Mongol vanguard deterred. Bypass expected.',addLog:'Kraków fortified. Mongol vanguard deterred.',next:'sc_deploy'}},
+    {text:'Send the Duke\'s treasury south to Hungary — protect the wealth of the realm.',hint:'Practical — but people will draw conclusions when they see the wagons leave',cost:{pc:4},
+     outcome:{head:'Treasury Secured in Hungary',body:'Fourteen wagons of silver, gold, and religious treasures crossed the Carpathians before the Mongols could cut the passes. The people who saw the wagons leave drew their own conclusions.',deltas:{ap:-8,ec:+15,st:-5,al:+8,pc:+2,allies:{Hungary:+6}},ripples:['Treasury: Secured in Hungary — fourteen wagon loads','Morale: Damaged — people saw wealth leave','Nobles: Whispering that the Duke expects to lose'],addIntel:'MORALE: Treasury departure noted by population. Confidence shaken.',addLog:'Treasury evacuated to Hungary. Morale damaged.', next:'sc_crisis'}},
+   ,
+      {text:'Order an immediate cavalry charge the moment the Mongol vanguard comes into sight.',hint:'Charging into an unscounted force without reconnaissance is how armies die in an afternoon',type:'hawk',cost:{pc:8},
+       outcome:{head:'Charge Ordered — Into Three Tumens Instead of One',body:'The dust cloud that appeared to the east was the vanguard of a single tumen. The cavalry charge met it and broke it. And then the second tumen appeared on the left. And the third on the right. The intelligence had been wrong. There were not one but three tumens. The charge that had scattered the vanguard was now encircled by sixty thousand riders.',deltas:{ap:-18,mi:-30,st:-20,tension:+30},ripples:['Three tumens — not one — intelligence failure','Encirclement complete before the cavalry could withdraw','Chmielnik: Lost in two hours','The road to Kraków: Open and undefended'],
+       addIntel:'TERMINAL: Three tumens at Chmielnik. Army encircled and destroyed. Road to Kraków open.',next:'rout_end'}}
+    ,
+      {text:'Demand Duke Henryk submit to your command — you outrank him and the army must have one voice.',hint:'A power struggle over command the night before battle destroys both armies separately',cost:{pc:10},
+       outcome:{head:'Command Dispute — Both Armies Refused to March Together',body:'The demand was made in the council chamber with every duke present. Henryk refused. You refused to serve under him. The council broke without agreement. The next morning Henryk rode north with his Silesians. You rode back to Kraków. The Mongols faced neither army together — and destroyed both separately within a week.',deltas:{ap:-16,mi:-20,st:-18,tension:+22,al:-20,allies:{Silesia:-25,Teutonic:-15,Church:-10}},ripples:['Command dispute: Both armies refused to march together','Henryk: Rode north with Silesians — destroyed at Legnica without Polish support','Your force: Destroyed at the Oder crossing three days later','The Mongols destroyed both armies separately — as they had planned to from the beginning'],
+       addIntel:'TERMINAL: Command dispute. Both armies destroyed separately. No unified force exists.',next:'rout_end'}}
+    ,
+      {text:'Order the Templars and Teutonic Knights to charge first — let the military orders show the Poles how to fight.',hint:'The military orders have their own command — ordering them forward without coordination destroys unit cohesion',cost:{pc:9},
+       outcome:{head:'Templars Charged Alone — Surrounded Before Polish Forces Could Follow',body:'The Templars and Teutonic Knights were gone before the Polish cavalry had formed. They hit the Mongol vanguard and scattered it — and then the feigned retreat took them four miles north. The encirclement closed before the Polish force had finished forming. The military orders died in a circle of fire. The rest of the army, watching from the hill, understood what was happening. Three dukes ordered their men home.',deltas:{ap:-12,mi:-22,st:-16,tension:+25,al:-14,allies:{Teutonic:-20,Church:-10}},ripples:['Templars and Teutonic Knights: Encircled and destroyed — all dead','Polish cavalry: Still forming when the encirclement closed','Three dukes: Ordered their men home when they saw what happened','The army that could have won: Never engaged as one'],
+       addIntel:'TERMINAL: Military orders destroyed. Three dukes withdrew. Army dissolved without battle.',next:'rout_end'}}
+    ,
+      {text:'Send tribute to the Great Khan immediately — acknowledge Mongol suzerainty over Poland before anyone asks.',hint:'Volunteering submission before any demand is made tells the Mongols you have already given up and invites more demands',type:'hawk',cost:{pc:12},
+       outcome:{head:'Unsolicited Tribute — The Khan Interpreted It as Invitation to Annex',body:'The tribute wagons arrived at Batu Khan\'s court before anyone had asked for them. His advisors translated this correctly: a ruler who submits without being asked believes himself incapable of resistance. Batu Khan sent a garrison of five hundred soldiers to Kraków. Then a thousand. Then administrators. Poland was absorbed without a formal conquest because it had told its conquerors that no conquest was necessary.',deltas:{ap:-20,ec:-20,st:-25,al:-20,tension:-5,allies:{Mongols:+15,Church:-20,HRE:-15}},ripples:['Batu Khan sent 500 soldiers to Kraków — then 1,000 — then administrators','Unsolicited tribute: Interpreted as inability to resist','Poland: Absorbed without formal conquest','The message that was meant to buy peace: Announced that no peace was necessary — only submission'],
+       addIntel:'TERMINAL: Mongol administrators in Kraków. Poland absorbed. No conquest necessary.',next:'rout_end'}}
+    ,
+      {text:'Ride into the Mongol camp under a white banner — negotiate peace personally with Batu Khan.',hint:'Mongol camps are not embassies — no safe conduct was offered and none was received',cost:{pc:10},
+       outcome:{head:'No Safe Conduct — The Duke Was Held',body:'The white banner was visible from a mile away. The Mongol outriders escorted the Duke into the camp without incident. They also did not let him leave. Batu Khan had not requested a meeting. He had no framework for what to do with a self-delivered prisoner. He held him. Poland, without its duke, began to dissolve in the way that all leaderless things dissolve — slowly, then all at once.',deltas:{ap:-28,ec:-20,st:-28,al:-22,tension:+15},ripples:['Duke held in Mongol camp — no safe conduct had been arranged','Poland: Without its ruler, began dissolving','Batu Khan: Had not requested the meeting — had no protocol for release','The gesture that was meant to show courage: Ended the duchy'],
+       addIntel:'TERMINAL: Duke held in Mongol camp. Poland leaderless. Duchy dissolving.',next:'rout_end'}}
+    ,
+      {text:'Set fire to the hill and the surrounding forest — deny the Mongols the ground entirely.',hint:'The wind is from the east. The fire will turn.',cost:{pc:6},
+       outcome:{head:'The Wind Turned — Your Own Army Burned',body:'The fire was lit at dawn and spread exactly as intended — until the wind shifted at mid-morning. What had been burning east began burning west. The smoke hit the Polish lines before the Mongols did. Men who could not see could not fight. Men who could not breathe could not run. The Mongol cavalry came through the smoke like shadows and found an army already dying.',deltas:{ap:-18,mi:-28,st:-18,tension:+25},ripples:['Wind shifted — fire burned through Polish lines','Smoke blinded the army before the cavalry arrived','Mongols came through the smoke and found the army already dying','Chmielnik: Not held — lost to a fire meant to hold it'],
+       addIntel:'TERMINAL: Army destroyed by own fire. Chmielnik lost. Road to Kraków open.',next:'rout_end'}}
+    ,
+      {text:'Announce that any duke who does not march to Legnica will be stripped of his lands and titles.',hint:'Threatening nobles with dispossession during an invasion turns allies into enemies faster than the Mongols can',cost:{pc:9},
+       outcome:{head:'Ultimatum Issued — Three Dukes Sided With Their Own Survival',body:'The proclamation was read aloud in the council chamber. Duke Konrad of Mazovia stood up, said three words, and left. Two lesser dukes followed him. They did not go home. They rode east to the Mongol camp. Subutai received them warmly. They brought maps. They brought troop strengths. They brought the locations of every food store between the Vistula and the Oder. The ultimatum that was meant to unify Poland gave Subutai everything he needed.',deltas:{ap:-20,mi:-10,st:-22,tension:+28,al:-22,allies:{Silesia:-15,Church:-10}},ripples:['Three dukes rode to the Mongol camp','They brought maps, troop strengths, and every food store location','Subutai: Received them warmly — had everything he needed by nightfall','The ultimatum gave Poland\'s secrets to its enemies'],
+       addIntel:'TERMINAL: Three dukes defected to Mongols with maps and intelligence. All positions known.',next:'rout_end'}}
+    ,
+      {text:'Hold back — wait for the Mongols to charge uphill and meet them from a defensive ridge.',hint:'Sound strategy — but requires holding every knight in check, and knights were not bred for patience',cost:{pc:7},
+       outcome:{head:'The Teutonic Knights Charged Anyway — Against Orders',body:'The Teutonic Knights had not ridden from Prussia to stand on a hill. When the Mongol vanguard appeared and fired a volley of arrows, their Grand Master ordered the charge against your explicit command. The knights who followed him — five thousand men — rode into the feigned retreat. Your defensive plan collapsed the moment someone else decided it was not for them.',deltas:{ap:-12,mi:-22,st:-16,tension:+25,al:-14,allies:{Teutonic:-20}},ripples:['Teutonic Knights charged against explicit orders','Five thousand men followed them into the feigned retreat','Your defensive formation: Collapsed with the unauthorized charge','Legnica: Lost because the best soldiers in Europe could not follow a single order'],
+       addIntel:'TERMINAL: Unauthorized charge. Five thousand knights destroyed in feigned retreat. Defensive formation collapsed.',next:'rout_end'}}
+    ,
+      {text:'March into Hungary to help King Béla — commit everything to the relief of an already-broken army.',hint:'Hungary has already lost its army. Marching into a Mongol-controlled plain with a weakened force is not relief — it is suicide.',cost:{pc:11},
+       outcome:{head:'Into the Mongol Plain — Béla Was Already Gone',body:'The relief column crossed the Carpathians in winter. It was slow and cold and the horses suffered. When the column emerged into the Hungarian plain, there was no Hungarian army to find — only Mongol outriders, who had been watching the passes for exactly this. The column that left Poland to save Hungary never returned. Poland had sent its last force into the open ground where Mongol cavalry was supreme.',deltas:{ap:-18,mi:-25,st:-20,tension:+25,al:-8},ripples:['Relief column entered Hungarian plain — found Mongol outriders instead of Béla','Béla: Already in Dalmatia — the column was riding toward absence','Mongol outriders had been watching the passes for exactly this','The last force of Poland: Lost in Hungarian snow'],
+       addIntel:'TERMINAL: Relief column destroyed in Hungarian plain. Béla already gone. Poland has no army.',next:'rout_end'}}
+    ,
+      {text:'Set fire to the hill and the surrounding forest — deny the Mongols the ground entirely.',hint:'The wind is from the east. The fire will turn.',cost:{pc:6},
+       outcome:{head:'The Wind Turned — Your Own Army Burned',body:'The fire spread exactly as intended — until the wind shifted at mid-morning. What had been burning east began burning west. The smoke hit the Polish lines before the Mongols did. Men who could not see could not fight. The Mongol cavalry came through the smoke and found an army already dying.',deltas:{ap:-18,mi:-28,st:-18,tension:+25},ripples:['Wind shifted — fire burned through Polish lines','Smoke blinded the army before the cavalry arrived','Chmielnik: Not held — lost to a fire meant to hold it'],
+       addIntel:'TERMINAL: Army destroyed by own fire. Road to Kraków open.',next:'rout_end'}}
+    ,
+      {text:'Threaten that any duke who does not march will be stripped of his lands and titles.',hint:'Threatening nobles with dispossession during an invasion turns potential allies into enemies',cost:{pc:9},
+       outcome:{head:'Ultimatum Issued — Three Dukes Rode to the Mongol Camp',body:'Duke Konrad stood up, said three words, and left. Two lesser dukes followed. They rode east to the Mongol camp. Subutai received them warmly. They brought maps, troop strengths, and the locations of every food store between the Vistula and the Oder. The ultimatum that was meant to unify Poland gave Subutai everything he needed.',deltas:{ap:-20,mi:-10,st:-22,tension:+28,al:-22,allies:{Silesia:-15,Church:-10}},ripples:['Three dukes rode to the Mongol camp with maps and intelligence','Subutai received them warmly — had everything by nightfall','The ultimatum gave Poland\'s secrets to its enemies'],
+       addIntel:'TERMINAL: Three dukes defected with maps and intelligence. All positions known.',next:'rout_end'}}
+    ,
+      {text:'Hold back — wait for the Mongols to charge uphill and meet them from a defensive ridge.',hint:'Sound strategy — but requires holding every knight in check, and knights were not bred for patience',cost:{pc:7},
+       outcome:{head:'The Teutonic Knights Charged Anyway — Against Orders',body:'The Teutonic Knights had not ridden from Prussia to stand on a hill. When the Mongol vanguard fired arrows, their Grand Master ordered the charge against your explicit command. Five thousand men rode into the feigned retreat. Your defensive plan collapsed the moment someone else decided it was not for them.',deltas:{ap:-12,mi:-22,st:-16,tension:+25,al:-14,allies:{Teutonic:-20}},ripples:['Teutonic Knights charged against explicit orders','Five thousand men into the feigned retreat','Defensive formation: Collapsed with the unauthorized charge','Legnica: Lost because the best soldiers in Europe could not follow one order'],
+       addIntel:'TERMINAL: Unauthorized charge. Five thousand knights destroyed. Defensive formation collapsed.',next:'rout_end'}}
+    ,
+      {text:'March into Hungary to relieve King Béla — commit everything to the relief of an already-broken army.',hint:'Hungary has already lost its army. Marching into a Mongol-controlled plain with a weakened force is not relief — it is sacrifice.',cost:{pc:11},
+       outcome:{head:'Into the Mongol Plain — Béla Was Already Gone',body:'The relief column crossed the Carpathians in winter. When it emerged into the Hungarian plain, there were no Hungarians — only Mongol outriders who had been watching the passes for exactly this. The column that left Poland to save Hungary never returned.',deltas:{ap:-18,mi:-25,st:-20,tension:+25,al:-8},ripples:['Relief column entered Hungarian plain — found Mongol outriders','Béla: Already in Dalmatia — the column was riding toward absence','The last force of Poland: Destroyed in Hungarian snow'],
+       addIntel:'TERMINAL: Relief column destroyed. Poland has no army.',next:'rout_end'}}
+    ]
+  },
+  sc_deploy:{tag:'MILITARY COUNCIL · STAGE 2',tagCls:'tag-mil',title:'Where Do You Stand? The Question Every General Asks Once',
+   body:'The army is assembled or the allies are coming. Now the question your Voivode and every captain has been waiting for: where do you fight? Subutai has faced every army in Asia and beaten them all. His tactic is invariable — draw the enemy out, encircle them, destroy them. You must choose your ground before he chooses it for you.',
+   advisors:[{who:'voivode',say:'Fight at the river crossings. Make them pay for every ford. We cannot match them in the open.',stance:'hawk'},{who:'spy',say:'Subutai knows your position. He will feign retreat to draw you forward — do not take the bait.',stance:'intel'},{who:'herald',say:'The people need to see you lead. A duke who hides behind walls is no duke at all.',stance:'dove'}],
+   consequences:[],
+   choices:[
+    {text:'Fight at the Vistula crossings — hold every ford and bridge with cavalry.',hint:'Defensible ground — costs them to cross',type:'hawk',cost:{pc:8},
+     roll:{odds:0.65,failHead:'The Mongols Found an Unknown Ford',failBody:'Subutai\'s scouts found a shallow ford three miles north that your maps did not show. While your cavalry held the main crossings, a tumen crossed unopposed and appeared behind your right flank. The battle became a rout before it had properly begun.',failDeltas:{ap:-10,mi:-20,st:-12,tension:+22},failRipples:['Unknown ford crossed — Mongol tumen behind Polish right flank','Battle collapsed into rout','Casualties: 2,400 dead'],failNext:'sc_crisis'},
+     outcome:{head:'The Vistula Line Holds — For Now',body:'Your cavalry held the main crossings for four days. Three Mongol assaults repelled. On the fifth day a tumen appeared from the north — they had found a ford. But your scouts had prepared a second position and the army withdrew in good order.',deltas:{ap:+8,mi:-8,st:+7,tension:+5,al:+6,pc:+8},ripples:['Vistula line held 4 days — significant Mongol delay','Withdrawal: Orderly — army intact','Kraków: Has more time to prepare'],addIntel:'MILITARY: Vistula line held 4 days. Orderly withdrawal. Kraków has more time.',addLog:'Vistula line held. Orderly withdrawal.',next:'resolve'}},
+    {text:'Disperse the army into the forests — conduct raids and avoid pitched battle.',hint:'Subutai cannot destroy what he cannot find',type:'intel',cost:{pc:10},
+     outcome:{head:'Forest War — The Horde Rides Into Shadow',body:'The army dissolved into a hundred raiding parties among the dark forests. Mongol foraging parties were ambushed nightly. Supply routes harassed. Subutai, accustomed to open-field destruction, could not bring his tactics to bear in the dense winter forest. He bypassed Kraków and continued west.',deltas:{ap:+4,mi:-5,st:+5,tension:-15,al:+5,pc:+6},ripples:['Forest raiding parties harassing Mongol supply and foraging','Subutai: Chose to bypass rather than waste time','Kraków: Unbesieged — population safe'],addIntel:'TACTICAL: Forest war effective. Subutai bypassed Kraków.',addLog:'Forest war. Subutai bypassed Kraków.',next:'resolve'}},
+    {text:'Negotiate. Send an envoy to Batu Khan\'s camp with tribute.',hint:'No Christian prince has negotiated successfully — but none tried with enough silver',type:'dove',cost:{pc:12,label:'HIGH FAVOUR'},
+     roll:{odds:0.35,failHead:'Envoy Executed — Message Sent to Christendom',failBody:'The envoys were killed and their heads sent back on poles. Batu Khan\'s reply: Submit or be destroyed. We do not speak with those who are not yet kneeling. The insult unified the nobles and the Church against any further negotiation.',failDeltas:{ap:-5,st:-8,tension:+18,al:-5,allies:{Church:+8}},failRipples:['Envoys executed — heads returned on poles','Church: Rallying nobles to fight','Nobles: Ashamed of the attempt but now ready to fight'],failNext:'sc_crisis'},
+     outcome:{head:'Batu Khan Accepted Tribute — Temporary Reprieve',body:'Three mule-loads of silver and two cartloads of fine cloth. Batu Khan, to everyone\'s astonishment, accepted and granted a thirty-day pause. The Church called it shameful. The people called it alive.',deltas:{ap:-14,ec:-22,st:-10,al:-14,tension:-20,pc:+2,allies:{Mongols:+14,Church:-20}},ripples:['Batu Khan: 30-day halt accepted','Church: Called it shameful — Bishop Prandota publicly objected','Thirty days: Enough to receive Hungarian reinforcements'],addIntel:'DIPLOMATIC: 30-day halt purchased with tribute. Church furious.',addLog:'Tribute paid. 30-day halt. Church furious.',next:'resolve'}},
+   ,
+      {text:'March the full army east to meet the Mongols in open battle before they reach the Vistula.',hint:'Open field against Subutai — every army that tried this is now archaeology',type:'hawk',cost:{pc:10},
+       outcome:{head:'The Army Destroyed in Open Field — Subutai Moved Exactly as Expected',body:'The advance was orderly. The engagement was not. The Mongol vanguard feigned retreat on contact. Your knights pursued at full gallop, exactly as . The flanking tumens closed at the gallop. The encirclement was complete before the sun had moved a hand\'s width.',deltas:{ap:-20,mi:-30,st:-20,tension:+30},ripples:['Army destroyed in open field — encircled and annihilated','Subutai: Noted Poland had been easier than expected','Kraków: Now undefended','The soldiers died as soldiers — doing what soldiers had always done against an enemy that was not like any other'],
+       addIntel:'TERMINAL: Army destroyed. Kraków undefended. Subutai advancing unopposed.',next:'rout_end'}}
+    ]
+  },
+  sc_crisis:{tag:'CRISIS · STAGE 2',tagCls:'tag-horde',title:'The Vanguard Is Here — Mongol Horsemen in the Eastern Suburbs',
+   body:'It happened faster than your scouts said it could. Mongol light cavalry are in the eastern suburbs of Kraków. They are not attacking — they are watching. Their archers sit on their horses at the end of every street and stare. The people who did not evacuate are hiding behind their shutters. Your Voivode says you have perhaps two hours before the main force arrives.',
+   advisors:[{who:'voivode',say:'We fight now, here, at the gates. Every hour we wait is another hour for the main tumen to arrive.',stance:'hawk'},{who:'spy',say:'Those riders are bait. Subutai wants us to charge the vanguard. The main force is behind the hill to the east.',stance:'intel'},{who:'bishop',say:'Burn the suburbs. Deny them the shelter and the food stored there.',stance:'faith'}],
+   consequences:[],
+   choices:[
+    {text:'Sally forth — attack the vanguard before the main force arrives.',hint:'Aggressive — may scatter the vanguard, may be a trap',type:'hawk',cost:{pc:8},
+     roll:{odds:0.45,failHead:'It Was a Trap — Encircled in the Suburbs',failBody:'The vanguard retreated as designed, drawing your knights into the narrow streets. Two flanking tumens closed from north and south. The flower of Polish knighthood was destroyed in the eastern suburbs of its own capital.',failDeltas:{ap:-14,mi:-28,st:-18,tension:+28},failRipples:['Encircled in eastern suburbs — catastrophic loss','2,600 knights killed in two hours','Kraków: Now undefended'],failNext:'rout_end'},
+     outcome:{head:'Vanguard Scattered — Main Force Slowed',body:'The sally surprised the vanguard, which retreated north. Your knights pursued for two miles before the trumpets recalled them. The main tumen, arriving to find their vanguard scattered, halted for a council of war. You had bought six more hours.',deltas:{ap:+6,mi:-5,st:+6,tension:+5,pc:+6},ripples:['Vanguard scattered — pulled back north','Main tumen halted for council','Six hours gained — enough to complete the evacuation'],addIntel:'MILITARY: Vanguard scattered. Main tumen halted. Six hours gained.',addLog:'Sally succeeded. Vanguard scattered. Six hours gained.',next:'resolve'}},
+    {text:'Burn the eastern suburbs and fall back behind the main walls.',hint:'Scorched earth — denies them shelter and food',cost:{pc:6},
+     outcome:{head:'Suburbs Burn — Kraków Holds',body:'The eastern quarter burned for six hours. Everything the Mongols might have used — stabling, food stores, timber for siege engines — was destroyed. The main tumen arrived to find a ring of ash and a closed gate. After three days probing the walls, they went around.',deltas:{ap:-5,ec:-8,mi:+4,st:+4,tension:-8,pc:+6},ripples:['Eastern suburbs destroyed — Mongols found nothing useful','Main tumen: Probed walls 3 days then bypassed','Kraków: Held — at the cost of a quarter of the city'],addIntel:'MILITARY: Mongols bypassed Kraków. Eastern quarter destroyed but city held.',addLog:'Eastern suburbs burned. Mongols bypassed. Kraków held.',next:'resolve'}},
+    {text:'Open the gate and submit — save the lives of everyone inside the walls.',hint:'Surrender — Mongols sometimes spare those who submit immediately',type:'dove',cost:{pc:20,label:'SUBMISSION'},
+     roll:{odds:0.50,failHead:'Submission Rejected — Kraków Burned Anyway',failBody:'The Mongol commander received the submission and sent a message to Batu Khan. The reply came at midnight: burn it. Submission had preserved nothing.',failDeltas:{ap:-20,ec:-20,st:-25,tension:+30,al:-15},failRipples:['Submission rejected — city burned anyway','Population: Partially enslaved, partially killed','Bolesław: Fled — never returned to Kraków'],failNext:'rout_end'},
+     outcome:{head:'Submission Accepted — Kraków Spared',body:'The garrison laid down their arms. The Mongol commander entered with two hundred riders and declared it a possession of the Great Khan. He left a garrison of fifty men and continued west. The city was intact. The people were humiliated and alive.',deltas:{ap:-20,mi:-18,st:-14,al:-18,tension:-18,pc:-20,allies:{Mongols:+15,Church:-22}},ripples:['Kraków: Spared — under Mongol garrison','50 Mongol soldiers left as garrison','Population: Alive but vassalized'],addIntel:'SUBMISSION: Kraków under garrison. Population alive.',addLog:'Kraków submitted. Spared. Garrison installed.',next:'resolve'}},
+   ]
+  },
+  resolve:{tag:'RESOLVED'},rout_end:{tag:'ROUT'}
+}}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 2: SANDOMIERZ — The First City Burns, January 1241
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+,// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE: SANDOMIERZ — THE FIRST CITY BURNS
+// January 1241
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+,{id:'SANDOMIERZ',name:'The Sacking of Sandomierz',nodes:{
+  start:{tag:'JANUARY 1241',tagCls:'tag-horde',
+   title:'Sandomierz Has Fallen — 10,000 Dead in Three Days',
+   body:'The Mongol vanguard crossed the frozen Vistula and destroyed Sandomierz in three days. The Benedictine monastery at Holy Cross was burned with the monks inside. Fifteen thousand people are dead or enslaved. Hundreds of survivors are now arriving at Kraków\'s gates, frostbitten, starving, and carrying news of what the horde does to cities that resist. Your Voivode stands beside you watching the columns arrive. "They will tell stories," he says. "The question is which stories."',
+   advisors:[
+    {who:'voivode',say:'Open the gates. Feed them. Every survivor who reaches us is a soldier who knows what we face and what we fight for.',stance:'hawk'},
+    {who:'bishop',say:'The monastery of Holy Cross is burned. Every monk is dead. This is not war — it is the end of civilization. Every Christian ruler in Europe must know.',stance:'faith'},
+    {who:'spy',say:'The survivors know the Mongol routes, their numbers, their commanders. Before we feed them, we interrogate them. Information is worth more than bread right now.',stance:'intel'},
+    {who:'herald',say:'The stories these survivors tell will either break the army\'s will or forge it. How we receive them matters as much as that we receive them.',stance:'dove'},
+   ],
+   consequences:[],
+   choices:[
+    {text:'Open the gates fully — absorb every survivor, feed them, recruit the fighting men.',hint:'Humanitarian — costs grain but builds the army with veterans',cost:{pc:6},
+     outcome:{head:'The Survivors of Sandomierz Become Soldiers',body:'Three thousand men who had survived the Mongol assault were fed, equipped, and incorporated into the Kraków garrison within two weeks. They were the best soldiers you had — not because of skill, but because they had no illusions left about what surrender meant. They would not run.',deltas:{ap:+10,mi:+14,ec:-8,st:+8,tension:+5,al:+6},
+     ripples:['3,000 Sandomierz veterans incorporated into Kraków garrison','Veterans: Will not retreat — they know what Mongol mercy looks like','Grain stores: Reduced by feeding the refugees','Stories of the massacre spreading through the city — recruiting rallied'],
+     addIntel:'MILITARY: 3,000 Sandomierz veterans now in garrison. Hardened — no illusions about surrender.',
+     addLog:'Survivors of Sandomierz absorbed. 3,000 veterans in garrison.',next:'san_response'}},
+    {text:'Interrogate every survivor before feeding them — extract everything they know about Mongol movements.',hint:'Intelligence first — but delays care to desperate people',type:'intel',cost:{pc:7},
+     outcome:{head:'Intelligence Haul — The Mongol Order of Battle Revealed',body:'Forty-eight hours of careful questioning produced the most detailed intelligence picture any Polish commander had of the Mongol army. Tumen commanders named. Route preferences identified. The pattern of the feigned retreat described in exact detail by men who had survived it. The information was worth more than an army.',deltas:{ap:-4,mi:+6,st:+4,iq:+28,tension:+8,pc:+8},
+     ripples:['Mongol order of battle: Fully mapped for first time','Feigned retreat: Documented in exact detail from survivors','Tumen commanders: Named and described','Survivors: Fed after 48 hours — resentment among some'],
+     addIntel:'INTELLIGENCE: Full Mongol order of battle from Sandomierz survivors. Feigned retreat documented.',
+     addLog:'Survivors interrogated. Full intelligence haul. Mongol tactics documented.',next:'san_response'}},
+    {text:'Send the survivors\' accounts to every court in Europe immediately — let the stories work.',hint:'Information warfare — shock the Christian world into action',cost:{pc:8},
+     outcome:{head:'The Stories of Sandomierz Reach Rome',body:'Detailed accounts of the massacre — monks burned alive, children enslaved, the city turned to ash — reached the papal court within three weeks. Pope Gregory IX used them in his crusade proclamation. Hungary\'s King Béla forwarded them to the Holy Roman Emperor. For the first time, Europe took the Mongol threat seriously.',deltas:{ap:+6,al:+16,tension:+8,pc:+6,allies:{Church:+14,HRE:+10,Hungary:+10,Silesia:+8}},
+     ripples:['Pope Gregory IX: Used the accounts in his crusade proclamation','Holy Roman Emperor: "Finally" taking the threat seriously','Hungary: King Béla forwarding intelligence to all European courts','Teutonic Knights: Mobilizing for crusade duty in Poland'],
+     addIntel:'DIPLOMATIC: Sandomierz accounts reaching European courts. Crusade mobilization accelerating.',
+     addLog:'Sandomierz accounts sent to Europe. Crusade mobilizing.',next:'san_response'}},
+    {text:'Use the survivors to show the citizens of Kraków exactly what is coming — let fear forge resolve.',hint:'Psychological — brutally honest about the stakes',cost:{pc:5},
+     outcome:{head:'The Citizens of Kraków Saw What Was Coming',body:'You ordered a public assembly in the market square. Survivors of Sandomierz told their stories without censorship. Women who had watched their children taken. Men who had watched the monastery burn. The crowd that dispersed was quieter than the one that assembled — but when the conscription rolls opened the next day, they were full by noon.',deltas:{ap:+4,mi:+10,st:-6,al:+4,tension:+12,pc:+6},
+     ripples:['Public assembly: Citizens heard unfiltered survivor accounts','Conscription rolls: Full by noon the next day — unusual','Morale: Complicated — not high, but resolved','Some citizens fled south — could not face what was described'],
+     addIntel:'MORALE: Public assembly created grim resolve. Conscription surge. Some fled.',
+     addLog:'Public assembly with survivors. Grim resolve. Conscription surge.',next:'san_response'}},
+    {text:'Close the gates — Kraków cannot feed refugees and garrison soldiers both.',hint:'Hard calculation — preserves supplies but abandons survivors',type:'hawk',cost:{pc:4},
+     outcome:{head:'Gates Closed — Survivors Turned Away',body:'The decision was announced from the walls. Those with weapons or specialist skills — smiths, carpenters, physicians — were admitted. The rest were directed south toward Hungary. It was defensible as military logic. It was devastating as a symbol. The Bishop of Kraków refused to speak to you for three days.',deltas:{ap:-12,mi:+4,st:-8,ec:+6,al:-6,tension:+8,allies:{Church:-14}},
+     ripples:['Survivors turned away — directed south toward Hungary','Bishop Prandota: Refused to speak to Duke for three days','Grain reserves: Preserved but at enormous political cost','City walls: Now associated with rejection rather than shelter'],
+     addIntel:'POLITICAL: Gate closure severely damaged Duke\'s reputation with Church and people.',
+     addLog:'Gates closed to most survivors. Bishop furious. Grain preserved.',next:'rout_end'}},
+   ]
+  },
+  san_response:{tag:'FEBRUARY 1241 · STAGE 2',tagCls:'tag-mil',
+   title:'The Horde Is Moving Again — Two Columns, Two Threats',
+   body:'Your scouts confirm what the survivors described: the Mongol force has split into two columns. The northern column under Baidar moves toward Silesia — toward Duke Henryk and the Teutonic Knights. The southern column, the larger one under Kadan, moves toward Hungary through the Carpathian passes. A smaller vanguard moves directly west — toward Chmielnik, and then toward Kraków. You are in the middle of a three-pronged advance. You cannot stop all three. Which threat do you address?',
+   advisors:[
+    {who:'voivode',say:'The Kraków vanguard is the threat to us directly. Everything else is someone else\'s problem until our own city is safe.',stance:'hawk'},
+    {who:'spy',say:'The split is intentional — Subutai wants us to react to each column separately so he can destroy each in turn. We must pick one and hit it before it is reinforced.',stance:'intel'},
+    {who:'herald',say:'Ride north to Henryk. If Silesia falls and the Teutonic Knights are destroyed, there is nothing between the northern column and Germany — and nothing between us and encirclement.',stance:'dove'},
+    {who:'bishop',say:'Hungary must be warned. If the southern column takes Hungary, the Mongols own the Danube plain and Poland cannot be relieved from any direction.',stance:'faith'},
+   ],
+   consequences:[{text:'Mongol advance: Three columns — Kraków, Silesia, Hungary'}],
+   choices:[
+    {text:'Concentrate forces to defend Kraków — the capital above all else.',hint:'Reasonable — but yields the field to the other columns',type:'hawk',cost:{pc:7},
+     outcome:{head:'Kraków Defended — Other Columns Advance Unopposed',body:'The decision to concentrate on Kraków was militarily sound. The garrison was at full strength when the Kraków vanguard arrived. The city held. But the northern column advanced through Silesia without opposition until it met Henryk at Legnica with full strength. And the southern column entered Hungary.',deltas:{ap:+4,mi:+8,st:+6,tension:+8,al:-4,pc:+6},
+     ripples:['Kraków: Fully defended — garrison at maximum strength','Silesian column: Advanced unopposed — full strength at Legnica','Hungarian column: Entered the Carpathian passes unopposed','Strategic picture: Bad — Poland defended one city, lost the region'],
+     addIntel:'STRATEGIC: Kraków defended but strategic picture deteriorating. Columns advancing.',
+     addLog:'Kraków concentrated defense. Other columns advancing unopposed.',next:'resolve'}},
+    {text:'Ride north to join Duke Henryk — combine forces before Legnica.',hint:'Risk Kraków to strengthen the decisive battle',type:'hawk',cost:{pc:9},
+     outcome:{head:'Combined Force at Legnica — Stronger But Kraków Exposed',body:'Your knights rode north. The combined Polish-Silesian force at Legnica was significantly stronger than it would have been without you. Kraków was left with a reduced garrison. The Kraków vanguard arrived to find a city less defended than it looked — and probed harder than Subutai had planned.',deltas:{ap:-5,mi:+12,al:+12,tension:+10,pc:+7,allies:{Silesia:+14,Teutonic:+8}},
+     ripples:['Combined force at Legnica: Significantly stronger','Kraków: Reduced garrison — vanguard probing harder','Your presence at Legnica: Gave Henryk more options','Kraków: Still holding — but the probing assault cost five hundred defenders'],
+     addIntel:'MILITARY: Combined Legnica force. Kraków holding under pressure. Both battles active.',
+     addLog:'Rode north to Henryk. Combined force at Legnica. Kraków under pressure.',next:'resolve'}},
+    {text:'Send urgent warning to Hungary — King Béla must be told what is coming through the Carpathians.',hint:'Saves Hungary — but you provide no soldiers, only information',type:'dove',cost:{pc:6},
+     outcome:{head:'Béla Warned — But Could Not Prepare in Time',body:'The riders reached King Béla twelve days before the Mongol column emerged from the Carpathian passes. It was not enough time to assemble the Hungarian army in a prepared position. But it was enough time to evacuate the royal treasury and the most vulnerable population. When Mohi came, Béla survived — because your riders had told him where not to stand.',deltas:{ap:+5,al:+14,tension:+5,pc:+7,allies:{Hungary:+18,Church:+6}},
+     ripples:['Béla warned 12 days before the Carpathian column emerged','Not enough time to prepare the army — but enough to evacuate wealth','Béla survived Mohi: Because your warning told him where not to stand','Hungary: Grateful — will remember who sent the riders'],
+     addIntel:'DIPLOMATIC: Béla warned. Hungarian treasury evacuated. Béla survived Mohi.',
+     addLog:'Béla warned. Hungarian treasury evacuated. Béla survived Mohi.',
+     next:'resolve'}},
+   ,
+      {text:'Attack the Mongol column that sacked Sandomierz immediately — pursue and punish them.',hint:'The army that burned Sandomierz is already behind fortified positions — this is not a pursuit, it is an ambush',type:'hawk',cost:{pc:9},
+       outcome:{head:'Pursuit Walked Into the Trap Subutai Had Prepared',body:'The column that burned Sandomierz had left a trail of bodies and smoke precisely to draw exactly this response. Three thousand Polish knights rode east in fury and rode into a prepared killing ground. The Mongols had been waiting for twelve hours. Not one knight in five returned.',deltas:{ap:-18,mi:-28,st:-15,tension:+25},ripples:['2,400 knights killed in prepared ambush — three in five did not return','Subutai had prepared the trap before the first building burned','The trail of bodies: A lure','Poland lost its best cavalry on the second day of the invasion'],
+       addIntel:'TERMINAL: 2,400 knights killed in ambush. Cavalry destroyed. Kraków now undefendable.',next:'rout_end'}}
+    ]
+  },
+  resolve:{tag:'RESOLVED'},rout_end:{tag:'ROUT'}
+}}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 3: THE WINTER MARCH — Supply Crisis, February 1241
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+,// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE: SUPPLY — THE WINTER MARCH
+// March 1241 — Between Chmielnik and Kraków
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+,{id:'SUPPLY',name:'The Winter March',nodes:{
+  start:{tag:'MARCH 1241',tagCls:'tag-winter',
+   title:'The Army Is Starving — Forty Miles From Kraków in the Snow',
+   body:'The retreat from Chmielnik has become a march through hell. It is March — the coldest March in twenty years. The supply wagons were burned to prevent Mongol capture. The men have been marching on hard bread and snow water for six days. Forty miles from Kraków, with the Mongol vanguard perhaps twelve miles behind, a third of your infantry has disappeared into the forests. Your Voivode tells you plainly: if the men do not eat tomorrow, they will not march the day after.',
+   advisors:[
+    {who:'voivode',say:'Slaughter the warhorses. It is that or lose the army. Feed the men. We can get new horses — we cannot get new men.',stance:'hawk'},
+    {who:'treasurer',say:'The villages between here and Kraków have food stores for winter. Requisition them. Pay the farmers later — with a promissory note from the duchy.',stance:'econ'},
+    {who:'bishop',say:'Send riders ahead to Kraków. The Church has grain stores in every monastery between here and the city. They will open them if I ask.',stance:'faith'},
+    {who:'spy',say:'The Mongol vanguard is twelve miles back — but their horses are exhausted too. If we can reach the first ford by nightfall we gain another day.',stance:'intel'},
+   ],
+   consequences:[{text:'Army: Retreating — starving, desertion rising'},{text:'Mongol vanguard: 12 miles behind — also exhausted'}],
+   choices:[
+    {text:'Slaughter the warhorses — feed the infantry, save the army.',hint:'Brutal — destroys cavalry capability but keeps infantry alive',type:'hawk',cost:{pc:8},
+     outcome:{head:'The Horses Were Eaten — The Army Reached Kraków',body:'Forty warhorses were slaughtered in the snow. The knights watched in silence as their animals were butchered. Some wept. All of them ate. The infantry, fed for the first time in six days, marched through the night and reached Kraków the following afternoon. The army was intact — and without cavalry.',deltas:{ap:+2,mi:-16,st:+6,ec:+2,tension:-5,pc:+4},
+     ripples:['40 warhorses slaughtered — infantry fed','Knights: Silent and shamed but fed and marching','Army reached Kraków the next day — intact but cavalry-less','Knights will remember what was sacrificed to keep the infantry alive'],
+     addIntel:'MILITARY: Army reached Kraków intact. Cavalry severely reduced. Infantry preserved.',
+     addLog:'Warhorses slaughtered. Army fed. Reached Kraków intact.',next:'sup_arrival'}},
+    {text:'Requisition the village food stores — pay the farmers with duchy promissory notes.',hint:'Legal but unpopular — farmers may resist, Mongols will burn the empty villages anyway',cost:{pc:6},
+     roll:{odds:0.65,failHead:'Farmers Resisted — Riot in Two Villages',failBody:'Three villages had already hidden their stores when your requisition riders arrived. The soldiers, desperate and cold, searched by force. Two villages resisted. In the chaos, a granary caught fire. The army got less food than expected and the duchy got a reputation for robbing its own people.',failDeltas:{ap:-8,ec:-4,st:-10,tension:+8},failRipples:['Granary fire: Lost half the expected grain','Riot in two villages: Three men killed — soldiers and farmers both','Duke\'s reputation: Damaged in his own duchy','Army: Fed but less than needed — still weakened'],failNext:'rout_end'},
+     outcome:{head:'Requisition Successful — Villages Understood',body:'The promissory notes were signed and witnessed. Most farmers understood — better to give grain to the Polish army than have it taken by the Mongols tomorrow. The army was fed. The promissory notes would be honored from the spring taxes. The villages kept their livestock.',deltas:{ap:+3,mi:+4,ec:-6,st:+4,tension:-4,pc:+6},
+     ripples:['Requisition: Successful in most villages — promissory notes accepted','Farmers: Understood the alternative — Mongol looting','Army: Fed and moving — reached Kraków in good order','Promissory notes: Will cost the treasury in spring — but spring exists'],
+     addIntel:'SUPPLY: Requisition worked. Army fed. Promissory notes accepted.',
+     addLog:'Requisition successful. Army fed. Promissory notes issued.',next:'sup_arrival'}},
+    {text:'Send Bishop Prandota ahead to open the monastery grain stores.',hint:'Church reserves — legitimate and plentiful if Prandota agrees',cost:{pc:9,label:'CHURCH FAVOUR'},
+     outcome:{head:'The Monasteries Fed the Army of Poland',body:'Bishop Prandota rode ahead on the fastest horse available. By the time the army reached the first monastery, the gates were open and the monks were carrying bread. Every monastery between Chmielnik and Kraków opened its stores. The army arrived at Kraków better fed than it had left.',deltas:{ap:+8,mi:+6,ec:0,st:+7,tension:-6,pc:-10,allies:{Church:+14}},
+     ripples:['Every monastery opened its grain stores to the army','Army arrived at Kraków better fed than when it left Chmielnik','Bishop Prandota: Hero of the march — people noticed','Church: Spent its reserves — will need to be replenished'],
+     addIntel:'CHURCH: Monastery chain fed the entire army. Bishop Prandota credited.',
+     addLog:'Monasteries opened. Army fed. Bishop Prandota credited.',next:'sup_arrival'}},
+    {text:'Push through without stopping — reach Kraków on willpower before the vanguard can cut you off.',hint:'Forced march — some men will die of exhaustion but the army stays together',type:'hawk',cost:{pc:7},
+     roll:{odds:0.60,failHead:'The Rear Guard Collapsed — Vanguard Cut Off 800 Men',failBody:'The rear of the column could not maintain the pace. By midnight on the second day, 800 men had fallen behind or collapsed in the snow. The Mongol vanguard swept through them at dawn. The 800 men did not reach Kraków.',failDeltas:{ap:-8,mi:-14,st:-10,tension:+16},failRipples:['800 men: Fallen behind — destroyed by vanguard at dawn','Survivors who reached Kraków: Told what happened to the rear','Morale: Severely damaged by the loss','Army: Reduced and shaken'],failNext:'sup_arrival'},
+     outcome:{head:'Forced March — The Army Made It By Sheer Will',body:'Two days of continuous marching in the snow. Men sleeping on their feet. Twelve men died of cold — not enemy action, just the winter and exhaustion. But the army stayed together. When the gates of Kraków opened the vanguard was still four miles behind. The men who entered the city could not speak from exhaustion. They were all present.',deltas:{ap:+4,mi:-4,st:+5,tension:-10,pc:+6},
+     ripples:['Forced march: Two days without real rest','12 men died of cold — not enemy action','Army: Arrived intact four miles ahead of vanguard','Gates closed before vanguard arrived — city secured'],
+     addIntel:'MILITARY: Forced march succeeded. Army intact at Kraków. Vanguard 4 miles behind.',
+     addLog:'Forced march. Army arrived intact. 12 dead from cold.',next:'sup_arrival'}},
+   ]
+  },
+  sup_arrival:{tag:'ARRIVAL · STAGE 2',tagCls:'tag-mil',
+   title:'The Army Arrives at Kraków — What Condition Is It In?',
+   body:'The army has reached Kraków. The men are alive — or most of them. But the retreat has taken something from them: not just food and horses and sleep, but the particular confidence that comes from never having run from anything. They have run. They know what it looked like and felt like. Now they are inside stone walls and the question is whether stone walls can give back what the retreat took. The Mongol vanguard will arrive within two days.',
+   advisors:[
+    {who:'voivode',say:'Rest them first. One full day of sleep and hot food. A man who has slept is worth two men who have not.',stance:'hawk'},
+    {who:'bishop',say:'A procession. Tonight. Every man who marched walks through the city with the city watching. Not a defeat — a return.',stance:'faith'},
+    {who:'herald',say:'Let the citizens feed them. Open the market. Let the soldiers buy what they want. Treat them as men who have earned rest.',stance:'dove'},
+   ],
+   consequences:[],
+   choices:[
+    {text:'One full day of rest — mandatory sleep, hot food, medical attention.',hint:'Recovers the army properly before the siege',cost:{pc:5},
+     outcome:{head:'The Army Rested — And Rose Again',body:'Twenty-four hours. Every man slept. The city\'s women brought soup. Wounds were dressed. Broken equipment was repaired. When the soldiers emerged at dawn of the second day, they were not the men who had stumbled through the gates — they were the men who had survived what the stumbling men had gone through.',deltas:{ap:+6,mi:+10,st:+8,ec:-4,tension:-3,pc:+7},
+     ripples:['Full day of rest: Army recovered — morale restored','Wounds dressed — medical losses reduced','Citizens fed the soldiers: Strengthened civic bond','Army at full capability when the siege began'],
+     addIntel:'MILITARY: Army fully rested and recovered before siege began.',
+     addLog:'Full day rest. Army recovered. Ready for siege.',
+     legacy:{army_rested:true},next:'resolve'}},
+    {text:'Hold a torchlit procession through the city — the army returns in triumph, not defeat.',hint:'Transforms the narrative — costly in favour but powerful',cost:{pc:9,label:'CHURCH FAVOUR'},
+     outcome:{head:'The Procession of Return — Defeat Became Something Else',body:'The Bishop led the procession himself. Torches on every wall. The citizens lining every street. The soldiers, exhausted and dirty and limping, walked through it and came out the other side different. By the time the procession ended they were not retreating soldiers. They were the men who had brought the army home.',deltas:{ap:+12,mi:+8,st:+12,tension:-5,pc:-10,allies:{Church:+12}},
+     ripples:['Torchlit procession through every street of Kraków','Soldiers transformed: From retreating to returning','Bishop Prandota led: Church fully behind the army','Citizens: Moved — civic pride at maximum'],
+     addIntel:'MORALE: Procession transformed army\'s self-understanding. Ready to defend Kraków.',
+     addLog:'Torchlit procession. Army transformed. Morale at peak.',next:'resolve'}},
+    {text:'Set them to work immediately — the walls need repair, the moat needs work.',hint:'Military necessity — but exhausted men work poorly and resent it',type:'hawk',cost:{pc:4},
+     outcome:{head:'The Walls Were Reinforced — At the Cost of Army Morale',body:'The men who had marched for two days through snow were put to work within four hours of arrival. The walls improved significantly. The moat was deepened. And the soldiers who had trusted the Duke to feed them first were working on empty stomachs and no sleep. Three deserted before nightfall.',deltas:{ap:-5,mi:+6,st:+4,ec:-2,tension:-5,pc:+4},
+     ripples:['Walls significantly reinforced — moat deepened','3 soldiers deserted before nightfall — others considering it','Army morale: Damaged by immediate return to labor','Walls: Better; army: Worse'],
+     addIntel:'MILITARY: Walls improved. Army morale damaged. 3 desertions.',
+     addLog:'Set to work immediately. Walls improved. 3 desertions.',next:'resolve'}},
+   ,
+      {text:'Execute the deserters publicly — make an example before the whole army.',hint:'Executing soldiers who fled starvation will cause the rest to desert before the order is finished',cost:{pc:5},
+       outcome:{head:'Executions Ordered — The Army Dissolved Overnight',body:'The first six men were hanged at dusk. By midnight the word had spread to every campfire. By dawn a third of the army had slipped away into the darkness — not from cowardice, but from the certain knowledge that an army that hangs men for surviving is not worth dying for. The six executions cost more soldiers than the retreat had.',deltas:{ap:-20,mi:-25,st:-18,tension:+20},ripples:['One third of the army: Deserted overnight after the executions','Six hanged men: Cost more than the retreat','Those who remained: Doing so out of loyalty to one another, not to the Duke','Voivode Mikołaj: Resigned his commission before dawn'],
+       addIntel:'TERMINAL: One third of army deserted after executions. Kraków cannot be defended.',next:'rout_end'}}
+    ]
+  },
+  resolve:{tag:'RESOLVED'},rout_end:{tag:'ROUT'}
+}}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 4: CHMIELNIK — The Last Hill, March 18, 1241
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+,// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 3: CHMIELNIK
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{id:'CHMIEL',name:'The Battle of Chmielnik',nodes:{
+  start:{tag:'BATTLE EVE',tagCls:'tag-siege',title:'Chmielnik — The Mongols Must Not Pass This Hill',
+   body:'Eight thousand men are assembled at the hill of Chmielnik. It is the last defensible ground before the road to Kraków becomes flat and fast and undefendable. The Mongol tumen that destroyed Sandomierz is two days behind you. If you do not hold here, there is nothing between them and the city walls.',
+   advisors:[{who:'voivode',say:'Hold the hill. Cavalry on the flanks, crossbowmen on the crest. If they cannot climb in formation they cannot use their bows effectively.',stance:'hawk'},{who:'spy',say:'Send skirmishers to destroy the road south of Chmielnik. Make them slow down.',stance:'intel'},{who:'herald',say:'Eight thousand cannot hold against a full tumen indefinitely. What is the withdrawal plan?',stance:'dove'}],
+   consequences:[],
+   choices:[
+    {text:'Fortify the hilltop — stakes, ditches, crossbowmen in front.',hint:'Defense in depth — reduces the Mongol archery advantage',type:'hawk',cost:{pc:7},
+     roll:{odds:0.65,failHead:'Flanked — The Hill Was Not Enough',failBody:'The main tumen engaged the front while a flanking force found a path through a wood your scouts had not surveyed. By the time you knew they were there, they were behind you.',failDeltas:{ap:-10,mi:-22,st:-14,tension:+20},failRipples:['Flanked through unsurveyed wood','Encirclement: Partial — most of army escaped south','Casualties: 3,200 dead including both voivodes'],failNext:'ch_retreat'},
+     outcome:{head:'The Hill Held for Two Days',body:'Stakes and ditches slowed the Mongol assault. Their arrows could not arc over the crest effectively. Two days of battle cost the Mongol tumen three thousand casualties — unusual losses. When the line finally gave, most of the army escaped south.',deltas:{ap:+8,mi:-10,st:+8,tension:+8,al:+8,pc:+8},ripples:['Hill held 2 days — Mongol tumen: 3,000 casualties','Unusual losses: Subutai unhappy','Withdrawal: Orderly — most army escaped south'],addIntel:'MILITARY: Chmielnik held 2 days. Mongol tumen suffered unusual losses.',addLog:'Chmielnik held 2 days. Orderly withdrawal south.',next:'ch_retreat'}},
+    {text:'Fight the mobile battle — harass them on the road, then withdraw before encirclement.',hint:'Avoids destruction but yields the hill',type:'intel',cost:{pc:6},
+     outcome:{head:'Mobile Defense — Army Preserved',body:'Your cavalry harassed the Mongol advance for a full day, destroying foraging parties and burning the bridges. The main tumen arrived at Chmielnik two days late. The hill was empty. Your army had withdrawn intact.',deltas:{ap:+4,mi:-3,st:+5,tension:+3,al:+4,pc:+8},ripples:['Army preserved intact','Mongol advance: Delayed two days','Kraków: Six more days to prepare'],addIntel:'TACTICAL: Mobile defense successful. Army intact.',addLog:'Mobile defense. Army intact. Kraków has six more days.',next:'resolve'}},
+    {text:'Use Greek fire from the monastery at Chmielnik — the Mongols have never faced this.',hint:'Unprecedented weapon — but the wind can be treacherous',cost:{pc:8},
+     roll:{odds:0.60,failHead:'Greek Fire Turned Against the Wind',failBody:'The mixture was prepared carefully — but the winter wind shifted at the critical moment. The burning liquid blew back into the Polish ranks. The screaming of burning men broke the formation before the Mongols even charged.',failDeltas:{ap:-8,mi:-15,st:-12,tension:+14},failRipples:['Greek fire: Turned by wind shift — burned Polish ranks','Formation collapsed before main engagement','200 men burned alive by their own weapon'],failNext:'ch_retreat'},
+     outcome:{head:'Greek Fire — The Mongols Have Never Seen This',body:'The Greek fire caught the Mongol vanguard completely unprepared. Horses and men burned. The screaming animals broke the formation. The tumen retreated a full mile to regroup. In the chaos your army withdrew in complete order — something almost no army had achieved against Subutai.',deltas:{ap:+6,mi:-5,st:+7,tension:-10,al:+6,pc:+8},ripples:['Greek fire effective — Mongol vanguard destroyed by fire','Tumen retreated 1 mile to regroup','Complete orderly withdrawal achieved — Subutai surprised for the first time'],addIntel:'TACTICAL: Greek fire worked. Subutai surprised.',addLog:'Greek fire effective. Orderly withdrawal achieved.',next:'resolve'}},
+    {text:'Sacrifice the infantry to hold the hill — withdraw the cavalry south immediately.',hint:'Preserves the mounted force at terrible human cost',type:'hawk',cost:{pc:10},
+     roll:{odds:0.55,failHead:'Infantry Encircled — Massacred to a Man',failBody:'The foot soldiers held the hill for half a day before the Mongols encircled them. They refused surrender — they knew what Mongol mercy looked like. Four thousand men died on the hill of Chmielnik.',failDeltas:{ap:-15,mi:-18,st:-12,tension:+15},failRipples:['4,000 foot soldiers killed at Chmielnik','Cavalry: Escaped but demoralized by the abandonment','People: Furious when they learned the infantry was left to die'],failNext:'ch_retreat'},
+     outcome:{head:'Infantry Held Long Enough — Cavalry Preserved',body:'The foot soldiers held the hill for three hours — long enough. The cavalry made it to Kraków with twelve hundred knights and their horses intact. The infantry broke on the fourth assault and most were killed or captured.',deltas:{ap:-8,mi:+8,st:-8,tension:+10,al:-4,pc:+4},ripples:['Infantry: Mostly killed — sacrificed for cavalry','1,200 cavalry: Arrived at Kraków intact','People: Angry — four thousand men abandoned'],addIntel:'MILITARY: Cavalry preserved at cost of infantry.',addLog:'Infantry sacrificed. 1,200 cavalry preserved.',next:'ch_retreat'}},
+      {text:'Set fire to the hill and the surrounding forest — deny the Mongols the ground entirely.',hint:'The wind is from the east. The fire will turn.',cost:{pc:6},
+       outcome:{head:'The Wind Turned — Your Own Army Burned',body:'The fire spread exactly as intended — until the wind shifted at mid-morning. What had been burning east began burning west. The smoke hit the Polish lines before the Mongols did. Men who could not see could not fight. The Mongol cavalry came through the smoke and found an army already dying.',deltas:{ap:-18,mi:-28,st:-18,tension:+25},ripples:['Wind shifted — fire burned through Polish lines','Smoke blinded the army before the cavalry arrived','Chmielnik: Not held — lost to a fire meant to hold it'],
+       addIntel:'TERMINAL: Army destroyed by own fire. Road to Kraków open.',next:'rout_end'}},
+   ]
+  },
+  ch_retreat:{tag:'RETREAT · STAGE 2',tagCls:'tag-mil',title:'Retreat to Kraków — The Road Behind You Is Full of Smoke',
+   body:'The army is retreating south and west. Behind you, the sky is orange with burning villages. The Mongol vanguard is perhaps eight miles back — close enough to hear the horns. Some men are beginning to slip away into the forests. Your Voivode rides beside you in silence.',
+   advisors:[{who:'voivode',say:'Hold them together. Any man who runs now dooms the men beside him. Ride up and down the column yourself.',stance:'hawk'},{who:'spy',say:'Three river crossings between here and Kraków. Destroy the bridges — we gain twelve hours at each.',stance:'intel'}],
+   consequences:[{text:'Mongol vanguard: 8 miles behind — closing'}],
+   choices:[
+    {text:'Burn every bridge on the retreat route.',hint:'Buys time at the cost of your own return route',cost:{pc:6},
+     outcome:{head:'Bridges Burned — Thirty-Six Hours Gained',body:'Three bridges. Thirty-six hours total. It was the difference between arriving at Kraków in disorder and arriving as a functioning army. The men who burned the last bridge could hear Mongol horns on the far bank as they rode away.',deltas:{ap:+4,mi:+6,st:+5,tension:-12,al:+3,pc:+7},ripples:['Three bridges destroyed — 36 hours total','Army: Arrived at Kraków as functioning force','Kraków: Well-prepared when the army arrived'],addIntel:'TACTICAL: Bridges burned. 36 hours gained. Army intact.',addLog:'Bridges burned. 36 hours gained. Army intact.',next:'resolve'}},
+    {text:'Push the men hard — reach Kraków before the vanguard can cut you off.',hint:'Exhausting but outpaces the threat',type:'hawk',cost:{pc:7},
+     roll:{odds:0.65,failHead:'Men Collapsed — Vanguard Arrived Simultaneously',failBody:'The push broke the weaker men. Fifty soldiers fell from exhaustion. The army arrived ragged and barely coherent — and the Mongol vanguard arrived at the eastern gate four hours later. No time to prepare the defenses.',failDeltas:{ap:-6,mi:-12,st:-8,tension:+16},failRipples:['50 men fallen from exhaustion and cold','Army: Arrived ragged and barely coherent','Mongol vanguard: At the gate 4 hours later'],failNext:'resolve'},
+     outcome:{head:'Hard Ride — Arrived 18 Hours Ahead',body:'The men were exhausted and three horses died under their riders. But the army made Kraków eighteen hours before the vanguard appeared. The gates were closed. The walls were manned. The Mongols arrived to find a prepared defense and chose to bypass.',deltas:{ap:+3,mi:-4,st:+7,tension:-8,al:+4,pc:+6},ripples:['Army at Kraków 18 hours ahead of vanguard','Defenses properly manned when vanguard arrived','Mongols chose bypass rather than assault'],addIntel:'MILITARY: Hard ride successful. City prepared. Bypass chosen.',addLog:'Hard ride. At Kraków 18 hours ahead. Mongols bypassed.',next:'resolve'}},
+    {text:'Send wounded ahead with horses — healthy infantry forms a rearguard.',hint:'Saves the cavalry at the cost of the rearguard',cost:{pc:8},
+     outcome:{head:'Rearguard Bought Eight Hours',body:'The rearguard of seven hundred volunteers held a narrow valley for eight hours, dying to let the cavalry ride free. All seven hundred were killed or captured. The cavalry arrived at Kraków in good order. The sacrifice was reported in detail to every church in Poland.',deltas:{ap:-4,mi:+10,st:-6,al:+8,tension:-6,pc:+4,allies:{Church:+8}},ripples:['700 rearguard: All killed or captured','Cavalry: Arrived in good order','Church recording the names of the dead'],addIntel:'MILITARY: Rearguard sacrifice. 700 dead. Cavalry preserved.',addLog:'Rearguard sacrificed. 700 dead. Cavalry at Kraków.',next:'resolve'}},
+   ,
+      {text:'Turn and fight — a fighting withdrawal will cost the Mongols too much to pursue.',hint:'A surrounded army fighting its way out against cavalry in open terrain has never once worked',type:'hawk',cost:{pc:8},
+       outcome:{head:'Turned to Fight — Encircled by Midday',body:'The decision to turn was announced by trumpet at dawn. The rear column wheeled to face the Mongol vanguard. The vanguard slowed — and the flanking force that had been shadowing the retreat sealed the north. A second flanking force closed from the south before noon. The fighting withdrawal became a fighting encirclement.',deltas:{ap:-16,mi:-26,st:-18,tension:+25},ripples:['Encircled before noon on the first day of the fighting retreat','Fighting withdrawal: Became fighting encirclement','Kraków: No army approaching — undefended','The decision that seemed aggressive was exactly what Subutai wanted'],
+       addIntel:'TERMINAL: Army encircled. No force approaching Kraków. City undefended.',next:'rout_end'}}
+    ]
+  },
+  resolve:{tag:'RESOLVED'},rout_end:{tag:'ROUT'}
+}}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 5: KRAKÓW — The City Under Siege, March 1241
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+,// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 4: KRAKÓW BESIEGED
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{id:'KRAKOW',name:'Kraków Under Siege',nodes:{
+  start:{tag:'SIEGE',tagCls:'tag-siege',title:'The Mongols Are at the Walls — Day One of the Siege',
+   body:'The main Mongol force has arrived at Kraków. Forty thousand horsemen camp on the eastern plain as far as the eye can see. Their fires burn all night. In the morning they sent one man to the gates with an interpreter. The message: surrender by noon or nothing inside these walls will live. Your Voivode says the walls can hold. Your spy says Subutai has never besieged a well-prepared city for more than three weeks. It is an hour before noon.',
+   advisors:[{who:'voivode',say:'Refuse. The walls are strong. They have no siege engines. Without siege engines they cannot breach worked stone.',stance:'hawk'},{who:'spy',say:'Subutai will not waste three weeks here if there are softer targets to the west. He needs to reach Hungary before spring.',stance:'intel'},{who:'bishop',say:'If we surrender these walls every church in Poland will know we handed God\'s house to pagans without a fight.',stance:'faith'},{who:'treasurer',say:'The city has six months of food. Three thousand soldiers. We can outlast them.',stance:'econ'}],
+   consequences:[],
+   choices:[
+    {text:'Refuse. Man the walls. Let them see we will not yield.',hint:'Classic siege defense — strong walls and time',type:'hawk',cost:{pc:7},
+     outcome:{head:'The Walls Hold — Subutai Grows Impatient',body:'Three weeks passed. The Mongols probed the walls daily but lacked the siege equipment to breach worked stone. On the twenty-second day, Subutai gave the order to move west. The siege lifted before dawn.',deltas:{ap:+12,mi:+5,st:+12,tension:-20,al:+8,pc:+10},ripples:['Siege lifted on day 22 — Subutai moved west','Walls held — not a single Mongol entered the city','Population emerged from 22 days to cheering'],addIntel:'CONFIRMED: Siege lifted. Subutai moved west. Kraków never breached.',addLog:'Siege lifted day 22. Walls held. Subutai moved to Hungary.',next:'kr_aftermath'}},
+    {text:'Sortie at night — attack their camp while they sleep.',hint:'High risk, potentially devastating',type:'hawk',cost:{pc:10},
+     roll:{odds:0.50,failHead:'Sortie Ambushed — They Were Waiting',failBody:'Subutai had anticipated the sortie. The outer camp fires were a screen — cavalry waited in darkness beyond. Four hundred of your best knights rode into an ambush. Fewer than a hundred returned.',failDeltas:{ap:-10,mi:-18,st:-12,tension:+18},failRipples:['Sortie ambushed — 300 knights killed in darkness','Subutai: Anticipated the move','Morale collapsed with loss of best fighters'],failNext:'kr_negotiate'},
+     outcome:{head:'Night Sortie — Chaos in the Mongol Camp',body:'Eight hundred knights rode out at midnight in silence. They hit the horse lines first — releasing four thousand horses into the darkness. Then they hit the command tents. Subutai escaped but two of his generals died. The camp burned for hours.',deltas:{ap:+8,mi:-8,st:+8,tension:-18,al:+8,pc:+10},ripples:['4,000 Mongol horses released and scattered','Two Mongol generals killed in the raid','Siege psychology shattered'],addIntel:'TACTICAL: Night sortie succeeded. 2 generals dead. 4,000 horses scattered.',addLog:'Night sortie. 2 generals dead. Siege weakened.',next:'kr_aftermath'}},
+    {text:'Send a messenger through the siege lines to Duke Henryk — report Mongol positions.',hint:'Intelligence sharing that could change the entire campaign',type:'intel',cost:{pc:6},
+     outcome:{head:'Messenger Reached Henryk — Battle Intelligence Shared',body:'A single rider crept through the horse lines wrapped in a Mongol felt blanket. He reached Duke Henryk\'s camp three days later with precise counts of Subutai\'s force and a critical detail: the main command tent was always at the eastern edge.',deltas:{ap:+4,st:+4,iq:+18,al:+12,tension:+3,pc:+8,allies:{Silesia:+14}},ripples:['Messenger reached Henryk — precise intelligence delivered','Camp layout shared: Command tent at eastern edge','Henryk: Studied the intelligence — said it was invaluable'],addIntel:'INTELLIGENCE: Messenger reached Henryk. Camp layout shared.',addLog:'Messenger to Henryk. Battle intelligence delivered.',next:'kr_aftermath'}},
+    {text:'Arm the citizens — every man, woman with a weapon defends every street.',hint:'Urban warfare negates the Mongol cavalry advantage completely',cost:{pc:6},
+     outcome:{head:'Armed Citizens Defend Every Street',body:'When the Mongols entered the suburbs for a probing attack, they found every alley blocked by armed civilians — merchants, craftsmen, priests wielding their own tools. Urban warfare was not Subutai\'s expertise. The probe cost forty men and gained nothing. He decided the city was not worth the time.',deltas:{ap:+10,mi:+8,st:+10,tension:-15,al:+6,pc:+8},ripples:['Citizens defending every alley','Mongol probe: Cost 40 men — gained nothing','Subutai decided Kraków was not worth the time'],addIntel:'URBAN DEFENSE: Citizens defending every alley. Mongol probe repelled.',addLog:'Citizens armed. Probe repelled. Subutai moving on.',next:'kr_aftermath'}},
+    {text:'Open the gate and submit — save the lives of everyone inside.',hint:'Surrender — Mongols sometimes spare those who submit immediately',type:'dove',cost:{pc:20,label:'SUBMISSION'},
+     roll:{odds:0.45,failHead:'Submission Rejected — Kraków Burned Anyway',failBody:'The Mongol commander received the submission and sent word to Batu Khan. The reply at midnight: burn it. The city burned. The population was divided — some enslaved, some killed, some fled.',failDeltas:{ap:-20,ec:-20,st:-25,tension:+30,al:-15},failRipples:['Submission rejected — city burned anyway','Population partially enslaved and killed','Bolesław fled — never returned'],failNext:'rout_end'},
+     outcome:{head:'Submission Accepted — Kraków Spared',body:'The garrison laid down arms. The Mongol commander entered with two hundred riders and declared it a possession of the Great Khan. He left fifty men and continued west. The city was intact. The people were humiliated and alive.',deltas:{ap:-14,mi:-15,st:-8,al:-12,tension:-18,pc:-15,allies:{Mongols:+15,Church:-20}},ripples:['Kraków spared — under 50-man Mongol garrison','Church desecrated — Bishop Prandota expelled','Population alive but vassalized'],addIntel:'SUBMISSION: Kraków under garrison. Population alive.',addLog:'Kraków submitted. Spared. Garrison installed.',next:'kr_aftermath'}},
+   ]
+  },
+  kr_negotiate:{tag:'NEGOTIATION · STAGE 2',tagCls:'tag-dip',title:'The Walls Have Weakened — Negotiate From Strength While You Can',
+   body:'The sortie failed and your best knights are dead. Subutai has sent a second envoy — more politely phrased. He is willing to discuss terms. Your Voivode says you have perhaps three days before the next assault that the walls may not withstand.',
+   advisors:[{who:'voivode',say:'Whatever you agree must include the army\'s safe passage south. We need them for Legnica.',stance:'hawk'},{who:'bishop',say:'The cathedral cannot be desecrated. Whatever else you concede, protect the Wawel cathedral.',stance:'faith'},{who:'treasurer',say:'Offer silver. It is cheaper than a sacking.',stance:'econ'}],
+   consequences:[{text:'Sortie failed — garrison weakened'}],
+   choices:[
+    {text:'Negotiate free passage for the garrison in exchange for the city.',hint:'Army lives to fight at Legnica',type:'hawk',cost:{pc:10},
+     outcome:{head:'Free Passage Granted — Garrison Marches to Legnica',body:'Subutai agreed. Three thousand soldiers marched south through the Mongol lines under a white banner. Kraków was in Mongol hands. The soldiers reached Legnica.',deltas:{ap:-8,mi:+12,st:-8,al:+8,tension:-10,pc:+6},ripples:['Garrison: 3,000 soldiers marched south to Legnica','Kraków: In Mongol hands — under garrison control','Legnica: Army reinforced at critical moment'],addIntel:'MILITARY: 3,000 soldiers reached Legnica. Kraków surrendered with free passage.',addLog:'Free passage. Garrison reached Legnica. Kraków surrendered.',next:'resolve'}},
+    {text:'Offer double tribute — buy two weeks with silver.',hint:'Expensive but preserves the city',cost:{pc:8},
+     outcome:{head:'Double Tribute Accepted — Two Weeks Gained',body:'Subutai accepted the silver without comment. The tribute bought a two-week pause — enough for Henryk to march for Legnica.',deltas:{ap:+2,ec:-20,tension:-15,al:+4,pc:+6},ripples:['Double tribute paid — two weeks\' pause purchased','Two weeks: Enough for Henryk to reach Legnica','Treasury: Severely depleted'],addIntel:'DIPLOMATIC: Double tribute bought two weeks. Henryk has time.',addLog:'Double tribute. Two weeks bought.',next:'resolve'}},
+    {text:'Demand the cathedral be protected as a condition of any agreement.',hint:'Subutai may agree if it costs him nothing',cost:{pc:9,label:'CHURCH FAVOUR'},
+     outcome:{head:'Cathedral Exemption Granted',body:'Subutai granted the exemption without hesitation. He had no interest in the Christian God\'s house — only in horses, silver, and strategic position. The Wawel Cathedral remained untouched. The Bishop called it a miracle. It was pragmatism.',deltas:{ap:+6,ec:-10,st:+4,tension:-12,pc:-8,allies:{Church:+18}},ripples:['Wawel Cathedral: Protected under exemption','Subutai: Granted exemption without hesitation','Bishop Prandota: Called it divine providence'],addIntel:'DIPLOMATIC: Cathedral exemption granted. Wawel protected.',addLog:'Cathedral exemption. Wawel protected. Tribute paid.',legacy:{wawel_saved:true},next:'resolve'}},
+   ,
+      {text:'Refuse all terms and attack the Mongol envoy — show contempt for their diplomacy.',hint:'Killing a Mongol envoy is one of the few acts that guarantees total war with no quarter',type:'hawk',cost:{pc:7},
+       outcome:{head:'Envoy Killed — The Law of the Steppe Invoked',body:'Mongol law was absolute on one point: the person of an envoy was sacred. Killing an envoy was not merely an insult — it was a declaration that all norms were void. Subutai, who had been willing to accept terms, now gave the order that no one inside Kraków would leave. The assault that followed made no distinction between combatant and civilian.',deltas:{ap:-25,mi:-20,st:-25,tension:+35},ripples:['Mongol law: Envoy killing voids all norms — total war with no quarter','Subutai: Gave order that no one inside Kraków would leave','The assault: No distinction between combatant and civilian','The action that was meant to show strength ended everything'],
+       addIntel:'TERMINAL: Envoy killed. Total war with no quarter declared. Kraków will be destroyed.',next:'rout_end'}}
+    ]
+  },
+  kr_aftermath:{tag:'AFTERMATH · STAGE 2',tagCls:'tag-mil',title:'The Siege Is Over — What Does Kraków Look Like Now?',
+   body:'The immediate crisis has passed. The city and the duchy bear the marks of what has happened. There are administrative decisions to make, alliances to rebuild, and a people who have been through something that will define them for generations.',
+   advisors:[{who:'voivode',say:'Rebuild the army first. Everything else depends on having swords.',stance:'hawk'},{who:'bishop',say:'The people need ceremony. A day of thanksgiving, a procession. Show them God was with them.',stance:'faith'},{who:'treasurer',say:'Trade must resume. The city earns nothing while its merchants are hiding.',stance:'econ'}],
+   consequences:[],
+   choices:[
+    {text:'Order a day of thanksgiving — process through the city with the Bishop.',hint:'Morale and legitimacy in one ceremony',cost:{pc:6,label:'CHURCH FAVOUR'},
+     outcome:{head:'The Procession of Kraków — City Reborn',body:'The Bishop led a procession through every street. Church bells rang. People who had not smiled in weeks wept with relief. The image of the Duke marching beside the Bishop sent a message to every duchy in Poland: resistance was possible.',deltas:{ap:+14,st:+10,al:+10,tension:-8,pc:-8,allies:{Church:+14}},ripples:['Day of thanksgiving: Every street of Kraków','Morale transformed — pride replacing fear','Message to Poland: Kraków held — resistance possible'],addIntel:'MORALE: Thanksgiving procession succeeded. Message sent to Poland.',addLog:'Thanksgiving procession. City morale restored.',legacy:{krakow_held:true},legacyConsequence:'Kraków Held: The city did not fall — symbol of resistance for all Poland',next:'resolve'}},
+    {text:'Rebuild the walls stronger — this will happen again.',hint:'Fortifications prevent the next siege',type:'hawk',cost:{pc:7},
+     outcome:{head:'Walls Rebuilt and Strengthened',body:'Every stone mason in the region was set to work. The walls grew thicker. The towers grew taller. New wells dug inside. When it was done Kraków had walls that even Subutai\'s generals would hesitate at.',deltas:{ap:+4,mi:+12,ec:-10,st:+8,tension:-5,pc:+6},ripples:['Walls: Significantly strengthened — tallest in Poland','New wells: Inside the walls — siege can never starve the water supply','Future sieges: Kraków now genuinely formidable'],addIntel:'FORTIFICATION: Kraków walls rebuilt stronger.',addLog:'Walls rebuilt. Kraków now formidable.',next:'resolve'}},
+    {text:'Send delegations to every Polish duke — build the coalition that failed at Sieradz.',hint:'Survivors who held a city are credible diplomats',type:'dove',cost:{pc:10},
+     outcome:{head:'Survivors Build the Next Alliance',body:'The messengers brought something no ambassador usually carries: proof that the Mongols could be survived. Three dukes who had refused to commit at Sieradz sent riders back offering knights. Kraków\'s survival had done more for unity than any council.',deltas:{ap:+8,al:+20,st:+6,tension:-5,pc:+8,allies:{Silesia:+10,HRE:+8,Church:+6,Teutonic:+8}},ripples:['Three previously-uncommitted dukes: Pledged knights','Kraków\'s survival more persuasive than any argument','New coalition forming around proof that resistance works'],addIntel:'DIPLOMATIC: Survival-based coalition forming.',addLog:'Survivors diplomacy. Three dukes pledged.',legacy:{coalition_built:true},legacyConsequence:'Kraków Coalition: Three dukes joined after the siege',next:'resolve'}},
+   ,
+      {text:'Pursue the departing Mongol forces south — attack them while they are withdrawing.',hint:'Attacking a withdrawing Mongol force is the oldest and most effective Mongol trap there is',type:'hawk',cost:{pc:8},
+       outcome:{head:'Pursuit — Into the Rearguard Trap',body:'The departing Mongol column had left exactly the trail it intended: scattered, vulnerable-looking riders withdrawing south. Two thousand of your knights gave pursuit. The prepared rearguard was waiting fifteen miles south in a narrow valley. None of the pursuing force returned. The knights who had just survived a siege were killed in an afternoon by the trap designed to punish their victory.',deltas:{ap:-14,mi:-24,st:-16,tension:+20},ripples:['2,000 knights killed in rearguard trap south of Kraków','The pursuit was prepared for — the trap had been set before the withdrawal began','Kraków: Survived the siege and lost its cavalry the same day','The victory became the instrument of defeat'],
+       addIntel:'TERMINAL: 2,000 knights killed in rearguard trap. Cavalry gone. Kraków undefended.',next:'rout_end'}}
+    ]
+  },
+  resolve:{tag:'RESOLVED'},rout_end:{tag:'ROUT'}
+}}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 6: SIERADZ — The Council, April 1241
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+,// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 2: THE COUNCIL AT SIERADZ
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{id:'SIERADZ',name:'The Council at Sieradz',nodes:{
+  start:{tag:'COUNCIL',tagCls:'tag-dip',title:'The Dukes of Poland Cannot Agree — Sieradz Will Decide Everything',
+   body:'A council of Polish dukes has assembled at Sieradz. Duke Henryk of Silesia wants to march his combined army north to link with the Teutonic Knights and face the Mongols in a single great battle. Duke Konrad of Mazovia refuses — his duchy is already half-destroyed. Three lesser dukes are watching you. What you say in this room may determine whether there is a unified Polish army at Legnica or a dozen separate forces that the Mongols destroy in detail.',
+   advisors:[{who:'voivode',say:'Henryk is right. One army, one battle, one chance. Divided we are already dead.',stance:'hawk'},{who:'herald',say:'Konrad will not be moved by argument. He needs to be given something — a prize, a promise, a title.',stance:'dove'},{who:'bishop',say:'The Church endorses Duke Henryk\'s plan. A crusade requires unity.',stance:'faith'},{who:'treasurer',say:'Konrad\'s duchy is ruined. He needs silver to fight. Promise him a year\'s tribute from Kraków\'s treasury.',stance:'econ'}],
+   consequences:[],
+   choices:[
+    {text:'Support Duke Henryk publicly — bring your knights to his standard.',hint:'Unity — but Henryk gets the glory',type:'hawk',cost:{pc:8},
+     outcome:{head:'Polish Army Unified Under Henryk',body:'Your public declaration broke the stalemate. Two lesser dukes followed immediately. Even Konrad grudgingly pledged five hundred men. The unified army that assembled outside Legnica numbered over twenty thousand — the largest Polish force in living memory.',deltas:{ap:+8,mi:+15,al:+18,tension:-5,pc:-5,allies:{Silesia:+18,Church:+8,HRE:+5}},ripples:['Unified Polish army: 20,000+ under Henryk at Legnica','Konrad of Mazovia: 500 men pledged — grudgingly','Teutonic Knights: Riding south to join'],addIntel:'MILITARY: Unified Polish army forming at Legnica. 20,000+.',addLog:'Polish army unified under Henryk. 20,000 men.',next:'si_aftermath'}},
+    {text:'Propose a compromise — Henryk commands, but each duke keeps his own withdrawal authority.',hint:'Weakens unity but gets everyone to Legnica',type:'dove',cost:{pc:10},
+     outcome:{head:'Compromise Council — Army United But Fragile',body:'The compromise kept the council together. Each duke retained command of his own men — a fatal weakness in battle, but it got them all to Legnica. The army had twenty-two thousand men and seven separate chains of command.',deltas:{ap:+5,mi:+10,al:+12,tension:0,pc:+4,allies:{Silesia:+10}},ripples:['Army united — but seven separate command chains','22,000 men at Legnica','Each duke will decide independently whether to fight or flee'],addIntel:'MILITARY: 22,000 men at Legnica. Seven command chains. Coordination uncertain.',addLog:'Compromise army. 22,000 men. Seven commands.',next:'si_aftermath'}},
+    {text:'Bribe Konrad with a year of Kraków\'s silver — buy his full cooperation.',hint:'Expensive but effective',cost:{pc:6},
+     outcome:{head:'Konrad Bought — The Army Is Whole',body:'A year\'s silver from Kraków\'s treasury changed everything. Konrad pledged his full retinue — four thousand men — and rode to Legnica without complaint.',deltas:{ap:+4,mi:+18,ec:-15,al:+14,tension:-5,pc:+6,allies:{Silesia:+12}},ripples:['Konrad: Full retinue pledged — four thousand men','Army: Most unified version possible','Konrad: Will remember who paid him when the war is over'],addIntel:'MILITARY: Konrad bought. 24,000 men at Legnica.',addLog:'Konrad bribed. 24,000 men at Legnica.',next:'si_aftermath'}},
+    {text:'Refuse to attend — let Henryk and Konrad sort it out.',hint:'Preserves your force — abandons the coalition',cost:{pc:3},
+     outcome:{head:'You Did Not Come — The Council Failed',body:'Your absence was interpreted as a vote against unity. The smaller dukes followed your example. Duke Henryk left Sieradz with fewer than nine thousand men. Konrad stayed home entirely.',deltas:{ap:-16,mi:-6,al:-22,tension:+14,pc:+2,allies:{Silesia:-22,HRE:-12,Church:-10}},ripples:['Council collapsed — no unity achieved','Henryk: Rides to Legnica with 9,000 men — alone','Church: Condemned your absence publicly'],addIntel:'POLITICAL: Your absence destroyed the coalition. Henryk fights alone.',addLog:'Did not attend. Council failed. Henryk fights alone.',next:'si_aftermath'}},
+    {text:'Invoke the Pope\'s crusade bull — demand unity in God\'s name.',hint:'Religious authority — works on the pious, fails on the pragmatic',cost:{pc:9,label:'CHURCH FAVOUR'},
+     outcome:{head:'The Crusade Bull Unifies the Council',body:'The Archbishop read the papal bull aloud. Duke Konrad, who feared excommunication more than the Mongols, pledged his full forces within the hour. The council that had been deadlocked for two days resolved in twenty minutes.',deltas:{ap:+9,mi:+20,al:+16,tension:-8,pc:-12,allies:{Church:+14,Silesia:+14,HRE:+8}},ripples:['Crusade bull: Unified the council — Konrad feared excommunication','Full army: 26,000 men riding to Legnica','Bishop Prandota: Credited with turning the council'],addIntel:'CRUSADE: Papal bull unified the council. 26,000 men at Legnica.',addLog:'Crusade bull read. Konrad yielded. 26,000 men at Legnica.',next:'si_aftermath'}},
+      {text:'Threaten that any duke who does not march will be stripped of his lands and titles.',hint:'Threatening nobles with dispossession during an invasion turns potential allies into enemies',cost:{pc:9},
+       outcome:{head:'Ultimatum Issued — Three Dukes Rode to the Mongol Camp',body:'Duke Konrad stood up, said three words, and left. Two lesser dukes followed. They rode east to the Mongol camp and brought maps, troop strengths, and the location of every food store between the Vistula and the Oder. The ultimatum gave Poland\'s secrets to its enemies.',deltas:{ap:-20,mi:-10,st:-22,tension:+28,al:-22,allies:{Silesia:-15,Church:-10}},ripples:['Three dukes rode to the Mongol camp with maps and intelligence','Subutai received them warmly — had everything by nightfall','The ultimatum gave Poland\'s military position away entirely'],
+       addIntel:'TERMINAL: Three dukes defected with maps and intelligence. All positions known to Subutai.',next:'rout_end'}},
+   ]
+  },
+  si_aftermath:{tag:'AFTERMATH · STAGE 2',tagCls:'tag-mil',title:'Legnica Is Over. What Remains of the Army?',
+   body:'The Battle of Legnica has been fought. Duke Henryk the Pious is dead — his head on a Mongol lance. The army is destroyed or scattered. But the Mongols turned south toward Hungary rather than continuing west into Germany. The question before you now is not victory — it is survival. What do you do with what remains?',
+   advisors:[{who:'voivode',say:'Gather the survivors. Any man still carrying a sword is worth ten new levies. Regroup at Kraków.',stance:'hawk'},{who:'bishop',say:'Henryk must be honoured. His sacrifice must be given meaning. The people need a martyr.',stance:'faith'},{who:'spy',say:'The Mongols turned south. Every day they march away from us is a day to rebuild.',stance:'intel'}],
+   consequences:[{text:'Legnica: Polish army destroyed — Henryk the Pious dead'}],
+   choices:[
+    {text:'Gather every surviving knight and march south — show the Mongol rearguard that Poland still has soldiers.',hint:'Military deterrence with what remains',type:'hawk',cost:{pc:8},
+     outcome:{head:'Survivors Gathered — A Force, However Small',body:'Twelve hundred knights and three thousand foot soldiers survived Legnica. Gathered and marching south with banners flying, they looked like less of an army than they were. But the Mongol rearguard saw them and reported: Poland still has soldiers.',deltas:{ap:+6,mi:+10,st:+6,tension:-10,al:+6,pc:+8},ripples:['1,200 knights gathered — marching south with purpose','Mongol rearguard: Deterred from pressing north','Survivors given direction and dignity'],addIntel:'MILITARY: Survivors gathered. Mongol rearguard deterred.',addLog:'Survivors gathered. Mongol rearguard deterred.',legacy:{survivors_gathered:true},next:'resolve'}},
+    {text:'Declare Henryk a martyr — make his sacrifice the foundation of national resistance.',hint:'Turns defeat into a rallying cause',cost:{pc:9,label:'CHURCH FAVOUR'},
+     outcome:{head:'Henryk the Martyr — Poland Finds Its Purpose',body:'The Bishop of Kraków declared Duke Henryk\'s death a martyrdom for the faith. Masses were said across Poland. New recruits arrived in their hundreds — not because they thought they could defeat the Mongols, but because dying in the same cause as a martyr had meaning.',deltas:{ap:+14,mi:+8,st:+10,al:+10,tension:-8,pc:-10,allies:{Church:+18,Silesia:+8}},ripples:['Henryk declared martyr by Bishop Prandota','Recruitment surge: Hundreds of new volunteers','Morale: Transformed from despair to purposeful resistance'],addIntel:'SPIRITUAL: Henryk martyrdom declaration transformed morale.',addLog:'Henryk declared martyr. Morale transformed.',legacy:{henryk_martyr:true},next:'resolve'}},
+    {text:'Negotiate tributary peace with the Mongol rearguard — buy a generation of safety.',hint:'Submission that functions as peace — expensive but real',type:'dove',cost:{pc:12},
+     roll:{odds:0.55,failHead:'Rearguard Refused — Demand Escalated',failBody:'The rearguard commander had no authority to negotiate peace — only to receive submissions. When no submission came, he sent riders north and burned three villages.',failDeltas:{ap:-14,ec:-8,st:-16,tension:+20},failRipples:['Rearguard: No negotiating authority','Three villages burned as reminder','Nobles: Questioned the Duke\'s judgment'],failNext:'resolve'},
+     outcome:{head:'Tributary Peace Accepted — Poland as Vassal',body:'The rearguard commander accepted: annual tribute, no fortifications east of the Vistula, Polish levies available for Mongol service. It was humiliating. The rearguard turned south instead of north.',deltas:{ap:-10,ec:-12,st:-6,al:-10,tension:-22,pc:-8,allies:{Mongols:+14,Church:-12}},ripples:['Tributary status: Annual silver, no eastern forts','Rearguard: Turned south — Poland proper unoccupied','Church: Condemned the submission — three bishops resigned'],addIntel:'SUBMISSION: Poland tributary. Church furious. Time purchased.',addLog:'Tributary peace. Church furious. Time to rebuild.',next:'resolve'}},
+   ,
+      {text:'Abandon Poland — ride south to Hungary with the treasury and continue the fight from there.',hint:'A duke who flees when his people need him has no duchy to return to',cost:{pc:3},
+       outcome:{head:'The Duke Fled — The Duchy Dissolved Behind Him',body:'The column left Kraków before dawn: the Duke, a hundred knights, the treasury, the most portable relics. By the time it reached the Carpathian passes, word had already raced ahead. Every noble who received the news made the same calculation: if the Duke had fled, there was nothing left worth fighting for. The duchy did not fall to the Mongols. It dissolved when its ruler chose himself over it.',deltas:{ap:-25,ec:-25,st:-30,al:-25,tension:+15},ripples:['Duke fled with treasury — news raced ahead at twice the speed of the column','Every noble who heard it: Made the same calculation and stood down','The duchy dissolved — not conquered, abandoned','Bolesław IV was never spoken of as duke again in any chronicle that matters'],
+       addIntel:'TERMINAL: Duke fled. Duchy dissolved. Not conquered — abandoned.',next:'rout_end'}}
+    ]
+  },
+  resolve:{tag:'RESOLVED'},rout_end:{tag:'ROUT'}
+}}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 7: LEGNICA — April 9, 1241
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+,// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 5: THE BATTLE OF LEGNICA
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{id:'LEGNICA',name:'The Battle of Legnica',nodes:{
+  start:{tag:'THE GREAT BATTLE',tagCls:'tag-horde',title:'Legnica — April 9th, 1241 — The Day Poland Decides',
+   body:'The armies are in sight of each other outside Legnica. Duke Henryk commands the Christian force: Silesian knights, Templars, Teutonic Knights, Poles, and your own retinue — perhaps twenty-five thousand. Opposite them: two Mongol tumens under Baidar, Subutai\'s most trusted general. Baidar must win today. So must Henryk. By sunset one of these armies will not exist.',
+   advisors:[{who:'voivode',say:'The heavy cavalry must charge together. If the knights charge piecemeal the Mongols will destroy each group in turn.',stance:'hawk'},{who:'spy',say:'Their standard tactic: feigned retreat. When they run, do not pursue. Do not chase them — it is always a trap.',stance:'intel'},{who:'bishop',say:'I will ride with you. Let the men see their bishop on horseback.',stance:'faith'},{who:'herald',say:'Duke Henryk should be kept from the front line. He is worth more as a symbol than as a fighter.',stance:'dove'}],
+   consequences:[],
+   choices:[
+    {text:'The Grand Charge — all cavalry forward at once, infantry following close.',hint:'Classic medieval tactic — Mongols have never faced a fully coordinated charge at this scale',type:'hawk',cost:{pc:10},
+     roll:{odds:0.55,failHead:'The Feigned Retreat — Five Thousand Knights Destroyed',failBody:'The charge worked — until it did not. The Mongol front broke and fled, and five thousand of the most aggressive Polish knights pursued at full gallop. When they were four miles from the main line, the Mongol wings closed. The encircled knights were destroyed in forty minutes.',failDeltas:{ap:-14,mi:-25,st:-18,tension:+25},failRipples:['Feigned retreat succeeded — 5,000 knights destroyed in pursuit','Henryk: Watched from the hill as his cavalry died','Legnica: Battle lost — army destroyed'],failNext:'le_aftermath'},
+     outcome:{head:'The Grand Charge Held Together — Mongol Line Broke',body:'The charge was extraordinary — twenty-five thousand men moving as one. The Mongol line broke on contact and the feigned retreat began. Your Voivode had briefed every captain: if they run, hold the line. The trumpets sounded recall before anyone could pursue. The Mongols, confused by an army that did not chase, collided with their own reserve tumen. Baidar\'s command collapsed.',deltas:{ap:+15,mi:-8,st:+14,tension:-30,al:+15,pc:+12},ripples:['Grand charge succeeded — Mongol line broke on contact','Feigned retreat: Recall held — no pursuit','Baidar\'s reserve collided with fleeing vanguard in chaos','Battle of Legnica: Won — Baidar retreating south'],addIntel:'CONFIRMED: Legnica won. Baidar retreating. Mongol advance into Germany stopped.',addLog:'Battle of Legnica won. Grand charge held.',legacy:{legnica_won:true},legacyConsequence:'Legnica Won: The Mongol western advance stopped — Poland held',next:'le_victory'}},
+    {text:'Defensive formation — use the terrain, force them to attack uphill.',hint:'Removes cavalry advantage — but medieval knights hate standing still',type:'dove',cost:{pc:8},
+     outcome:{head:'Defensive Victory — Baidar Could Not Break the Line',body:'The knights held the high ground. Three Mongol assaults broken on the uphill approach. On the fourth, a reserve tumen appeared to the north — but your flanking cavalry, kept back for exactly this, intercepted them. The battle lasted eight hours. Baidar withdrew at dusk.',deltas:{ap:+12,mi:-5,st:+12,tension:-25,al:+12,pc:+10},ripples:['Defensive line held 8 hours — four Mongol assaults broken','Flanking cavalry reserved and deployed perfectly','Baidar: Withdrew at dusk'],addIntel:'MILITARY: Defensive Legnica won. Baidar withdrew.',addLog:'Defensive Legnica. Baidar withdrew.',legacy:{legnica_won:true},next:'le_victory'}},
+    {text:'Send three thousand knights into the northern forest — make the army look larger than it is.',hint:'Deception — make Baidar count a larger army',type:'intel',cost:{pc:8},
+     roll:{odds:0.65,failHead:'Baidar Sent Scouts — Ruse Discovered',failBody:'Mongol light cavalry scouted the forest before the battle. The hidden knights were found and reported. The flanking move was pre-planned. When the battle began the Mongol cavalry appeared exactly where the hidden knights could not respond.',failDeltas:{ap:-8,mi:-15,st:-10,tension:+15},failRipples:['Forest scouts: Found the hidden knights — ruse exposed','Flanking move pre-countered by Baidar','Battle lost the advantage before it began'],failNext:'le_aftermath'},
+     outcome:{head:'Baidar Counted a Larger Army — Hesitated Four Hours',body:'Baidar\'s scouts reported what appeared to be a reserve corps in the northern forest. He called a council of war that lasted four hours. In those four hours, your main force was fed, rested, and repositioned. When the battle finally began, you had chosen your ground perfectly.',deltas:{ap:+8,mi:-4,st:+9,tension:-20,al:+10,pc:+10},ripples:['Baidar: Hesitated four hours — lost initiative','Your force: Rested and repositioned during the council','First time a Polish commander fooled Subutai\'s generals'],addIntel:'DECEPTION: Baidar hesitated four hours. Battle fought on chosen ground.',addLog:'Forest deception worked. Baidar hesitated.',legacy:{legnica_won:true},next:'le_victory'}},
+    {text:'Refuse battle — withdraw south and deny Baidar the decisive engagement he needs.',hint:'Preserves the army — but yields northern Poland',cost:{pc:12},
+     outcome:{head:'Withdrawal — Baidar Could Not Win What Was Not Offered',body:'Henryk was furious. The Teutonic Knights called it cowardice. Three lesser dukes left with their retinues. But the army survived intact. Baidar, denied the decisive battle, turned south toward Hungary. Northern Poland was raided but not conquered.',deltas:{ap:-18,mi:+8,st:-16,al:-20,tension:-15,pc:-12,allies:{Silesia:-20,Teutonic:-18,Church:-8}},ripples:['Battle refused — Baidar turned south','Army: Intact — no major casualties','Henryk: Furious','Northern Poland: Raided but not conquered'],addIntel:'WITHDRAWAL: Army intact. Baidar turned south.',addLog:'Withdrew from Legnica. Army intact. Northern Poland raided.',next:'le_aftermath'}},
+      {text:'Hold back — let the Mongols charge uphill and meet them from a defensive ridge.',hint:'Sound strategy — but requires holding every knight in check, and knights were not bred for patience',cost:{pc:7},
+       outcome:{head:'The Teutonic Knights Charged Anyway — Against Explicit Orders',body:'The Teutonic Knights had not ridden from Prussia to stand on a hill. When the Mongol vanguard fired arrows, their Grand Master ordered the charge against your command. Five thousand men rode into the feigned retreat. Your defensive plan collapsed the moment someone else decided it was not for them.',deltas:{ap:-12,mi:-22,st:-16,tension:+25,al:-14,allies:{Teutonic:-20}},ripples:['Teutonic Knights charged against explicit orders','Five thousand men into the feigned retreat','Defensive formation: Collapsed with the unauthorized charge'],
+       addIntel:'TERMINAL: Unauthorized charge. Five thousand knights in feigned retreat. Formation collapsed.',next:'rout_end'}},
+   ]
+  },
+  le_victory:{tag:'VICTORY · STAGE 2',tagCls:'tag-faith',title:'The Field Is Ours — But the War Is Not Over',
+   body:'The battle is won. Baidar is retreating south in disorder. The western advance into Germany is stopped. But your spy brings a dispatch: Subutai\'s main force has destroyed the Hungarian army at the Mohi River. Hungary is falling. The Mongols have not been defeated — they have won everywhere except here.',
+   advisors:[{who:'voivode',say:'Pursue Baidar south. Do not let him regroup.',stance:'hawk'},{who:'spy',say:'Hungary is falling. If the Mongols take Hungary they will be back next year with a larger force.',stance:'intel'},{who:'bishop',say:'Build the victory into something permanent. A cathedral. A military order. Give this day a shape that lasts.',stance:'faith'}],
+   consequences:[],
+   choices:[
+    {text:'Pursue Baidar — finish the retreating tumen before it reaches Hungary.',hint:'Destroy the defeated force — prevents it from reinforcing Subutai',type:'hawk',cost:{pc:9},
+     roll:{odds:0.60,failHead:'Ambush in the Retreat — Baidar Had Prepared a Rearguard',failBody:'The pursuit ran into a prepared Mongol rearguard in a valley two days south. Baidar had sacrificed a thousand men specifically to ambush the pursuing Christians. Five hundred knights dead before they could disengage.',failDeltas:{ap:-5,mi:-12,st:-5,tension:+8},failRipples:['Rearguard ambush: 500 Christian knights killed','Baidar: Escaped into Hungary','Pursuit abandoned after the ambush'],failNext:'resolve'},
+     outcome:{head:'Baidar Destroyed at the Oder Crossing',body:'The pursuing cavalry caught Baidar\'s rearguard at the Oder River crossing. What had been an orderly retreat became a rout. Baidar himself escaped but left four thousand men dead on the riverbank. The Mongol western advance was not just stopped — it was destroyed.',deltas:{ap:+10,mi:-8,st:+8,tension:-20,al:+12,pc:+10},ripples:['Baidar\'s rearguard: Destroyed at the Oder — 4,000 dead','Baidar reported to Subutai that Poland was unconquerable','Western advance definitively destroyed'],addIntel:'PURSUIT: Baidar destroyed at Oder. Western advance ended.',addLog:'Baidar destroyed at Oder. Western advance ended.',next:'resolve'}},
+    {text:'Send relief to Hungary — ride south to help King Béla at the Mohi.',hint:'Christendom stands together or falls separately',type:'dove',cost:{pc:10},
+     outcome:{head:'Polish Knights Enter Hungary — Too Late for Mohi, Not Too Late for Béla',body:'The Polish force arrived in Hungary two weeks after the disaster at Mohi. King Béla was alive and organizing a defense in the Dalmatian mountains. The sight of Polish knights — cavalry that had beaten Mongols at Legnica — transformed his army\'s morale.',deltas:{ap:+8,mi:-6,ec:-6,al:+18,tension:-18,pc:+8,allies:{Hungary:+22,Church:+10,HRE:+8}},ripples:['Polish force arrived in Hungary two weeks after Mohi','King Béla: Alive and reorganizing','Danube crossings: Held by joint Polish-Hungarian force through winter'],addIntel:'DIPLOMATIC: Polish-Hungarian alliance holding Danube. Subutai facing resistance.',addLog:'Polish relief to Hungary. Danube held with Béla.',legacy:{danube_held:true},legacyConsequence:'Danube Held: Polish-Hungarian alliance stopped further advance',next:'resolve'}},
+    {text:'Found a military order at Legnica — make this the permanent base of Christian defense.',hint:'Institution-building — costly but creates lasting strength',cost:{pc:8,label:'CHURCH FAVOUR'},
+     outcome:{head:'Foundation of the Order of Legnica',body:'The battlefield was consecrated. A chapter house of a new military order was established on the site. Every year hence, knights would train there on the anniversary of the battle.',deltas:{ap:+10,ec:-10,mi:+8,st:+12,al:+10,pc:-10,allies:{Church:+16,Teutonic:+8}},ripples:['Order of Legnica: Founded on the battlefield','Annual training: Battle tactics preserved and taught','Church: Fully behind the Order'],addIntel:'INSTITUTION: Order of Legnica established. Annual training.',addLog:'Order of Legnica founded.',legacy:{order_of_legnica:true},legacyConsequence:'Order of Legnica: Military foundation — Poland permanently stronger',next:'resolve'}},
+   ,
+      {text:'Demand Baidar\'s personal surrender publicly — announce he must kneel before the Duke of Kraków.',hint:'A Mongol general does not kneel — this demand will resume fighting immediately',cost:{pc:8},
+       outcome:{head:'Demand Refused — Baidar Resumed the Battle With Fresh Reserves',body:'The herald was sent under a white banner. Baidar listened to the demand, cut off the herald\'s nose, and sent him back. The battle resumed within the hour. The fresh Mongol reserve tumen that had held back during the initial fight now entered the field. Your army, exhausted from the morning\'s victory, faced fresh cavalry at full strength. The battle that had been won was lost again by afternoon.',deltas:{ap:-14,mi:-22,st:-16,tension:+25},ripples:['Herald sent back noseless — battle resumed within the hour','Fresh Mongol reserve tumen: Entering the field','Your army: Exhausted from morning victory — facing fresh cavalry','The victory of the morning was undone by an afternoon\'s pride'],
+       addIntel:'TERMINAL: Battle resumed. Fresh Mongol reserves engaged. Exhausted army being destroyed.',next:'rout_end'}}
+    ]
+  },
+  le_aftermath:{tag:'AFTERMATH · STAGE 2',tagCls:'tag-mil',title:'Legnica Was Not Won — What Remains of Poland',
+   body:'The battle did not go as planned. The army is reduced. Duke Henryk is either dead or retreating. The kingdom now depends entirely on what you do with whatever men and resources remain.',
+   advisors:[{who:'voivode',say:'We still have knights. Use them to buy the duchy time, not on heroics.',stance:'hawk'},{who:'spy',say:'Subutai will winter his horses in Hungary. Poland has the winter to rebuild. Use it.',stance:'intel'},{who:'bishop',say:'Henryk must be honoured if he is dead. Martyrdom transforms failure into foundation.',stance:'faith'}],
+   consequences:[{text:'Legnica: Army destroyed or scattered'}],
+   choices:[
+    {text:'Gather every survivor and fortify the most defensible duchy in Poland.',hint:'Consolidate what remains — winter gives time',cost:{pc:8},
+     outcome:{head:'Winter Fortification — Poland Consolidates',body:'Eight hundred surviving knights and four thousand foot soldiers assembled at Wrocław through the winter. The walls were rebuilt. Food stored. Every smith making arrows and swords. When the Mongols turned north after Hungary, they found a different Poland.',deltas:{ap:+8,mi:+14,st:+12,ec:-8,tension:-18,pc:+8},ripples:['800 knights and 4,000 foot assembled at Wrocław','Walls rebuilt, food stored, weapons made','Winter of 1241: Used completely'],addIntel:'MILITARY: Winter fortification complete.',addLog:'Winter fortification. Poland consolidating.',next:'resolve'}},
+    {text:'Appeal directly to the Holy Roman Emperor — invoke the duty of Christian solidarity.',hint:'Frederick II has ignored every previous appeal — but this is different',cost:{pc:10},
+     outcome:{head:'Frederick II Finally Responds',body:'Something about the battle of Legnica — perhaps the fact that the Mongols were now three days from Bohemia — changed the Emperor\'s calculus. He sent six thousand German knights to the Bohemian border. They came too late for Legnica but their presence stopped the advance from turning into a German occupation.',deltas:{ap:+8,al:+16,tension:-20,pc:+8,allies:{HRE:+20,Bohemia:+12}},ripples:['Frederick II: Sent 6,000 German knights to Bohemian border','Too late for Legnica — but stopped western advance','HRE: Now treating the eastern threat as its own problem'],addIntel:'DIPLOMATIC: Frederick II engaged. German knights at Bohemian border.',addLog:'Frederick II responded. German knights at Bohemian border.',legacy:{hre_engaged:true},legacyConsequence:'HRE Engaged: Frederick II committed — western advance stopped',next:'resolve'}},
+    {text:'Offer Subutai a permanent tributary arrangement — buy a generation of peace.',hint:'Submission that functions as peace',type:'dove',cost:{pc:14},
+     roll:{odds:0.55,failHead:'Subutai Declined — More Interested in Conquest',failBody:'Subutai had no interest in tribute from a broken country. He wanted submission, not silver. The embassy was turned away. A message came back: send the Duke in chains or send nothing.',failDeltas:{ap:-8,st:-8,tension:+14,al:-10},failRipples:['Subutai: Rejected tribute — wanted submission','Message: Send the Duke in chains','Church: Furious at the attempt'],failNext:'resolve'},
+     outcome:{head:'Tribute Accepted — A Generation of Peace',body:'Subutai, looking at his horses and his calendar, accepted a generation of tribute. Poland would pay annually, not fortify east of the Vistula. In exchange, no Mongol campaign in Polish lands for twenty years. Shameful. A generation of time to rebuild.',deltas:{ap:-10,ec:-18,st:-8,al:-10,tension:-28,pc:-10,allies:{Mongols:+18,Church:-18}},ripples:['Tributary peace: 20 years of annual payments','Church: Called it a betrayal of Christendom','20 years: Time to rebuild — if used wisely'],addIntel:'SUBMISSION: 20-year tributary peace. Church furious. Time purchased.',addLog:'Tributary peace. 20 years. Time to rebuild.',next:'resolve'}},
+   ,
+      {text:'Declare total war on the Mongol empire — announce Poland will fight until every Mongol is expelled from Europe.',hint:'A total war declaration from a broken army is not strategy — it is an announcement that you have no strategy',cost:{pc:6},
+       outcome:{head:'Total War Declaration — Subutai Took It Seriously and Acted Accordingly',body:'The declaration was made from the walls of Wrocław with the full ceremony of a ducal proclamation. Subutai received the text from a captured herald two days later. He convened a council: if Poland intended total war, Poland should receive it. The main tumen turned north from Hungary. Kraków fell in eleven days.',deltas:{ap:-20,mi:-15,st:-22,tension:+35},ripples:['Subutai took the declaration seriously — turned north from Hungary','Main tumen: Now moving toward Kraków instead of Hungary','The declaration that was meant to inspire the people: Ended the duchy','Kraków: Fell in eleven days'],
+       addIntel:'TERMINAL: Subutai turned north. Main tumen heading for Kraków. City will fall.',next:'rout_end'}}
+    ]
+  },
+  resolve:{tag:'RESOLVED'},rout_end:{tag:'ROUT'}
+}}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 8: AFTERMATH — While Hungary Burns, April 1241
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+,// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE: AFTERMATH — WHAT POLAND DOES WHILE HUNGARY BURNS
+// April-May 1241
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+,{id:'AFTERMATH',name:'While Hungary Burns',nodes:{
+  start:{tag:'APRIL 1241',tagCls:'tag-horde',
+   title:'Legnica Is Over — The Mongols Are in Hungary and the Danube Plain',
+   body:'The battle of Legnica ended four days ago. Duke Henryk is dead or alive — you are not certain. The Mongol column that fought at Legnica turned south toward Hungary. On April 11th — two days ago — Subutai destroyed the Hungarian army at the Mohi River. King Béla fled to the Adriatic coast. The Mongols now control the Danube plain. Poland is behind them, Hungary is below them, and Vienna is two weeks\' hard riding to the west. The question every European is asking tonight is: will they stop? And if they do not — what then?',
+   advisors:[
+    {who:'voivode',say:'They will stop when they run out of grass for the horses. The Danube plain has grass. Vienna has grass. They will not stop at the Danube.',stance:'hawk'},
+    {who:'spy',say:'My sources in the Mongol camp say they are waiting for orders from the Great Khan. There is a political dispute in Mongolia. That may be our salvation.',stance:'intel'},
+    {who:'bishop',say:'Send me to the Pope. In person. I will make Innocent IV understand what is at stake. A crusade — a real one, not a proclamation — can be assembled in six months.',stance:'faith'},
+    {who:'herald',say:'Frederick II of the Holy Roman Empire is two days from the battlefield. He has the largest army in Europe. If he will not fight now, when will he?',stance:'dove'},
+   ],
+   consequences:[{text:'Legnica: Won or lost — Henryk dead'},{text:'Mohi: Hungarian army destroyed — Béla fled'}],
+   choices:[
+    {text:'Build a defensive line along the Oder River — the next natural barrier west of Poland.',hint:'Strategic depth — if they come west this stops them',type:'hawk',cost:{pc:10},
+     outcome:{head:'The Oder Line — Poland\'s Last Shield',body:'Every available soldier was sent to the Oder crossings. Earthworks rose. Bridges were prepared for demolition. The Oder line was not impregnable — but it was something. When Mongol scouting parties reached it and reported back to Batu Khan, his council decided the costs were too high for what lay beyond. The western advance ended at the Oder.',deltas:{ap:+8,mi:+12,st:+8,ec:-10,tension:-14,al:+8,pc:+8},
+     ripples:['Oder defensive line: Constructed in three weeks','Mongol scouts reported line to Batu Khan','Council decision: Western advance too costly','Vienna: Unaware how close it came'],
+     addIntel:'MILITARY: Oder line constructed. Mongol scouts deterred. Western advance stopped.',
+     addLog:'Oder defensive line built. Mongols deterred. Western advance stopped.',
+     legacy:{oder_line:true},next:'aft_winter'}},
+    {text:'Pursue the Mongol column south — harry their rear as they move into Hungary.',hint:'Keeps pressure on — prevents them using Hungary as a staging base for return',type:'hawk',cost:{pc:10},
+     roll:{odds:0.55,failHead:'Pursuit Ambushed — Baidar\'s Rearguard',failBody:'The Mongol rearguard was not an afterthought — it was a prepared force waiting for exactly this response. Your pursuing cavalry was hit from three sides in a narrow valley. Four hundred knights killed before the survivors could withdraw.',failDeltas:{ap:-8,mi:-16,st:-8,tension:+14},failRipples:['Rearguard ambush: 400 knights killed','Pursuit: Abandoned — army too weakened to defend Kraków','Mongol rearguard turned north: Kraków now exposed'],failNext:'rout_end'},
+     outcome:{head:'Rear Harassment — The Mongols Could Not Rest',body:'Your cavalry harassed the Mongol rear for six days south of Legnica. They could not make camp without losing horses. They could not forage without losing riders. When the column crossed into Hungary it was more battered than when it had left the battlefield. Subutai noted the harassment in his dispatches.',deltas:{ap:+6,mi:-8,st:+5,tension:-10,al:+8,pc:+8},
+     ripples:['Mongol rear column harassed for 6 days','Column crossed into Hungary more battered than expected','Subutai noted the harassment — respected the pursuit','Poland demonstrated it could still project force after Legnica'],
+     addIntel:'TACTICAL: Rear harassment successful. Mongol column weakened entering Hungary.',
+     addLog:'Rear harassment. Mongol column weakened. 6 days of pursuit.',next:'aft_winter'}},
+    {text:'Send a personal letter to Frederick II — the Holy Roman Emperor must act now.',hint:'Direct appeal to the most powerful ruler in Europe',type:'dove',cost:{pc:8},
+     outcome:{head:'Frederick II Read the Letter and Moved His Army',body:'The letter was specific: distances, troop counts, the speed of Mongol advance, the vulnerability of Vienna. Frederick II, who had been watching from a comfortable distance, moved 20,000 German soldiers to the Bohemian border within two weeks. The Mongols\' western scouts found them there. The western column turned north, not west.',deltas:{ap:+8,al:+16,tension:-16,pc:+8,allies:{HRE:+20,Bohemia:+12}},
+     ripples:['Frederick II moved 20,000 soldiers to Bohemian border','Mongol western scouts found them — western column turned north','Vienna: Saved by a letter from Poland','HRE: Now treating the Mongol threat as its direct problem'],
+     addIntel:'DIPLOMATIC: Frederick II moved. 20,000 soldiers at Bohemian border. Western advance turned.',
+     addLog:'Letter to Frederick II. 20,000 German soldiers mobilized. Western advance turned.',next:'aft_winter'}},
+    {text:'Ride to the Adriatic to find King Béla — bring him back with a plan.',hint:'Béla is the legitimate ruler of Hungary — finding him means Hungary can resist',type:'dove',cost:{pc:9},
+     outcome:{head:'Béla Found — The King of Hungary Has a Plan',body:'King Béla was hiding in a Dalmatian coastal fortress. When Polish riders arrived, he wept — he had thought himself forgotten. The plan he had was simple: wait for winter. Mongol horses could not overwinter in Hungary without fodder. By March they would have to move. He needed only to survive until then.',deltas:{ap:+6,al:+18,tension:-8,pc:+7,allies:{Hungary:+22,Church:+8}},
+     ripples:['Béla found in Dalmatian fortress — was weeping when Polish riders arrived','Plan: Wait for winter — Mongol horses cannot overwinter without fodder','By March they must move: Béla needs only to survive till then','Polish-Hungarian alliance: Cemented by the rescue'],
+     addIntel:'DIPLOMATIC: Béla found. Winter strategy confirmed. Polish-Hungarian alliance cemented.',
+     addLog:'Béla found in Dalmatia. Winter strategy. Alliance cemented.',next:'aft_winter'}},
+    {text:'Use the lull to rebuild Kraków\'s walls — they will return eventually.',hint:'Defensive investment — you cannot stop them now but you can make them bleed next time',cost:{pc:7},
+     outcome:{head:'Kraków\'s Walls Rise While the Mongols Are Occupied',body:'With the Mongol columns occupied in Hungary, six months of uninterrupted construction followed. The walls grew. New towers rose. The castle of Wawel was reinforced to siege standards. When the Mongols eventually sent scouting parties back into Poland, they found a city that looked considerably harder than the one they had bypassed in March.',deltas:{ap:+5,mi:+10,st:+8,ec:-12,tension:-10,pc:+6},
+     ripples:['Six months of uninterrupted construction','Kraków walls significantly enhanced','New towers: Wawel castle reinforced to siege standards','Mongol scouts returning: Reported a harder target than before'],
+     addIntel:'CONSTRUCTION: Kraków significantly reinforced during the Hungarian occupation.',
+     addLog:'Six months construction. Kraków significantly reinforced.',next:'aft_winter'}},
+   ]
+  },
+  aft_winter:{tag:'WINTER 1241 · STAGE 2',tagCls:'tag-winter',
+   title:'Winter 1241 — Ögedei Is Dead. The Horde Is Being Recalled.',
+   body:'It is December 1241. A rider has arrived from the east with news that will change everything: Ögedei Khan, son of Genghis, Great Khan of the Mongol Empire, is dead. He died in November. Batu Khan must return to the kurultai — the Mongol succession council — or lose his claim to power entirely. The invasion of Europe is being suspended. Not abandoned — suspended. The Mongols will leave Hungary in the spring. Poland has survived. The question now is: what do you build before they come back?',
+   advisors:[
+    {who:'voivode',say:'Build. Every year without war is a year the walls get taller and the army gets better. We have perhaps twenty years.',stance:'hawk'},
+    {who:'spy',say:'Batu Khan will not return personally. He must consolidate in Mongolia. But his generals will be back. Probably within fifteen years.',stance:'intel'},
+    {who:'bishop',say:'This is not luck — this is divine providence. The death of a pagan king at exactly the right moment. That fact alone will fill every church in Poland with the faithful.',stance:'faith'},
+    {who:'treasurer',say:'The war destroyed fifteen years of accumulated wealth in nine months. We must rebuild the treasury before we rebuild the walls.',stance:'econ'},
+   ],
+   consequences:[{text:'Ögedei Khan dead — Mongol recall confirmed'},{text:'Poland has survived — the rebuild begins now'}],
+   choices:[
+    {text:'Declare a year of mourning and then rebuilding — frame the survival as the beginning, not the end.',hint:'Narrative leadership — the right story changes everything',cost:{pc:8},
+     outcome:{head:'The Year of Survival Becomes the Year of Beginning',body:'The Bishop of Kraków gave the sermon. The Duke spoke after him. The message was not "we survived" — it was "this is when Polish civilization begins." Every noble, every merchant, every farmer heard it differently. But everyone heard it as forward-looking rather than backward. The treasury was filled by voluntary contribution three months faster than the tax rolls could have done it.',deltas:{ap:+14,ec:+8,st:+12,al:+8,tension:-10,pc:+8,allies:{Church:+12}},
+     ripples:['Year of Survival declared — framed as a beginning','Voluntary contributions: Treasury filled 3 months faster than tax rolls','Church and duchy: Unified in purpose for first time in a generation','Foreign observers: Poland composing itself with unusual dignity'],
+     addIntel:'POLITICAL: Narrative leadership succeeded. Unity and treasury both strengthened.',
+     addLog:'Year of Survival declared. Unity and treasury both strengthened.',
+     legacy:{survival_narrative:true},
+     legacyConsequence:'Year of Survival: Poland framed its ordeal as a beginning — unity at maximum',
+     next:'resolve'}},
+    {text:'Begin the castle programme immediately — forty stone fortresses in five years.',hint:'Military priority — if they return this time Poland is ready',type:'hawk',cost:{pc:10},
+     outcome:{head:'The Castle Programme Begins',body:'Forty-two stone castles along every approach route. The first five were under construction before the Mongols had even fully withdrawn from Hungary. When Burundai\'s assessment column came in 1259, they counted the castles from the hilltops. They stopped counting at thirty and turned back.',deltas:{ap:+8,mi:+18,ec:-18,st:+10,tension:-20,al:+8,pc:+8},
+     ripples:['42 stone castles: Under construction along invasion routes','First five: Built before the Mongols left Hungary','1259 assessment: Burundai\'s column stopped counting at thirty','The programme became the model for all of central Europe'],
+     addIntel:'CONSTRUCTION: Castle programme begun. 42 fortresses along invasion routes.',
+     addLog:'Castle programme begun. 42 fortresses. 1259 assessment deterred.',
+     legacy:{castle_network:true},
+     legacyConsequence:'Castle Network: 42 stone fortifications — Poland defended against future invasions',
+     next:'resolve'}},
+    {text:'Seek a lasting peace treaty with the western Mongol khanate — use Batu\'s need for stability.',hint:'Batu needs the succession secured — he may want a stable western frontier',type:'dove',cost:{pc:11},
+     roll:{odds:0.55,failHead:'Batu Khan Refused — No Treaties With Those Who Resisted',failBody:'Batu Khan\'s reply was delivered by a courier: the Mongols did not make treaties with peoples they intended to eventually conquer. The attempt was noted. The note was filed. Twenty years later, Burundai\'s column was significantly larger than it would have been had the treaty not been attempted.',failDeltas:{ap:-10,st:-12,tension:+14,al:-12},failRipples:['Batu Khan: Refused — no treaties with resisters','Noted: The attempt was filed as evidence of weakness','Burundai\'s 1259 column: Larger than it might have been'],failNext:'resolve'},
+     outcome:{head:'Treaty of the Steppe — Twenty Years of Verified Peace',body:'Batu Khan, needing western stability while contesting the succession, accepted a framework: Poland would not attack Mongol territory, would pay a nominal annual tribute, and would be exempt from the next campaign. The tribute was insultingly small — symbolic. The peace was real.',deltas:{ap:+4,ec:-8,al:+8,tension:-25,pc:+8,allies:{Mongols:+12,Church:-8}},
+     ripples:['Treaty: 20 years of verified peace with the western khanate','Annual tribute: Nominal — symbolic rather than substantial','Church: Furious — called it commerce with pagans','Peace: Real and verified — twenty years to rebuild in safety'],
+     addIntel:'DIPLOMATIC: Treaty secured. 20 years of peace. Nominal tribute. Church furious.',
+     addLog:'Treaty secured. 20 years of peace. Nominal tribute. Church furious.',
+     legacy:{steppe_treaty:true},
+     legacyConsequence:'Steppe Treaty: 20-year peace with Mongols — nominal tribute, real security',
+     next:'resolve'}},
+   ,
+      {text:'Spend the winter celebrating — God has delivered Poland and the victory must be marked properly.',hint:'Using the survival winter for feasting instead of building is how Poland ends up in the same position in twenty years',cost:{pc:4},
+       outcome:{head:'Winter Spent in Celebration — Burundai Arrived to Find Nothing Built',body:'The winter of 1241 was one of feasting. The silver that should have built castles bought wine. The men who should have trained hunted. The walls that should have risen stayed at the same height they had been when the Mongols left. When Burundai arrived in 1259 with a full tumen to assess what Poland had become, he found it essentially unchanged from the Poland that had nearly been destroyed in 1241. He did not leave the same way he had come.',deltas:{ap:+5,ec:-8,st:-14,mi:-8,tension:+24},ripples:['Winter of 1241: Feasting and celebration — nothing built','Burundai arrived in 1259: Found nothing changed from 1241','Assessment: Poland is the same weakness it was','Burundai did not turn back — the assessment became an occupation'],
+       addIntel:'TERMINAL: Nothing built in eighteen years. Burundai found unchanged Poland. Assessment became invasion.',next:'rout_end'}}
+    ]
+  },
+  resolve:{tag:'RESOLVED'},rout_end:{tag:'ROUT'}
+}}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 9: MOHI AND BEYOND — The Long Return, 1241-1259
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+,// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREE 6: MOHI AND BEYOND
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{id:'MOHI',name:'The Long Retreat and the Long Return',nodes:{
+  start:{tag:'ENDGAME',tagCls:'tag-winter',title:'Winter 1241 — The Mongols Hold Hungary. What Becomes of Poland?',
+   body:'Subutai has destroyed the Hungarian army at Mohi and holds the Danube plain. Poland is behind him — neither fully conquered nor fully safe. But in the winter of 1241, the Great Khan Ögedei died in Mongolia. Batu Khan must return to the kurultai — the Mongol council — to contest the succession. The horde is being recalled. For Poland, this is the moment between catastrophe and possibility.',
+   advisors:[{who:'voivode',say:'Rebuild the army while they are gone. If they return — and they may — we must be different.',stance:'hawk'},{who:'bishop',say:'This winter is a gift from God. Use it to repair every church, every monastery, every hospital.',stance:'faith'},{who:'treasurer',say:'Trade must resume. The amber road, the cloth road — every day those routes are closed costs the duchy more than a battle.',stance:'econ'},{who:'spy',say:'Batu Khan will not return — the succession dispute is too important. We have perhaps twenty years. Use every day.',stance:'intel'},{who:'herald',say:'The kings of Europe are watching Poland. How you behave in weakness will determine who stands with you when strength returns.',stance:'dove'}],
+   consequences:[],
+   choices:[
+    {text:'Build a permanent defensive network — stone castles along every Mongol approach route.',hint:'Prevents the same disaster — but takes years and treasure',type:'hawk',cost:{pc:10},
+     outcome:{head:'The Castle Programme — Poland Prepares for Return',body:'Within five years, forty-two stone castles rose along the old invasion routes. Each could hold with a garrison of two hundred against a tumen without siege equipment. When Mongol raiding parties probed west in the 1250s, they found a different country. The raids stopped.',deltas:{ap:+10,mi:+18,ec:-18,st:+14,tension:-22,al:+10,pc:+10},ripples:['42 stone castles built along invasion routes in 5 years','1250s Mongol raids: Stopped at the castle network','Poland transformed from an open country to a defended one'],addIntel:'CONSTRUCTION: Castle network complete. 1250s raids stopped.',addLog:'42 castles built. Mongol raids of 1250s stopped.',legacy:{castle_network:true},legacyConsequence:'Castle Network: 42 stone fortifications — Poland defended against future invasions',next:'mo_endgame'}},
+    {text:'Reform the army — learn Mongol tactics, create mobile horse-archer units.',hint:'Fight them as they fight — unusual for Christian knights',cost:{pc:12},
+     outcome:{head:'The New Army — Poland Learns From Its Defeats',body:'Polish riders trained for two years with Cuman cavalry who had fought alongside and against the Mongols. They learned to use the feigned retreat. The new Polish light cavalry units were unlike anything in Europe. When the 1259 Mongol campaign came, Poland was the only country that fought them to a draw.',deltas:{ap:+8,mi:+22,st:+8,ec:-12,al:+10,pc:+8},ripples:['Cuman cavalry instructors hired to train Polish riders','New light cavalry: Unlike anything in Europe','1259 Mongol campaign: Poland fought them to a draw'],addIntel:'MILITARY: New cavalry tactics trained. 1259 campaign: Poland fought Mongols to a draw.',addLog:'Army reformed. Mongol tactics learned.',legacy:{new_army:true},legacyConsequence:'Military Reform: Polish cavalry learned Mongol tactics — fought 1259 to a draw',next:'mo_endgame'}},
+    {text:'Repair the Church and rebuild the towns — heal the duchy before strengthening it.',hint:'People before fortifications — loyalty is the deepest defense',type:'dove',cost:{pc:8,label:'CHURCH FAVOUR'},
+     outcome:{head:'The Healing of Poland — A Decade of Rebuilding',body:'Every church that had been burned was rebuilt. Every monastery that had been looted was restocked. The population — which had fled during the invasion — began returning. The duchy\'s population recovered in a decade rather than a generation.',deltas:{ap:+16,ec:-8,st:+16,al:+14,tension:-15,pc:-8,allies:{Church:+16}},ripples:['Every burned church rebuilt within 5 years','Population returned within a decade — not a generation','Duchy: Human capital preserved'],addIntel:'RECOVERY: Poland healed in a decade. Population returned.',addLog:'Poland healed. Every church rebuilt.',next:'mo_endgame'}},
+    {text:'Establish a permanent alliance with Hungary, Bohemia, and Silesia — a Christian defensive league.',hint:'The Mongols will test each country separately — they can only survive together',cost:{pc:12},
+     outcome:{head:'The Central European League — Three Kingdoms United',body:'The Treaty of Kraków established the first permanent military alliance between Poland, Hungary, and Bohemia. Each kingdom pledged to come to the others\' aid within thirty days. When the 1259 Mongol campaign probed the alliance, they found six countries mobilizing rather than one. They did not advance.',deltas:{ap:+10,al:+24,st:+10,tension:-25,pc:+8,allies:{Hungary:+18,Bohemia:+18,Silesia:+14,Teutonic:+12,Church:+8}},ripples:['Treaty of Kraków: Permanent alliance — Poland, Hungary, Bohemia','30-day mutual defense pledge','1259 Mongol campaign: Found six countries mobilizing — withdrew'],addIntel:'ALLIANCE: Treaty of Kraków signed. Six-country mobilization stopped 1259 campaign.',addLog:'Treaty of Kraków. Six-country alliance. 1259 campaign withdrew.',legacy:{krakow_treaty:true},legacyConsequence:'Treaty of Kraków: Central European alliance — six countries stopped the 1259 campaign',legacyDeltas:{al:+10,tension:-5},next:'mo_endgame'}},
+    {text:'Resettle the devastated borderlands — push Poland\'s frontier east.',hint:'Defensive depth — more Poland between Kraków and the Mongols',cost:{pc:10},
+     outcome:{head:'The Eastern Resettlement — Poland Expands',body:'A programme of deliberate settlement in the burned eastern lands began. German craftsmen, Jewish merchants, Armenian traders, and Polish peasants all received land grants. Within twenty years the eastern frontier was more populated than before the invasion.',deltas:{ap:+8,ec:+12,st:+8,al:+8,tension:-15,pc:+8},ripples:['Eastern settlement: German, Jewish, Armenian, and Polish settlers','Eastern frontier: More populated in 20 years than before the invasion','Trade: Amber road and eastern routes restored'],addIntel:'SETTLEMENT: Eastern resettlement programme successful. Trade restored.',addLog:'Eastern resettlement. Trade restored. Defensive depth created.',next:'mo_endgame'}},
+    {text:'Seek a papal crusade declaration — bring western military orders permanently to Poland.',hint:'Teutonic Knights and Hospitallers are the finest military in Christendom',cost:{pc:9,label:'CHURCH FAVOUR'},
+     outcome:{head:'Crusade Bull for Poland — The Orders Arrive',body:'Pope Innocent IV issued a crusade bull specifically for the defense of Poland. The Teutonic Knights expanded their Polish presence from dozens to hundreds. The Knights Hospitaller built a commandery at Kraków. Poland became a crusading destination — and the crusaders stayed.',deltas:{ap:+8,mi:+16,al:+14,tension:-12,pc:-10,allies:{Church:+14,Teutonic:+20,HRE:+8}},ripples:['Pope Innocent IV: Issued crusade bull for Poland','Teutonic Knights: Expanded presence from dozens to hundreds','Knights Hospitaller: Commandery at Kraków'],addIntel:'CRUSADE: Papal bull issued. Military orders permanently stationed.',addLog:'Crusade bull for Poland. Military orders permanently stationed.',next:'mo_endgame'}},
+      {text:'March into Hungary to relieve King Béla — commit everything to saving him.',hint:'Hungary has already lost its army. Marching into a Mongol-controlled plain is not relief — it is sacrifice.',cost:{pc:11},
+       outcome:{head:'Into the Mongol Plain — Béla Was Already Gone',body:'The relief column crossed the Carpathians in winter. When it emerged into the Hungarian plain, there were no Hungarians — only Mongol outriders who had been watching the passes. The column that left Poland to save Hungary never returned.',deltas:{ap:-18,mi:-25,st:-20,tension:+25,al:-8},ripples:['Relief column entered Hungarian plain — found Mongol outriders only','Béla: Already in Dalmatia — the column was riding toward absence','Poland\'s last force: Destroyed in Hungarian snow'],
+       addIntel:'TERMINAL: Relief column destroyed. Poland has no army left.',next:'rout_end'}},
+   ]
+  },
+  mo_endgame:{tag:'FINAL RECKONING · STAGE 2',tagCls:'tag-winter',title:'Anno Domini 1259 — The Second Mongol Wave Tests Everything You Built',
+   body:'Eighteen years after the great invasion, a second Mongol campaign enters Poland under Burundai. He is assessing what Poland became. The duchy you built, the alliances you forged, the walls you raised, the army you reformed — all of it is being measured right now. What he reports to the Khan will determine whether there is a third wave.',
+   advisors:[{who:'voivode',say:'Show him everything. Let him count the castles. If he reports we are too costly they will not come again.',stance:'hawk'},{who:'spy',say:'Burundai is not Subutai. He is looking for weakness. Give him an excuse to leave.',stance:'intel'},{who:'herald',say:'Receive him diplomatically. A general treated as a guest sees less than one treated as an enemy.',stance:'dove'}],
+   consequences:[],
+   choices:[
+    {text:'Mobilize the full army — let Burundai see twenty thousand swords assembled.',hint:'Show of strength — deters assessment from becoming invasion',type:'hawk',cost:{pc:10},
+     outcome:{head:'Burundai Counted the Swords and Left',body:'The Polish army assembled on the eastern plain in the finest order it had ever achieved. Burundai observed for three days from the eastern hills. Then he sent a rider with a written message: greetings from the Khan. Then his tumen turned east and rode away.',deltas:{ap:+14,mi:+8,st:+14,tension:-30,al:+12,pc:+12},ripples:['Burundai: Observed for 3 days — then left','No battle, no raid, nothing','Poland: Assessed as too costly to attack'],addIntel:'CONFIRMED: Burundai left without engagement. Poland too costly. No third wave.',addLog:'Burundai counted the swords and left. No attack.',legacy:{burundai_deterred:true},legacyConsequence:'Burundai Deterred: No third Mongol wave — the defenses worked',next:'resolve'}},
+    {text:'Offer Burundai hospitality — receive him formally and discuss permanent peace.',hint:'Diplomacy with a Mongol general — unusual but possible',type:'dove',cost:{pc:8},
+     outcome:{head:'The Guest Who Became an Ambassador',body:'Burundai accepted the hospitality. Three days of feasting, hunting, and formal discussion followed. What began as an assessment visit became an unofficial diplomatic congress. Burundai sent back to the Khan: Poland is not worth taking. It is worth knowing.',deltas:{ap:+10,al:+16,st:+10,tension:-25,pc:+10,allies:{Mongols:+14}},ripples:['Burundai accepted hospitality — three days of congress','Report to Khan: Poland not worth taking — worth knowing','Permanent Mongol envoy established at Kraków'],addIntel:'DIPLOMATIC: Burundai became unofficial ambassador. Envoy at Kraków.',addLog:'Burundai hosted. Diplomatic congress. Envoy at Kraków.',next:'resolve'}},
+    {text:'Ambush Burundai immediately — end the second wave before it can establish itself.',hint:'Aggressive — prevent assessment from becoming occupation',type:'hawk',cost:{pc:14,label:'HIGH RISK'},
+     roll:{odds:0.55,failHead:'Burundai Retreated Efficiently and Sent for Reinforcements',failBody:'The attack surprised Burundai but did not destroy his force. He retreated in the Mongol manner — efficiently, without panic, and with exact knowledge of what attacked him. His report to the Khan was precise: Poland has an army. It needs a full tumen to defeat. A full tumen will come.',failDeltas:{ap:-6,mi:-12,st:-6,tension:+20,al:-8},failRipples:['Burundai retreated efficiently — minimal losses','Report to Khan: Precise assessment of Polish strength','Third wave: Being considered'],failNext:'resolve'},
+     outcome:{head:'Burundai Destroyed — No Report Reaches the Khan',body:'The ambush was executed in the forest where the Mongols had once destroyed a Polish force. The irony was intentional. Burundai\'s entire tumen was destroyed. No report reached the Khan. For ten years the Mongols assessed Poland as unknown territory — and unknown territories are not invaded.',deltas:{ap:+10,mi:-8,st:+10,tension:-28,al:+8,pc:+8},ripples:['Burundai\'s tumen: Destroyed in forest ambush','No report reached the Khan — Poland unknown for 10 years','Forest ambush: Used Mongol technique against them'],addIntel:'MILITARY: Burundai destroyed. No report to Khan. Poland unknown for 10 years.',addLog:'Burundai ambushed and destroyed. No report to Khan.',next:'resolve'}},
+   ,
+      {text:'Attack Burundai\'s outriders immediately — show that Poland has teeth before the assessment begins.',hint:'Killing assessment outriders does not prevent the assessment — it ensures the assessment concludes with invasion',type:'hawk',cost:{pc:11},
+       outcome:{head:'Outriders Attacked — Burundai Completed His Assessment in Blood',body:'The outriders were killed at a river crossing. Burundai did not panic. He sent riders east with a report: Poland attacked the assessment force. The response came in six weeks: a full campaign force, not an assessment column. The Poland that had survived 1241 was destroyed in 1259 by the act that was meant to demonstrate it had survived.',deltas:{ap:-18,mi:-20,st:-18,tension:+30,al:-10},ripples:['Burundai sent his report east: Poland attacked the assessment','Full campaign force dispatched: Not assessment — invasion','The strength demonstration: Triggered the invasion it was meant to deter','Poland survived 1241 to be destroyed in 1259 by its own action'],
+       addIntel:'TERMINAL: Full campaign force dispatched in response to outrider attack. Invasion incoming.',next:'rout_end'}}
+    ]
+  },
+  resolve:{tag:'RESOLVED'},rout_end:{tag:'ROUT'}
+}}
+]; // end TREES
+</script>
+
+<script>
+function loadNextTree(){
+  if(S.treesDone.length>=TREES.length){triggerGameEnd();return;}
+  S.currentTree=TREES[S.treesDone.length];
+  S.stage=1;S.crisisCount++;S.day+=rnd(8,25);
+  if(S.day>365){S.year++;S.day=rnd(1,30);}
+  hideOutcome();clearDecisions();
+  document.getElementById('crisis-panel').style.display='none';
+  document.getElementById('advisor-panel').style.display='none';
+  document.getElementById('gameover').className='';
+  setLoad(true,'DISPATCHES ARRIVING FROM THE EAST…');
+  S.intel.forEach(it=>{it.isNew=false;it.age++;});
+  const gr=S.crisisCount<=2?5:S.crisisCount<=4?4:3;
+  S.ec=clamp(S.ec+gr);S.pc=clamp(S.pc+10);
+  setTimeout(()=>{
+    setLoad(false);renderProgress();
+    renderNode('start','DISPATCH','b-new');
+    addLog('TRIAL '+(S.treesDone.length+1)+' OF 6: '+S.currentTree.name,'neg');
+    addLog('Between battles: Grain +'+gr+', Favour +10','neu');
+    updateStats();
+  },1200);
+}
+
+function renderNode(nodeId,badge,badgeClass){
+  const node=S.currentTree.nodes[nodeId];
+  if(!node||node.tag==='RESOLVED'||node.tag==='ROUT')return;
+  S.currentNode=nodeId;clearDecisions();hideOutcome();
+  const eb=document.getElementById('esc-badge');eb.textContent=badge;eb.className='badge '+badgeClass;
+  const stages=['STAGE 1','STAGE 2','STAGE 3','STAGE 4'];
+  document.getElementById('stage-ind').textContent=stages[S.stage-1]||'STAGE '+S.stage;
+  document.getElementById('c-tag').textContent=node.tag;
+  document.getElementById('c-tag').className='cp-tag '+(node.tagCls||'tag-mil');
+  document.getElementById('c-title').textContent=node.title;
+  document.getElementById('c-body').textContent=node.body;
+  const cc=document.getElementById('c-consequences'),cl=document.getElementById('c-con-list');
+  const cons=(node.consequences||[]).concat(S.globalConsequences||[]);
+  if(cons.length>0){cl.innerHTML=cons.map(c=>'<div class="con-item">'+c.text+'</div>').join('');cc.style.display='block';}else{cc.style.display='none';}
+  document.getElementById('crisis-panel').style.display='block';
+  const card=document.getElementById('cp-card');card.style.animation='none';void card.offsetWidth;card.style.animation='pin .45s ease both';
+  if(node.advisors&&node.advisors.length>0){
+    const ap=document.getElementById('advisor-panel'),ar=document.getElementById('advisor-rows');
+    ar.innerHTML=node.advisors.map(a=>{
+      const adv=COUNCIL[a.who]||{name:a.who,role:'Councillor',emoji:'👤'};
+      return '<div class="adv-row"><div class="adv-avatar">'+adv.emoji+'</div><div class="adv-info"><div class="adv-name">'+adv.name+'</div><div class="adv-role">'+adv.role+'</div><div class="adv-quote">"'+a.say+'"</div><span class="adv-stance stance-'+a.stance+'">'+a.stance.toUpperCase()+'</span></div></div>';
+    }).join('');
+    ap.style.display='block';
+  }
+  const dc=document.getElementById('decisions');
+  const ltrs=['A','B','C','D','E','F'];
+  (node.choices||[]).forEach((ch,i)=>{
+    const isH=ch.type==='hawk',isCo=ch.cost&&ch.cost.label;
+    const btn=document.createElement('button');
+    btn.className='dec-btn'+(isH?' d-hawk':isCo?' d-costly':'');
+    const pcC=ch.cost&&ch.cost.pc?ch.cost.pc:0,canA=S.pc>=pcC;
+    if(!canA)btn.disabled=true;
+    const odds=ch.roll?ch.roll.odds:null;
+    let oC='',oL='';
+    if(odds!==null){
+      if(odds>=0.70){oC='odds-high';oL=Math.round(odds*100)+'% FAVOURED';}
+      else if(odds>=0.50){oC='odds-med';oL=Math.round(odds*100)+'% FAVOURED';}
+      else{oC='odds-low';oL=Math.round(odds*100)+'% FAVOURED';}
+    }
+    const lH='<div class="dec-letter"><span class="dl-main">'+ltrs[i]+'. </span>'
+      +(pcC>0&&canA?'<span class="dec-cost">−'+pcC+' FAVOUR'+(ch.cost.label?' · '+ch.cost.label:'')+'</span>':'')
+      +(pcC>0&&!canA?'<span class="dec-cost" style="background:#2d0000;color:#f88">NEED '+pcC+'</span>':'')
+      +'</div>';
+    btn.innerHTML=lH+'<div class="dec-text">'+ch.text+'</div>'
+      +(ch.hint?'<div class="dec-hint">⚠ '+ch.hint+'</div>':'')
+      +(odds!==null?'<div class="dec-odds '+oC+'"><span class="odds-label">🎲 '+oL+'</span><div class="odds-bar"><div class="odds-fill" style="width:'+Math.round(odds*100)+'%"></div></div></div>':'');
+    btn.onclick=()=>{if(!btn.disabled)pickChoice(ch,nodeId);};
+    dc.appendChild(btn);
+  });
+}
+
+function pickChoice(choice,fromNodeId){
+  if(S.gameOver)return;
+  disableDecisions();
+  if(choice.cost&&choice.cost.pc)S.pc=clamp(S.pc-choice.cost.pc);
+  let out=choice.outcome,rolled=null;
+  if(choice.roll){
+    const r=Math.random();
+    if(r>choice.roll.odds){
+      rolled='fail';
+      out={head:choice.roll.failHead||'The Plan Failed',body:choice.roll.failBody||'Events did not unfold as hoped.',deltas:choice.roll.failDeltas||{ap:-5,st:-8,tension:+12},ripples:choice.roll.failRipples||['The plan failed'],addIntel:choice.roll.failIntel||null,addLog:choice.roll.failLog||'The plan failed.',next:choice.roll.failNext||out.next};
+    }else{rolled='success';}
+  }
+  applyDeltas(out.deltas||{});
+  S.day+=rnd(3,10);
+  if(out.addIntel)addIntel('DISPATCH',out.addIntel);
+  if(out.addLog)addLog(out.addLog,'neg');
+  S.totalDecisions++;
+  S.history.push({day:S.day,label:'Council '+S.totalDecisions,crisis:S.currentTree.nodes[fromNodeId].title,result:out.head});
+  renderHistory();
+  const nextId=out.next||choice.next;
+  let nextLabel='';
+  if(nextId==='rout_end')nextLabel='⚔ The duchy cannot withstand what comes next…';
+  else if(nextId==='resolve')nextLabel='The trial has passed. But the horde is still moving.';
+  else nextLabel=out.deltas&&out.deltas.tension>0?'The situation grows more dire…':'Events shift…';
+  showOutcome(out,nextLabel,nextId,rolled);
+  document.getElementById('cont-btn').onclick=()=>{
+    if(nextId==='rout_end'){triggerRout();return;}
+    if(nextId==='resolve'){
+      const tIdx=TREES.indexOf(S.currentTree);
+      if(!S.treesDone.includes(tIdx))S.treesDone.push(tIdx);
+      if(out.legacy)for(const k in out.legacy)S.legacyFlags[k]=out.legacy[k];
+      if(out.legacyConsequence){S.globalConsequences.push({text:out.legacyConsequence,global:true});addIntel('LEGACY',out.legacyConsequence);}
+      if(out.legacyDeltas)applyDeltas(out.legacyDeltas);
+      renderProgress();checkGameOver();
+      if(!S.gameOver)loadNextTree();
+      return;
+    }
+    S.stage++;
+    const isE=!!(out.deltas&&out.deltas.tension>0);
+    hideOutcome();setLoad(true,isE?'THE HORDE ADVANCES…':'EVENTS UNFOLD…');
+    setTimeout(()=>{setLoad(false);renderNode(nextId,isE?'ESCALATING':'DEVELOPING',isE?'b-esc':'b-desc');},800);
+  };
+}
+
+function showOutcome(out,nextLabel,nextId,rolled){
+  const panel=document.getElementById('outcome-panel');
+  const er=panel.querySelector('.roll-result');if(er)er.remove();
+  if(rolled){
+    const rb=document.createElement('div');
+    rb.className='roll-result '+(rolled==='success'?'roll-success':'roll-fail');
+    rb.textContent=rolled==='success'?'🎲 GOD FAVOURED THE BOLD — The plan succeeded.':'🎲 GOD TESTED YOUR RESOLVE — The plan failed.';
+    panel.insertBefore(rb,panel.firstChild);
+  }
+  document.getElementById('o-head').textContent=out.head;
+  document.getElementById('o-body').textContent=out.body;
+  const lbls={ap:'People',ec:'Treasury',mi:'Swords',st:'Order',pc:'Favour',al:'Alliances',tension:'Horde Adv.',iq:'Scouts'};
+  const dd=document.getElementById('o-deltas');dd.innerHTML='';
+  const allD=Object.assign({},out.deltas||{});
+  for(const k in allD){
+    if(k==='allies')continue;const v=allD[k];if(v===0||v===undefined||v===null)continue;
+    const sp=document.createElement('span');
+    if(k==='tension')sp.className='delta '+(v>0?'dt-up':'dt-dn');else sp.className='delta '+(v>0?'dp':'dn');
+    sp.textContent=(lbls[k]||k)+': '+(v>0?'+':'')+v;dd.appendChild(sp);
+  }
+  if(allD.allies)for(const k in allD.allies){const v=allD.allies[k];if(!v)continue;const sp=document.createElement('span');sp.className='delta '+(v>0?'dp':'dn');sp.textContent=(S.allies[k]?S.allies[k].emoji:'')+' '+(S.allies[k]?S.allies[k].name:k)+': '+(v>0?'+':'')+v;dd.appendChild(sp);}
+  const ripples=out.ripples||[],rp=document.getElementById('o-ripples'),rl=document.getElementById('o-ripple-list');
+  if(ripples.length>0){rl.innerHTML=ripples.map(r=>'<div class="ripple-item">▶ '+r+'</div>').join('');rp.style.display='block';ripples.forEach(r=>addLog(r,'neg'));}else rp.style.display='none';
+  document.getElementById('o-next').textContent=nextLabel;
+  const cb=document.getElementById('cont-btn');
+  cb.textContent=nextId==='rout_end'?'THE DUCHY IS BROKEN ⚔':nextId==='resolve'?'THE TRIAL PASSES →':'CONTINUE →';
+  panel.style.display='block';panel.classList.add('show');
+}
+
+function hideOutcome(){const p=document.getElementById('outcome-panel');p.style.display='none';p.classList.remove('show');}
+function clearDecisions(){document.getElementById('decisions').innerHTML='';}
+function disableDecisions(){document.querySelectorAll('.dec-btn').forEach(b=>b.disabled=true);}
+
+function checkGameOver(){
+  if(S.gameOver||S.nuked)return;
+  if(S.ap<=12){S.gameOver=true;triggerCollapse('people');}
+  else if(S.st<=10){S.gameOver=true;triggerCollapse('order');}
+  else if(S.ec<=8){S.gameOver=true;triggerCollapse('treasury');}
+}
+
+function triggerCollapse(r){
+  const t={people:'The People Have Abandoned the Duke — The Duchy Is Without a Lord',order:'The Duchy Has Fractured — Nobles Rule Their Own Fiefs',treasury:'The Treasury Is Empty — The Army Has Gone Home'};
+  const b={people:'With fewer than one in ten people remaining loyal, the Duke\'s authority dissolved. The nobility stopped attending council. The soldiers stopped following orders. The Mongols did not destroy the duchy — the duchy destroyed itself.',order:'With order collapsed, every lord in Poland rules his own land. The unified duchy of Kraków is no more. The Mongols did not need to conquer a united Poland — there is no united Poland to conquer.',treasury:'Without silver to pay the army, the soldiers went home. Without soldiers, the walls mean nothing. The Mongols, when they came, found a city that had already surrendered to poverty.'};
+  showEndScreen(t[r]||'The Duchy Has Fallen',b[r]||'The trial was too great.');
+}
+
+function triggerGameEnd(){
+  S.gameOver=true;
+  if(S.treesDone.length>=9&&!S.nuked){triggerVictory();return;}
+  const avg=Math.round((S.ap+S.ec+S.mi+S.st+S.pc+S.al)/6);
+  let title,body;
+  if(avg>=65){title='A Duchy Forged in Fire';body='You faced the greatest military force the world had ever seen and you did not break. The Duchy of Kraków survives. Future generations will inherit what you built in the worst years in Polish history.';}
+  else if(avg>=48){title='Survival at Great Cost';body='Poland endured. The costs were enormous — churches burned, knights dead, silver spent. But the duchy stands. History will record what was lost. It will also record that it was not everything.';}
+  else{title='A Diminished Duchy';body='The duchy survived, technically. The walls are thinner, the alliances fractured, the people fewer than before. The Mongols may not return. But the Poland they leave behind is smaller than the Poland they found.';}
+  showEndScreen(title,body);
+}
+
+function triggerVictory(){
+  const avg=Math.round((S.ap+S.ec+S.mi+S.st+S.pc+S.al)/6);
+  const grades=[
+    {min:72,grade:'S',color:'#c8a030',title:'The Iron Duke of Kraków',body:'You guided the Duchy of Kraków through the greatest catastrophe medieval Europe had ever faced and you emerged stronger than you entered. Nine trials. Nine survived. The Mongols, when Burundai assessed Poland, saw a country that had learned from its wounds. They did not come back in force. Your name will be remembered for as long as Kraków stands.'},
+    {min:55,grade:'A',color:'#b0d0a0',title:'A Worthy Duke',body:'Nine trials. Nine survived. The duchy is intact. Some scars remain — a burned eastern quarter, a depleted treasury, a generation of knights who did not return from Legnica. But the walls stand, the Church serves, the people remain loyal. History will say you were the right duke for the worst winter.'},
+    {min:40,grade:'B',color:'#a0c0d0',title:'Poland Endures',body:'The six trials nearly broke you several times. You survived each by making the choices that were possible, not the choices that were ideal. Poland endures. What you leave your successors is diminished but real. They will rebuild from what you preserved.'},
+    {min:0,grade:'C',color:'#c0b080',title:'The Duchy Survived Its Duke',body:'Nine trials. Six survived — but only just. The duchy that emerges from this winter is smaller, poorer, and more fragile than the one that entered it. The chroniclers will note the survival. They will also note the condition of the survivor.'}
+  ];
+  const r=grades.find(x=>avg>=x.min)||grades[grades.length-1];
+  document.getElementById('crisis-panel').style.display='none';
+  document.getElementById('advisor-panel').style.display='none';
+  clearDecisions();hideOutcome();
+  const go=document.getElementById('gameover');
+  const bcs={SCOUTS:'#9070a0',SIERADZ:'#4080a0',CHMIEL:'#a04020',KRAKOW:'#8b3a1a',LEGNICA:'#c0392b',MOHI:'#205080'};
+  const fstats=[['People',S.ap],['Treasury',S.ec],['Swords',S.mi],['Order',S.st],['Favour',S.pc],['Alliances',S.al],['Horde',S.tension],['Councils',S.totalDecisions]];
+  go.innerHTML=`
+    <div style="text-align:center;margin-bottom:18px;">
+      <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:.35em;color:var(--gold);margin-bottom:6px;text-transform:uppercase;">All Nine Trials Survived — Anno Domini 1259</div>
+      <div style="font-family:'UnifrakturMaguntia',serif;font-size:56px;color:${r.color};line-height:1;text-shadow:0 0 30px ${r.color}88;">${r.grade}</div>
+      <div style="font-family:'Cinzel Decorative',serif;font-size:11px;color:${r.color};margin-top:6px;letter-spacing:.1em;">${r.title}</div>
+    </div>
+    <p style="font-size:13px;line-height:1.75;color:#3a2a10;font-style:italic;margin-bottom:16px;padding:12px 16px;background:rgba(0,0,0,.04);border-left:3px solid var(--gold);">${r.body}</p>
+    <div style="margin-bottom:14px;">
+      <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:.2em;color:var(--gold);margin-bottom:8px;border-bottom:1px solid #2a1e0a;padding-bottom:4px;text-transform:uppercase;">Final Record of the Duchy</div>
+      <div class="final-grid" id="fgv"></div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:.2em;color:var(--gold);margin-bottom:8px;border-bottom:1px solid #2a1e0a;padding-bottom:4px;text-transform:uppercase;">The Nine Trials Survived</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">${CRISIS_ORDER.map(c=>`<div style="font-family:'Cinzel',serif;font-size:8px;padding:4px 10px;border-radius:2px;border:1px solid ${bcs[c.id]||'#888'};color:${bcs[c.id]||'#888'};">✝ ${c.label}</div>`).join('')}</div>
+    </div>
+    <button class="btn-continue" onclick="location.reload()">RIDE AGAIN</button>
+  `;
+  document.getElementById('fgv').innerHTML=fstats.map(([l,v])=>'<div class="final-stat"><div class="fs-lbl">'+l+'</div><div class="fs-val">'+v+'</div></div>').join('');
+  go.classList.add('show');
+}
+
+function showEndScreen(title,body){
+  document.getElementById('crisis-panel').style.display='none';
+  document.getElementById('advisor-panel').style.display='none';
+  clearDecisions();hideOutcome();
+  document.getElementById('go-title').textContent=title;
+  document.getElementById('go-body').textContent=body;
+  const fstats=[['People',S.ap],['Treasury',S.ec],['Swords',S.mi],['Order',S.st],['Favour',S.pc],['Alliances',S.al],['Trials',S.crisisCount],['Councils',S.totalDecisions]];
+  document.getElementById('final-grid').innerHTML=fstats.map(([l,v])=>'<div class="final-stat"><div class="fs-lbl">'+l+'</div><div class="fs-val">'+v+'</div></div>').join('');
+  document.getElementById('gameover').classList.add('show');
+}
+
+function triggerRout(){
+  S.gameOver=true;S.nuked=true;
+  const sc=ROUTS[Math.floor(Math.random()*ROUTS.length)];
+  document.getElementById('rout-sub').textContent=sc.sub;
+  document.getElementById('rout-desc').textContent=sc.desc;
+  document.getElementById('rout-screen').classList.add('show');
+  const fl=document.getElementById('rout-flash');
+  let f=0;const fi=setInterval(()=>{fl.style.opacity=f%2===0?'0.9':'0';f++;if(f>8)clearInterval(fi);},150);
+  let secs=rnd(8,14);document.getElementById('rout-cdown').textContent=secs;
+  const ci=setInterval(()=>{secs--;document.getElementById('rout-cdown').textContent=Math.max(0,secs);if(secs<=0)clearInterval(ci);},1000);
+}
+
+// INIT
+updateStats();renderLog();renderIntel();renderNobles();renderProgress();loadNextTree();
+</script>
+</body>
+</html>
