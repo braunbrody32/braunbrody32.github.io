@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main Page - Baroon's Stuff</title>
+    <link rel="icon" type="image/x-icon" href="appimages/lebron.jpeg">
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #000000;
+            margin: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* The background canvas */
+        #myCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1; /* Pushes it behind everything */
+        }
+
+        /* Content styling */
+        .content {
+            position: relative;
+            z-index: 1; /* Ensures links stay clickable and on top */
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        h1, h3, p {
+            color: white;
+            text-shadow: 0px 0px 10px rgba(0,0,0,0.8); /* Helps readability */
+        }
+
+        .icon-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 800px;
+            margin-top: 40px;
+        }
+
+        img {
+            width: 100px;
+            height: 100px;
+            transition: transform 0.2s;
+            border-radius: 10px;
+        }
+
+        img:hover {
+            transform: scale(1.3);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Canvas -->
+    <canvas id="myCanvas"></canvas>
+
+    <!-- UI Content -->
+    <div class="content">
+        <h1>Home Page</h1>
+        <h3>of Baroon's Stuff t</h3>
+
+        <div class="icon-container">
+            <a href="mongol_sim.html"><img src="khan.jpeg" alt="mongol"></a>
+            <a href="us_crisis_sim.html"><img src="kaboom.jpeg" alt="america"></a>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Match canvas size to window size
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        let z = 0;
+        let mouseX = -1000;
+        let mouseY = -1000;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        const p = new Uint8Array(512);
+        const permutation = new Uint8Array(256).map(() => Math.floor(Math.random() * 256));
+        for (let i = 0; i < 512; i++) p[i] = permutation[i & 255];
+
+        function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+        function lerp(t, a, b) { return a + t * (b - a); }
+        function grad(hash, x, y, z) {
+            const h = hash & 15;
+            const u = h < 8 ? x : y, v = h < 4 ? y : h === 12 || h === 14 ? x : z;
+            return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+        }
+
+        function noise(x, y, z) {
+            const X = Math.floor(x) & 255, Y = Math.floor(y) & 255, Z = Math.floor(z) & 255;
+            x -= Math.floor(x); y -= Math.floor(y); z -= Math.floor(z);
+            const u = fade(x), v = fade(y), w = fade(z);
+            const A = p[X] + Y, AA = p[A] + Z, AB = p[A + 1] + Z, B = p[X + 1] + Y, BA = p[B] + Z, BB = p[B + 1] + Z;
+            return lerp(w, lerp(v, lerp(u, grad(p[AA], x, y, z), grad(p[BA], x - 1, y, z)), lerp(u, grad(p[AB], x, y - 1, z), grad(p[BB], x - 1, y - 1, z))), lerp(v, lerp(u, grad(p[AA + 1], x, y, z - 1), grad(p[BA + 1], x - 1, y, z - 1)), lerp(u, grad(p[AB + 1], x, y - 1, z - 1), grad(p[BB + 1], x - 1, y - 1, z - 1))));
+        }
+
+        function draw() {
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const scale = 0.01;
+            const step = 10; // Slightly larger steps for performance
+            const radius = 100;
+
+            for (let x = 0; x < canvas.width; x += step) {
+                for (let y = 0; y < canvas.height; y += step) {
+                    const dx = x - mouseX;
+                    const dy = y - mouseY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < radius) {
+                        let val = noise(x * scale, y * scale, z);
+                        let strength = Math.max(0, 1 - (distance / radius));
+                        strength = Math.pow(strength, 2) * 5;
+                        
+                        let r = (Math.sin(val * 3 + z) * 127 + 128) * strength;
+                        let g = (Math.sin(val * 3 + z + 2) * 127 + 128) * strength;
+                        let b = (Math.sin(val * 3 + z + 4) * 127 + 128) * strength;
+                        
+                        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                        ctx.fillRect(x, y, step, step);
+                    }
+                }
+            }
+            z += 0.1;
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
+</body>
+</html>
