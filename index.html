@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Main Page - LeBraun's Stuff</title>
     <link rel="icon" type="image/x-icon" href="appimages/lebron.jpeg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles:wght@400;700&family=Playpen+Sans+Deva:wght@100..800&family=Wallpoet&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: sans-serif;
@@ -168,6 +171,13 @@
             font-size: 13px;
             word-spacing: 1px;
         }
+
+        #clock {
+            color: white;
+            font-family: "Wallpoet", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
     </style>
 </head>
 <body>
@@ -230,7 +240,8 @@
         <div id="sfc3nhl48s8qmcm7dtct45atsfb86ae7uty"></div>
         <script type="text/javascript" src="https://optistats.ovh" async></script>
         <h1>Home Page</h1>
-        <h3>of LeBraun's Stuff t</h3>
+        <h3>of LeBraun's Stuff</h3>
+        <h2 id="clock">00:00:00</h2>
         
         <div class="icon-container">
             <a href="BraunsSandbox/index.html"><img src="appimages/auracat.png" alt="Sandbox"></a>
@@ -252,6 +263,23 @@
         const themeSelect = document.getElementById('themeSelect');
         const resetThemeBtn = document.getElementById('resetThemeBtn');
         const gifUrl = 'https://media.tenor.com/9Wq8TgrN4qEAAAAM/patriotism-patriotic.gif';
+
+        function updateClock() {
+            const now = new Date();
+            let h = now.getHours();
+            let m = now.getMinutes();
+            let s = now.getSeconds();
+
+            // Add leading zeros if needed
+            h = h < 10 ? "0" + h : h;
+            m = m < 10 ? "0" + m : m;
+            s = s < 10 ? "0" + s : s;
+
+            document.getElementById('clock').innerText = `${h}:${m}:${s}`;
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock(); 
 
         // Theme structures & defaults definitions
         const panels = {
